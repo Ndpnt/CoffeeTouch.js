@@ -1,10 +1,33 @@
 (function() {
   var $;
-  Object.prototype.bind = function(ev, callback) {
-    var calls, list;
+  Object.prototype.bind = function(eventName, callback) {
+    var calls, evtName, list, that, _i, _len, _ref;
     calls = this._callbacks || (this._callbacks = {});
-    list = this._callbacks[ev] || (this._callbacks[ev] = []);
+    list = this._callbacks[eventName] || (this._callbacks[eventName] = []);
     list.push(callback);
+    that = this;
+    this.touchProperties = {};
+    this.touchProperties.dateLastTouch = 0;
+    this.addEventListener('touchstart', function(event) {
+      var _t;
+      this.touchProperties.isTouched = true;
+      this.trigger("tap");
+      _t = (new Date()).getTime();
+      if ((_t - this.touchProperties.dateLastTouch) < 500) {
+        this.trigger("doubletap");
+      }
+      this.touchProperties.dateLastTouch = _t;
+      return setTimeout(function() {
+        if (that.touchProperties.isTouched === true) {
+          return that.trigger("press");
+        }
+      }, 500);
+    });
+    _ref = ['touchcancel', 'touchend'];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      evtName = _ref[_i];
+      this.touchProperties.isTouched = false;
+    }
     return this;
   };
   Object.prototype.unbind = function(ev, callback) {
@@ -51,26 +74,14 @@ Object.prototype.trigger =  function(ev) {
     return document.getElementById(element);
   };
   window.onload = function() {
-    var t;
-    t = new Date();
-    $('blue').bind("doubletap", function() {
+    $('blue').bind("tap", function() {
+      return alert("I've been taped");
+    });
+    $('white').bind("doubletap", function() {
       return alert("I've been double taped");
     });
-    $('blue').addEventListener('click', function(event) {
-      var _t;
-      _t = new Date();
-      if ((_t.getTime() - t.getTime()) < 500) {
-        this.trigger("doubletap");
-      }
-      return t = _t;
-      /*
-      		panX = panY = 0
-      		f1 = event.touches[0]
-      		alert event.touches.length		
-      		*/
-    });
-    return $('red').addEventListener('touchstart', function(event) {
-      return alert(toto);
+    return $('red').bind("press", function() {
+      return alert("I've been pressed");
     });
   };
 }).call(this);

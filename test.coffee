@@ -1,13 +1,51 @@
-Object::bind = (ev, callback) ->
-	calls = @._callbacks or @._callbacks = {}
-	list = @._callbacks[ev] or @._callbacks[ev] = []
+###
+## The bind, unbind and trigger function have been taken from Backbone Framework.
+## The bind function has been changed
+###
+
+Object::bind = (eventName, callback) ->
+	calls = @_callbacks or @_callbacks = {}
+	list = @_callbacks[eventName] or @_callbacks[eventName] = []
 	list.push callback
+### 
+## Modifications start here
+###
+
+	that = this
+	## Initializing specific properties for this given object
+	@touchProperties = {};
+	@touchProperties.dateLastTouch = 0
+	
+	this.addEventListener 'touchstart', (event) ->
+		@touchProperties.isTouched = true
+
+		## Tap
+		## If a simple tap is done, trigger "tap"
+		this.trigger "tap"
+
+		## Double Tap
+		## If two tap are separated from 500 ms, trigger "doubletap"
+		_t = (new Date()).getTime()
+		if (_t - @touchProperties.dateLastTouch) < 500
+			this.trigger "doubletap"
+		@touchProperties.dateLastTouch = _t
+		
+		## Press
+		setTimeout(-> 
+			if that.touchProperties.isTouched == true
+				that.trigger "press"
+		, 500);
+
+	
+	for evtName in ['touchcancel','touchend']
+		@touchProperties.isTouched = false
+	
 	return this
 
 Object::unbind = (ev, callback) ->
 	if !ev
-		@._callbacks = {}
-	else if calls = @._callbacks
+		@_callbacks = {}
+	else if calls = @_callbacks
 		if !callback
 			calls[ev] = []
 		else
@@ -19,7 +57,6 @@ Object::unbind = (ev, callback) ->
 					list.splice(i, 1)
 					break
 	return this
-
 
 `
 Object.prototype.trigger =  function(ev) {
@@ -41,22 +78,16 @@ Object.prototype.trigger =  function(ev) {
 
 $ = (element) ->
 	document.getElementById element
-
+###
+## Exemple of use
+###
 window.onload = ->
-	t = new Date()
-	$('blue').bind "doubletap", ->
+	
+	$('blue').bind "tap", ->
+		alert "I've been taped"
+
+	$('white').bind "doubletap", ->
 		alert "I've been double taped"
 
-	$('blue').addEventListener 'click', (event) ->
-		_t = new Date()
-		if (_t.getTime() - t.getTime()) < 500
-			this.trigger "doubletap"
-		t = _t
-		###
-		panX = panY = 0
-		f1 = event.touches[0]
-		alert event.touches.length		
-		###
-
-	$('red').addEventListener 'touchstart', (event) ->
-		alert toto
+	$('red').bind "press", ->
+		alert "I've been pressed"
