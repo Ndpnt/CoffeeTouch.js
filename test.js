@@ -1,10 +1,16 @@
 (function() {
-  var $;
+  /*
+  ## The bind, unbind and trigger function have been taken from Backbone Framework.
+  ## The bind function has been changed
+  */  var $;
   Object.prototype.bind = function(eventName, callback) {
     var calls, evtName, list, that, _i, _len, _ref;
     calls = this._callbacks || (this._callbacks = {});
     list = this._callbacks[eventName] || (this._callbacks[eventName] = []);
     list.push(callback);
+    /* 
+    	## Modifications start here
+    	*/
     that = this;
     this.touchProperties = {};
     this.touchProperties.dateLastTouch = 0;
@@ -13,7 +19,7 @@
       this.touchProperties.isTouched = true;
       this.trigger("tap");
       _t = (new Date()).getTime();
-      if ((_t - this.touchProperties.dateLastTouch) < 500) {
+      if ((_t - this.touchProperties.dateLastTouch) < 1000) {
         this.trigger("doubletap");
       }
       this.touchProperties.dateLastTouch = _t;
@@ -21,7 +27,7 @@
         if (that.touchProperties.isTouched === true) {
           return that.trigger("press");
         }
-      }, 500);
+      }, 5000);
     });
     _ref = ['touchcancel', 'touchend'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -73,6 +79,9 @@ Object.prototype.trigger =  function(ev) {
   $ = function(element) {
     return document.getElementById(element);
   };
+  /*
+  ## Exemple of use
+  */
   window.onload = function() {
     $('blue').bind("tap", function() {
       return alert("I've been taped");

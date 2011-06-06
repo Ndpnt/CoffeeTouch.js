@@ -22,7 +22,7 @@ class GenericState
 	touchmove: -> #throw "undefined"
 	touchend: -> #throw "undefined"
 
-	xthrow: (name, params) -> $("debug").innerHTML = "throw " + name + " params: " + @param + "\n" + $("debug").innerHTML #Futur trigger
+	xthrow: (name, params) -> $("debug").innerHTML = "throw " + name + " params: " + @param.initX + "\n" + $("debug").innerHTML #Futur trigger
 
 
 
