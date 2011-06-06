@@ -7,9 +7,9 @@ Object::bind = (eventName, callback) ->
 	calls = @_callbacks or @_callbacks = {}
 	list = @_callbacks[eventName] or @_callbacks[eventName] = []
 	list.push callback
-### 
-## Modifications start here
-###
+	### 
+	## Modifications start here
+	###
 
 	that = this
 	## Initializing specific properties for this given object
@@ -26,7 +26,7 @@ Object::bind = (eventName, callback) ->
 		## Double Tap
 		## If two tap are separated from 500 ms, trigger "doubletap"
 		_t = (new Date()).getTime()
-		if (_t - @touchProperties.dateLastTouch) < 500
+		if (_t - @touchProperties.dateLastTouch) < 1000
 			this.trigger "doubletap"
 		@touchProperties.dateLastTouch = _t
 		
@@ -34,7 +34,7 @@ Object::bind = (eventName, callback) ->
 		setTimeout(-> 
 			if that.touchProperties.isTouched == true
 				that.trigger "press"
-		, 500);
+		, 5000);
 
 	
 	for evtName in ['touchcancel','touchend']

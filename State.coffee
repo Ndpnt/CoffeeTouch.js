@@ -15,14 +15,14 @@ class GenericState
 		else
 			@param = {}
 		this.init()
-	apply: (event) ->
-		this[event](@param)	
+	apply: (event, param) ->
+		this[event](param)	
 
 	touchstart: -> #throw "undefined"
 	touchmove: -> #throw "undefined"
 	touchend: -> #throw "undefined"
 
-	xthrow: (name, params) -> $("debug").innerHTML = "throw " + name + " params: " + @params + "\n" + $("debug").innerHTML #Futur trigger
+	xthrow: (name, params) -> $("debug").innerHTML = "throw " + name + " params: " + @param.initX + "\n" + $("debug").innerHTML #Futur trigger
 
 
 
@@ -91,9 +91,9 @@ window.onload = ->
 	$("body").addEventListener "mouseup", (event) -> machine.apply("touchend")
 	$("body").addEventListener "mousemove", (event) -> machine.apply("touchmove")
 
-	$("body").addEventListener "touchstart", (event) -> machine.apply("touchstart")
-	$("body").addEventListener "touchend", (event) -> machine.apply("touchend")
-	$("body").addEventListener "touchmove", (event) -> machine.apply("touchmove")
+	$("body").addEventListener "touchstart", (event) -> machine.apply("touchstart", event)
+	$("body").addEventListener "touchend", (event) -> machine.apply("touchend", event)
+	$("body").addEventListener "touchmove", (event) -> machine.apply("touchmove", event)
 
 
 
