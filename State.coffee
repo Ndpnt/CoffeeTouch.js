@@ -15,21 +15,21 @@ class GenericState
 		else
 			@param = {}
 		this.init()
-	apply: (event) ->
-		this[event](@param)	
+	apply: (event, param) ->
+		this[event](param)	
 
 	touchstart: -> #throw "undefined"
 	touchmove: -> #throw "undefined"
 	touchend: -> #throw "undefined"
 
-	xthrow: (name, params) -> $("debug").innerHTML = "throw " + name + " params: " + @params + "\n" + $("debug").innerHTML #Futur trigger
+	xthrow: (name, params) -> $("debug").innerHTML = "throw " + name + " params: " + @param + "\n" + $("debug").innerHTML #Futur trigger
 
 
 
 class NoTouch extends GenericState
 	description: -> "NoTouch state"
 	touchstart: (event) ->
-		@param.initX = event.touches[0].clientX
+		@param.initX = event
 		@param.llsdfsdf = "ok"
 		@machine.setState(new FirstTouch @machine)
 		
@@ -87,13 +87,13 @@ Object::bind = (eventName, callback) ->
 
 window.onload = ->
 	machine = new StateMachine
-	$("body").addEventListener "mousedown", (event) -> machine.apply("touchstart")
-	$("body").addEventListener "mouseup", (event) -> machine.apply("touchend")
-	$("body").addEventListener "mousemove", (event) -> machine.apply("touchmove")
+	$("body").addEventListener "mousedown", (event) -> machine.apply("touchstart", event)
+	$("body").addEventListener "mouseup", (event) -> machine.apply("touchend", event)
+	$("body").addEventListener "mousemove", (event) -> machine.apply("touchmove", event)
 
-	$("body").addEventListener "touchstart", (event) -> machine.apply("touchstart")
-	$("body").addEventListener "touchend", (event) -> machine.apply("touchend")
-	$("body").addEventListener "touchmove", (event) -> machine.apply("touchmove")
+	$("body").addEventListener "touchstart", (event) -> machine.apply("touchstart", event)
+	$("body").addEventListener "touchend", (event) -> machine.apply("touchend", event)
+	$("body").addEventListener "touchmove", (event) -> machine.apply("touchmove", event)
 
 
 
