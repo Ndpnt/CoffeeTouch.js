@@ -1,5 +1,11 @@
 (function() {
-  var $, Drag, FirstTouch, FirstTouchDouble, GenericState, NoTouch, NoTouchDouble, StateMachine, xthrow;
+  /*
+  	tap
+  	doubletap
+  	drag
+  	dragend
+  
+  */  var $, Analyser, Drag, FirstTouch, FirstTouchDouble, GenericState, NoTouch, NoTouchDouble, StateMachine;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -11,9 +17,10 @@
   StateMachine = (function() {
     function StateMachine() {
       this.currentState = new NoTouch(this);
+      this.analyser = new Analyser;
     }
-    StateMachine.prototype.apply = function(event, param) {
-      return this.currentState.apply(event, param);
+    StateMachine.prototype.apply = function(eventName, eventObj) {
+      return this.currentState.apply(eventName, eventObj);
     };
     StateMachine.prototype.setState = function(newState) {
       return this.currentState = newState;
@@ -37,14 +44,17 @@
       }
       this.init();
     }
-    GenericState.prototype.apply = function(event) {
-      return this[event](this.param);
+    GenericState.prototype.apply = function(eventName, eventObj) {
+      this.eventObj = eventObj;
+      return this[eventName](this.eventObj);
     };
     GenericState.prototype.touchstart = function() {};
     GenericState.prototype.touchmove = function() {};
     GenericState.prototype.touchend = function() {};
-    GenericState.prototype.xthrow = function(name, params) {
-      return $("debug").innerHTML = "throw " + name + " params: " + this.params + "\n" + $("debug").innerHTML;
+    GenericState.prototype.xthrow = function(name) {
+      this.param.nbFingers = this.eventObj.touches.length;
+      $("debug").innerHTML = "throw " + name + " param: " + dump(this.param) + "\n" + $("debug").innerHTML;
+      return this.machine.analyser.add(name, this.param);
     };
     return GenericState;
   })();
@@ -57,8 +67,6 @@
       return "NoTouch state";
     };
     NoTouch.prototype.touchstart = function(event) {
-      this.param.initX = event.touches[0].clientX;
-      this.param.llsdfsdf = "ok";
       return this.machine.setState(new FirstTouch(this.machine));
     };
     return NoTouch;
@@ -71,8 +79,12 @@
     FirstTouch.prototype.description = function() {
       return "FirstTouch state";
     };
+    FirstTouch.prototype.init = function() {
+      this.param.initX = event.touches[0].clientX;
+      return this.param.initY = event.touches[0].clientY;
+    };
     FirstTouch.prototype.touchend = function() {
-      this.xthrow("@tap", this.params);
+      this.xthrow("@tap");
       return this.machine.setState(new NoTouchDouble(this.machine));
     };
     FirstTouch.prototype.touchmove = function() {
@@ -124,6 +136,8 @@
       return "Drag state";
     };
     Drag.prototype.touchmove = function() {
+      this.param.currentX = event.touches[0].clientX;
+      this.param.currentY = event.touches[0].clientY;
       return this.xthrow("@drag");
     };
     Drag.prototype.touchend = function() {
@@ -132,9 +146,34 @@
     };
     return Drag;
   })();
-  xthrow = function(name, params) {
-    return $("debug").innerHTML = "throw " + name + "params: " + params + "\n" + $("debug").innerHTML;
-  };
+  
+function dump(arr,level) {
+		var dumped_text = "["
+		for(var item in arr) {
+			var value = arr[item];
+			if(typeof(value)=='function') continue;
+			dumped_text += item + "=" + value + " ";
+		}
+
+	return dumped_text + "]";
+}
+;
+  Analyser = (function() {
+    function Analyser() {
+      this.fingerArray = [];
+      this.size = 0;
+    }
+    Analyser.prototype.add = function(name, param) {
+      this.fingerArray.push(param);
+      if (this.fingerArray.length === param.nbFingers) {
+        return this.analyse();
+      }
+    };
+    Analyser.prototype.analyse = function() {
+      return alert("J'analyse");
+    };
+    return Analyser;
+  })();
   $ = function(element) {
     return document.getElementById(element);
   };
@@ -148,22 +187,22 @@
     var machine;
     machine = new StateMachine;
     $("body").addEventListener("mousedown", function(event) {
-      return machine.apply("touchstart");
+      return machine.apply("touchstart", event);
     });
     $("body").addEventListener("mouseup", function(event) {
-      return machine.apply("touchend");
+      return machine.apply("touchend", event);
     });
     $("body").addEventListener("mousemove", function(event) {
-      return machine.apply("touchmove");
+      return machine.apply("touchmove", event);
     });
     $("body").addEventListener("touchstart", function(event) {
-      return machine.apply("touchstart");
+      return machine.apply("touchstart", event);
     });
     $("body").addEventListener("touchend", function(event) {
-      return machine.apply("touchend");
+      return machine.apply("touchend", event);
     });
     return $("body").addEventListener("touchmove", function(event) {
-      return machine.apply("touchmove");
+      return machine.apply("touchmove", event);
     });
   };
 }).call(this);

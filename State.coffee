@@ -1,6 +1,16 @@
+###
+	tap
+	doubletap
+	drag
+	dragend
+
+###
+
 class StateMachine
-	constructor:-> @currentState = new NoTouch(this)
-	apply: (event, param) -> @currentState.apply(event, param)
+	constructor:-> 
+		@currentState = new NoTouch(this)
+		@analyser = new Analyser
+	apply: (eventName, eventObj) -> @currentState.apply(eventName, eventObj)
 	setState: (newState) -> @currentState = newState
 	getState: -> @currentState
 	
@@ -15,30 +25,35 @@ class GenericState
 		else
 			@param = {}
 		this.init()
-	apply: (event, param) ->
-		this[event](param)	
+
+	apply: (eventName, @eventObj) ->
+		this[eventName](@eventObj)	
 
 	touchstart: -> #throw "undefined"
 	touchmove: -> #throw "undefined"
 	touchend: -> #throw "undefined"
 
-	xthrow: (name, params) -> $("debug").innerHTML = "throw " + name + " params: " + @param.initX + "\n" + $("debug").innerHTML #Futur trigger
+	xthrow: (name) ->
+		@param.nbFingers = @eventObj.touches.length
+		$("debug").innerHTML = "throw " + name + " param: " + dump(@param) + "\n" + $("debug").innerHTML #Futur trigger
+		@machine.analyser.add(name, @param)
 
 
 
 class NoTouch extends GenericState
 	description: -> "NoTouch state"
 	touchstart: (event) ->
-		@param.initX = event
-		@param.llsdfsdf = "ok"
 		@machine.setState(new FirstTouch @machine)
 		
 
 
 class FirstTouch extends GenericState
 	description: -> "FirstTouch state"
+	init: ->
+		@param.initX = event.touches[0].clientX
+		@param.initY = event.touches[0].clientY
 	touchend: ->
-		@xthrow "@tap", @params
+		@xthrow "@tap"
 		@machine.setState(new NoTouchDouble @machine)
 	touchmove: ->
 		@xthrow "@drag"
@@ -69,12 +84,44 @@ class FirstTouchDouble extends GenericState
 class Drag extends GenericState
 	description: -> "Drag state"
 	touchmove: ->
+		@param.currentX = event.touches[0].clientX
+		@param.currentY = event.touches[0].clientY
 		@xthrow "@drag"
 	touchend: ->
 		@xthrow "@dragend"
 		@machine.setState(new NoTouch @machine)
 
-xthrow = (name, params) -> $("debug").innerHTML = "throw " + name + "params: " + params + "\n" + $("debug").innerHTML #Futur trigger
+
+`
+function dump(arr,level) {
+		var dumped_text = "["
+		for(var item in arr) {
+			var value = arr[item];
+			if(typeof(value)=='function') continue;
+			dumped_text += item + "=" + value + " ";
+		}
+
+	return dumped_text + "]";
+}
+`
+
+
+class Analyser
+	constructor: -> 
+		@fingerArray = []
+		@size = 0
+
+	add: (name, param) ->
+		@fingerArray.push(param)
+		if @fingerArray.length == param.nbFingers
+			@analyse()
+
+	analyse: ->
+		alert "J'analyse"
+	
+
+
+
 
 $ = (element) ->
 	document.getElementById element
