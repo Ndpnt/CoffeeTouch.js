@@ -170,7 +170,6 @@ Object.merge = function(destination, source) {
 };
 
 `
-
 $ = (element) ->
 	document.getElementById element
 
@@ -178,22 +177,6 @@ Object::bind = (eventName, callback) ->
 	calls = @_callbacks or @_callbacks = {}
 	list = @_callbacks[eventName] or @_callbacks[eventName] = []
 	list.push callback
-
-####################### Analyser      ####################### 
-class Analyser
-	constructor: -> 
-		@fingerArray = []
-		@size = 0
-
-	add: (name, param, index) ->
-		@fingerArray[index] = param
-		if @fingerArray.length == param.nbFingers
-			@analyse()
-
-	analyse: ->
-		#alert "J'analyse"
-	
-
 
 ####################### EventRouter   ####################### 
 

@@ -7,6 +7,7 @@ Object::bind = (eventName, callback) ->
 	calls = @_callbacks or @_callbacks = {}
 	list = @_callbacks[eventName] or @_callbacks[eventName] = []
 	list.push callback
+	###
 	### 
 	## Modifications start here
 	###
@@ -40,6 +41,7 @@ Object::bind = (eventName, callback) ->
 	for evtName in ['touchcancel','touchend']
 		@touchProperties.isTouched = false
 	
+	###
 	return this
 
 Object::unbind = (ev, callback) ->
@@ -78,16 +80,3 @@ Object.prototype.trigger =  function(ev) {
 
 $ = (element) ->
 	document.getElementById element
-###
-## Exemple of use
-###
-window.onload = ->
-	
-	$('blue').bind "tap", ->
-		alert "I've been taped"
-
-	$('white').bind "doubletap", ->
-		alert "I've been double taped"
-
-	$('red').bind "press", ->
-		alert "I've been pressed"

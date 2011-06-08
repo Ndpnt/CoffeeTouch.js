@@ -1,96 +1,70 @@
 (function() {
-  /*
-  ## The bind, unbind and trigger function have been taken from Backbone Framework.
-  ## The bind function has been changed
-  */  var $;
-  Object.prototype.bind = function(eventName, callback) {
-    var calls, evtName, list, that, _i, _len, _ref;
-    calls = this._callbacks || (this._callbacks = {});
-    list = this._callbacks[eventName] || (this._callbacks[eventName] = []);
-    list.push(callback);
-    /* 
-    	## Modifications start here
-    	*/
-    that = this;
-    this.touchProperties = {};
-    this.touchProperties.dateLastTouch = 0;
-    this.addEventListener('touchstart', function(event) {
-      var _t;
-      this.touchProperties.isTouched = true;
-      this.trigger("tap");
-      _t = (new Date()).getTime();
-      if ((_t - this.touchProperties.dateLastTouch) < 1000) {
-        this.trigger("doubletap");
-      }
-      this.touchProperties.dateLastTouch = _t;
-      return setTimeout(function() {
-        if (that.touchProperties.isTouched === true) {
-          return that.trigger("press");
-        }
-      }, 5000);
-    });
-    _ref = ['touchcancel', 'touchend'];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      evtName = _ref[_i];
-      this.touchProperties.isTouched = false;
+  var Analyser, FingerGesture;
+  FingerGesture = (function() {
+    function FingerGesture(fingerId, gestureName, params) {
+      this.fingerId = fingerId;
+      this.gestureName = gestureName;
+      this.params = params;
     }
-    return this;
-  };
-  Object.prototype.unbind = function(ev, callback) {
-    var calls, i, list, _i, _len;
-    if (!ev) {
-      this._callbacks = {};
-    } else if (calls = this._callbacks) {
-      if (!callback) {
-        calls[ev] = [];
+    FingerGesture.prototype.update = function(params) {};
+    return FingerGesture;
+  })();
+  Analyser = (function() {
+    function Analyser(totalNbFingers, targetElement) {
+      this.totalNbFingers = totalNbFingers;
+      this.targetElement = targetElement;
+      this.fingersArray = {};
+    }
+    Analyser.prototype.notify = function(fingerID, gestureName, params) {
+      if (this.fingersArray[fingerID] != null) {
+        this.fingersArray[fingerID].update(params);
       } else {
-        list = calls[ev];
-        if (!list) {
-          return this;
-        }
-        for (_i = 0, _len = list.length; _i < _len; _i++) {
-          i = list[_i];
-          if (callback === list[i]) {
-            list.splice(i, 1);
-            break;
-          }
+        this.fingersArray[fingerID] = new FingerGesture(fingerId, gestureName, params);
+      }
+      return this.analyse(this.totalNbFingers);
+    };
+    Analyser.prototype.analyse = function(nbFingers) {
+      switch (nbFingers) {
+        case 1:
+          return this.oneFingerGesture(this.fingersArray);
+        case 2:
+          return this.twoFingersGestures(this.fingersArray);
+        case 3:
+          return this.threeFingersGestures(this.fingersArray);
+        case 4:
+          return this.fourFingersGestures(this.fingersArray);
+        case 5:
+          return this.fiveFingersGetures(this.fingersArray);
+        default:
+          throw "We do not analyse more than 5 fingers";
+      }
+    };
+    Analyser.prototype.oneFingerGesture = function(fingersArray) {
+      var finger, key;
+      for (key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          finger = obj[key];
         }
       }
-    }
-    return this;
-  };
-  
-Object.prototype.trigger =  function(ev) {
-	  var list, calls, i, l;
-	  if (!(calls = this._callbacks)) return this;
-	  if (list = calls[ev]) {
-	    for (i = 0, l = list.length; i < l; i++) {
-	      list[i].apply(this, Array.prototype.slice.call(arguments, 1));
-	    }
-	  }
-	  if (list = calls['all']) {
-	    for (i = 0, l = list.length; i < l; i++) {
-	      list[i].apply(this, arguments);
-	    }
-	  }
-	  return this;
-	};
-;
-  $ = function(element) {
-    return document.getElementById(element);
-  };
-  /*
-  ## Exemple of use
-  */
+      switch (finger.gestureName) {
+        case "tap":
+          return alert("I've been tapped");
+        case "doubleTap":
+          return targetElement.trigger("doubleTap");
+        case "fixed":
+          return targetElement.trigger("fixed");
+        case "drag":
+          return targetElement.trigger("drag");
+      }
+    };
+    return Analyser;
+  })();
   window.onload = function() {
-    $('blue').bind("tap", function() {
-      return alert("I've been taped");
-    });
-    $('white').bind("doubletap", function() {
-      return alert("I've been double taped");
-    });
-    return $('red').bind("press", function() {
-      return alert("I've been pressed");
+    var analyser;
+    analyser = new Analyser(1, $('blue'));
+    return analyser.update(4, "tap", {
+      x: 10,
+      y: 12
     });
   };
 }).call(this);
