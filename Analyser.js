@@ -2,7 +2,7 @@
   /*
   ## The bind, unbind and trigger function have been taken from Backbone Framework.
   ## The bind function has been changed
-  */  var $, Analyser, FingerGesture;
+  */  var $, Analyser, FingerGesture, distanceBetweenTwoPoints, getDirection;
   Object.prototype.bind = function(eventName, callback) {
     var calls, list;
     calls = this._callbacks || (this._callbacks = {});
@@ -87,54 +87,44 @@ Object.prototype.trigger =  function(ev) {
   $ = function(element) {
     return document.getElementById(element);
   };
-  /*
-  ## Exemple of use
-  */
-  /*
-  
-  window.onload = ->
-  	$('blue').addEventListener 'touchstart', (event) ->
-  		$('white').innerHTML += " START: " + event.touches[0].identifier + "<br />"
-  	$('blue').addEventListener 'touchmove', (event) ->
-  		$('white').innerHTML += " MOVE: " + event.touches[0].identifier + "<br />"
-  	$('blue').addEventListener 'touchend', (event) ->
-  		$('white').innerHTML += " END: " + event.touches[0].identifier + "<br />"
-  */
-  
-/*
-  window.onload = function() {
-     return $('blue').addEventListener('touchmove', function(event) {
-	  var prop, str;
-      str = '';
-      for (prop in event.changedTouches) {
-        str += prop + " value :" + event[prop] + "<br />";
-      }
-      return $('white').innerHTML += str;
-      });
-  };
-*/
-  
-;
-  /*
-  		$('white').innerHTML += "Number of fingers: " + event.touches.length
-  		$('white').innerHTML += " first: " + event.touches[0].pageX
-  		$('white').innerHTML += " second: " + event.touches[1].pageX
-  */
-  /*
-  	$('blue').bind "tap", ->
-  		alert "I've been taped"
-  
-  	$('white').bind "doubletap", ->
-  		alert "I've been double taped"
-  
-  	$('red').bind "press", ->
-  		alert "I've been pressed"
-  */
   Object.swap = function(obj1, obj2) {
     var temp;
     temp = obj2;
     obj2 = obj1;
     return obj1 = obj2;
+  };
+  distanceBetweenTwoPoints = function(x1, y1, x2, y2) {
+    return Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
+  };
+  getDirection = function(deltaX, deltaY) {
+    if (deltaX > 0 && deltaY < 0) {
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        "right";
+      } else {
+        "up";
+      }
+    }
+    if (deltaX > 0 && deltaY > 0) {
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        "right";
+      } else {
+        "down";
+      }
+    }
+    if (deltaX < 0 && deltaY < 0) {
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        "left";
+      } else {
+        "up";
+      }
+    }
+    if (deltaX < 0 && deltaY > 0) {
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        return "left";
+      } else {
+        return "down";
+      }
+    }
   };
   FingerGesture = (function() {
     function FingerGesture(fingerId, gestureName, eventObj) {
@@ -143,6 +133,8 @@ Object.prototype.trigger =  function(ev) {
       this.gestureName = gestureName;
       date = new Date();
       this.params = {};
+      this.params.startX = eventObj.clientX;
+      this.params.startY = eventObj.clientY;
       this.params.timeStart = date.getTime();
       this.params.timeElasped = 0;
       this.updatePosition(eventObj);
@@ -191,8 +183,11 @@ Object.prototype.trigger =  function(ev) {
           throw "We do not analyse more than 5 fingers";
       }
     };
+    /*----------------------------------------------------------------------------------------------------------------
+    	## One Finger Gesture
+    	*/
     Analyser.prototype.oneFingerGesture = function() {
-      var finger, key;
+      var deltaX, deltaY, finger, key;
       for (key in this.fingersArray) {
         if (this.fingersArray.hasOwnProperty(key)) {
           finger = this.fingersArray[key];
@@ -206,11 +201,16 @@ Object.prototype.trigger =  function(ev) {
         case "fixed":
           return this.targetElement.trigger("fixed", finger.params);
         case "drag":
-          return this.targetElement.trigger("drag", finger.params);
+          deltaX = finger.params.x - finger.params.startX;
+          deltaY = finger.params.y - finger.params.startY;
+          return this.targetElement.trigger(getDirection(deltaX, deltaY), finger.params);
       }
     };
+    /*----------------------------------------------------------------------------------------------------------------
+    	## Two Finger Gesture
+    	*/
     Analyser.prototype.twoFingersGesture = function() {
-      var firstFinger, gestureName, i, informations, key, secondFinger;
+      var deltaX, deltaY, firstFinger, gestureName, i, informations, key, secondFinger;
       i = 0;
       gestureName = "";
       for (key in this.fingersArray) {
@@ -232,10 +232,35 @@ Object.prototype.trigger =  function(ev) {
           }
           informations = {
             first: firstFinger.params,
-            second: secondFinger.params
+            second: secondFinger.params,
+            global: {
+              distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
+            }
           };
           this.targetElement.trigger("tap,tap", informations);
           return this.targetElement.trigger("two:tap", informations);
+        case "fixed,drag":
+        case "drag,fixed":
+          if (firstFinger.params.x > secondFinger.params.x) {
+            Object.swap(firstFinger, secondFinger);
+          }
+          informations = {
+            first: firstFinger.params,
+            second: secondFinger.params,
+            global: {
+              distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
+            }
+          };
+          if (firstFinger.gestureName === "fixed") {
+            deltaX = secondFinger.params.x - secondFinger.params.startX;
+            deltaY = secondFinger.params.y - secondFinger.params.startY;
+            return this.targetElement.trigger("fixed," + (getDirection(deltaX, deltaY)), informations);
+          } else {
+            deltaX = firstFinger.params.x - firstFinger.params.startX;
+            deltaY = firstFinger.params.y - firstFinger.params.startY;
+            return this.targetElement.trigger("" + (getDirection(deltaX, deltaY)) + ",fixed", informations);
+          }
+          break;
         case "doubleTap,doubleTap":
           return this.targetElement.trigger("doubleTap,doubleTap", finger.params);
         case "fixed,fixed":
@@ -245,26 +270,27 @@ Object.prototype.trigger =  function(ev) {
     return Analyser;
   })();
   window.onload = function() {
-    $('blue').bind("tap,tap", function(params) {
-      return $('white').innerHTML += "tap,tap x: " + params.x + "  y: " + params.y + " timeStart: " + params.timeStart + "  timeElasped: " + params.timeElasped + "<br/>";
+    /*
+    	$('blue').bind "up", (params) ->
+    		$('white').innerHTML += "up <br />"
+    	$('blue').bind "down", (params) ->
+    		$('white').innerHTML += "down <br />"
+    	*/
+    /*
+    $('blue').bind "left", (params) ->
+    		$('blue').style.width = (params.x + 20) + "px"
+    		$('blue').style.height = (params.y + 20) + "px"
+    	*/    var analyser;
+    $('blue').bind("fixed,down", function(params) {
+      return $('blue').style.backgroundColor = "rgb(255,0,0)";
     });
-    $('blue').bind("tap", function(params) {
-      return $('white').innerHTML += "tap x: " + params.x + "  y: " + params.y + " timeStart: " + params.timeStart + "  timeElasped: " + params.timeElasped + "<br/>";
+    analyser = new Analyser(2, $('blue'));
+    $('blue').addEventListener('touchstart', function(event) {
+      return analyser.notify(event.touches[0].identifier, "fixed", event.touches[0]);
     });
-    $('blue').bind("fixed", function(params) {
-      return $('white').innerHTML += "fixed x: " + params.x + "  y: " + params.y + " timeStart: " + params.timeStart + "  timeElasped: " + params.timeElasped + " <br/>";
-    });
-    $('blue').bind("drag", function(params) {
-      return $('blue').style.width = (params.x + 30) + "px";
-    });
-    return $('blue').addEventListener('touchstart', function(event) {
-      var analyser;
-      analyser = new Analyser(event.touches.length, $('blue'));
+    return $('blue').addEventListener('touchmove', function(event) {
       if (event.touches.length === 2) {
-        analyser.notify(4, "tap", event.touches[0]);
-        return analyser.notify(3, "tap", event.touches[1]);
-      } else {
-        return analyser.notify(12, "tap", event.touches[0]);
+        return analyser.notify(event.touches[1].identifier, "drag", event.touches[1]);
       }
     });
   };

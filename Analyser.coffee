@@ -1,7 +1,33 @@
+## Methods helper
 Object.swap = (obj1, obj2) ->
 	temp = obj2
 	obj2 = obj1
 	obj1 = obj2
+
+distanceBetweenTwoPoints = (x1, y1, x2, y2) -> 
+	Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)))
+
+getDirection = (deltaX, deltaY) ->
+	if deltaX > 0 and deltaY < 0 ## Right top side of the circle
+		if Math.abs(deltaX) > Math.abs(deltaY)
+			"right"
+		else
+			"up"
+	if deltaX > 0 and deltaY > 0 ## Right bottom side of the circle
+		if Math.abs(deltaX) > Math.abs(deltaY) 
+			"right"
+		else
+			"down"
+	if deltaX < 0 and deltaY < 0 ## Left top side of the circle
+		if Math.abs(deltaX) > Math.abs(deltaY) 
+			"left"
+		else
+			"up"
+	if deltaX < 0 and deltaY > 0 ## Left top side of the circle
+		if Math.abs(deltaX) > Math.abs(deltaY)
+			"left"
+		else
+			"down"
 
 ## Finger Object which contains an Id, a gesture and all important parameters
 ## Params:
@@ -12,6 +38,8 @@ class FingerGesture
 	constructor: (@fingerId, @gestureName, eventObj) ->
 		date = new Date()
 		@params = {}
+		@params.startX = eventObj.clientX
+		@params.startY = eventObj.clientY
 		@params.timeStart = date.getTime()
 		@params.timeElasped = 0
 		@updatePosition(eventObj)
@@ -49,7 +77,10 @@ class Analyser
 			when 4 then @fourFingersGesture @fingersArray
 			when 5 then @fiveFingersGeture @fingersArray
 			else throw "We do not analyse more than 5 fingers"
-
+			
+	###----------------------------------------------------------------------------------------------------------------
+	## One Finger Gesture
+	###
 	oneFingerGesture: ->
 		for key of @fingersArray
 			if @fingersArray.hasOwnProperty key
@@ -59,9 +90,16 @@ class Analyser
 			when "tap" then @targetElement.trigger "tap", finger.params
 			when "doubleTap" then @targetElement.trigger "doubleTap", finger.params
 			when "fixed" then @targetElement.trigger "fixed", finger.params
-			when "drag" then @targetElement.trigger "drag", finger.params
-	
+			when "drag"
+				deltaX = finger.params.x - finger.params.startX
+				deltaY = finger.params.y - finger.params.startY
+				@targetElement.trigger getDirection(deltaX, deltaY), finger.params 
+				
+	###----------------------------------------------------------------------------------------------------------------
+	## Two Finger Gesture
+	###
 	twoFingersGesture: ->
+		## Gesture Name detection
 		i = 0
 		gestureName = ""
 		for key of @fingersArray
@@ -78,8 +116,31 @@ class Analyser
 				informations =
 					first: firstFinger.params
 					second: secondFinger.params
+					global:
+						distance: distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
+
 				@targetElement.trigger "tap,tap", informations
 				@targetElement.trigger "two:tap", informations
+			when "fixed,drag", "drag,fixed"
+				## Detection of finger order. First one will be the first from the left
+				if firstFinger.params.x > secondFinger.params.x
+					Object.swap firstFinger, secondFinger
+				informations =
+					first: firstFinger.params
+					second: secondFinger.params
+					global:
+						distance: distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
+
+				if firstFinger.gestureName == "fixed"
+					deltaX = secondFinger.params.x - secondFinger.params.startX
+					deltaY = secondFinger.params.y - secondFinger.params.startY
+##					alert getDirection(deltaX, deltaY)
+					@targetElement.trigger "fixed,#{getDirection(deltaX, deltaY)}", informations
+				else 
+					deltaX = firstFinger.params.x - firstFinger.params.startX
+					deltaY = firstFinger.params.y - firstFinger.params.startY
+##					alert getDirection(deltaX, deltaY)
+					@targetElement.trigger "#{getDirection(deltaX, deltaY)},fixed", informations
 			
 			when "doubleTap,doubleTap"
 				@targetElement.trigger "doubleTap,doubleTap", finger.params
@@ -92,23 +153,28 @@ class Analyser
 ##					@targetElement.trigger "drag", finger.params
 
 window.onload = ->
-	$('blue').bind "tap,tap", (params) ->
-		$('white').innerHTML += "tap,tap x: #{params.x}  y: #{params.y} timeStart: #{params.timeStart}  timeElasped: #{params.timeElasped}<br/>"
-	$('blue').bind "tap", (params) ->
-		$('white').innerHTML += "tap x: #{params.x}  y: #{params.y} timeStart: #{params.timeStart}  timeElasped: #{params.timeElasped}<br/>"
-	$('blue').bind "fixed", (params) ->
-		$('white').innerHTML += "fixed x: #{params.x}  y: #{params.y} timeStart: #{params.timeStart}  timeElasped: #{params.timeElasped} <br/>"
-	$('blue').bind "drag", (params) ->
-		$('blue').style.width = (params.x + 30) + "px"
-		
-
-	$('blue').addEventListener 'touchstart',(event) ->
-		analyser = new Analyser event.touches.length, $('blue')	
-		if event.touches.length == 2
-			analyser.notify 4, "tap", event.touches[0]
-			analyser.notify 3, "tap", event.touches[1]
-		else 
-			analyser.notify 12, "tap", event.touches[0]
+	###
+	$('blue').bind "up", (params) ->
+		$('white').innerHTML += "up <br />"
+	$('blue').bind "down", (params) ->
+		$('white').innerHTML += "down <br />"
+	###
+	###
+$('blue').bind "left", (params) ->
+		$('blue').style.width = (params.x + 20) + "px"
+		$('blue').style.height = (params.y + 20) + "px"
+	###
 	
+	$('blue').bind "fixed,down", (params) ->
+		$('blue').style.backgroundColor = "rgb(255,0,0)"
+		##$('blue').style.width = (params.second.x + 20) + "px"
+		
+	
+	analyser = new Analyser 2, $('blue')
+	$('blue').addEventListener 'touchstart',(event) ->
+		analyser.notify event.touches[0].identifier, "fixed", event.touches[0]
+	$('blue').addEventListener 'touchmove',(event) ->
+		if event.touches.length == 2
+			analyser.notify event.touches[1].identifier, "drag", event.touches[1]
 		
 	
