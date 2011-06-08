@@ -74,7 +74,7 @@ class Drag extends GenericState
 		@xthrow "@dragend"
 		@machine.setState(new NoTouch @machine)
 
-xthrow = (name, params) -> $("debug").innerHTML = "throw " + name + "params: " + params + "\n" + $("debug").innerHTML #Futur trigger
+xthrow = (name, params) -> $("debug").innerHTML = "throw " + name + "params: " + params + "\n" + $('debug').innerHTML #Futur trigger
 
 $ = (element) ->
 	document.getElementById element

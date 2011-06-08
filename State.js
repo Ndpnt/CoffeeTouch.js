@@ -37,22 +37,22 @@
       }
       this.init();
     }
-    GenericState.prototype.apply = function(event) {
-      return this[event](this.param);
+    GenericState.prototype.apply = function(event, param) {
+      return this[event](param);
     };
     GenericState.prototype.touchstart = function() {};
     GenericState.prototype.touchmove = function() {};
     GenericState.prototype.touchend = function() {};
     GenericState.prototype.xthrow = function(name, params) {
-      return $("debug").innerHTML = "throw " + name + " params: " + this.params + "\n" + $("debug").innerHTML;
+      return $("debug").innerHTML = "throw " + name + " params: " + this.param.initX + "\n" + $("debug").innerHTML;
     };
     return GenericState;
   })();
   NoTouch = (function() {
-    __extends(NoTouch, GenericState);
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(NoTouch, GenericState);
     NoTouch.prototype.description = function() {
       return "NoTouch state";
     };
@@ -64,10 +64,10 @@
     return NoTouch;
   })();
   FirstTouch = (function() {
-    __extends(FirstTouch, GenericState);
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(FirstTouch, GenericState);
     FirstTouch.prototype.description = function() {
       return "FirstTouch state";
     };
@@ -82,10 +82,10 @@
     return FirstTouch;
   })();
   NoTouchDouble = (function() {
-    __extends(NoTouchDouble, GenericState);
     function NoTouchDouble() {
       NoTouchDouble.__super__.constructor.apply(this, arguments);
     }
+    __extends(NoTouchDouble, GenericState);
     NoTouchDouble.prototype.description = function() {
       return "NoTouch wait double state";
     };
@@ -102,10 +102,10 @@
     return NoTouchDouble;
   })();
   FirstTouchDouble = (function() {
-    __extends(FirstTouchDouble, GenericState);
     function FirstTouchDouble() {
       FirstTouchDouble.__super__.constructor.apply(this, arguments);
     }
+    __extends(FirstTouchDouble, GenericState);
     FirstTouchDouble.prototype.description = function() {
       return "FirstTouch double state";
     };
@@ -116,10 +116,10 @@
     return FirstTouchDouble;
   })();
   Drag = (function() {
-    __extends(Drag, GenericState);
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
+    __extends(Drag, GenericState);
     Drag.prototype.description = function() {
       return "Drag state";
     };
@@ -133,7 +133,7 @@
     return Drag;
   })();
   xthrow = function(name, params) {
-    return $("debug").innerHTML = "throw " + name + "params: " + params + "\n" + $("debug").innerHTML;
+    return $("debug").innerHTML = "throw " + name + "params: " + params + "\n" + $('debug').innerHTML;
   };
   $ = function(element) {
     return document.getElementById(element);
@@ -157,13 +157,13 @@
       return machine.apply("touchmove");
     });
     $("body").addEventListener("touchstart", function(event) {
-      return machine.apply("touchstart");
+      return machine.apply("touchstart", event);
     });
     $("body").addEventListener("touchend", function(event) {
-      return machine.apply("touchend");
+      return machine.apply("touchend", event);
     });
     return $("body").addEventListener("touchmove", function(event) {
-      return machine.apply("touchmove");
+      return machine.apply("touchmove", event);
     });
   };
 }).call(this);
