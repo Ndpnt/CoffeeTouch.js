@@ -265,32 +265,36 @@ Object.prototype.trigger =  function(ev) {
           return this.targetElement.trigger("doubleTap,doubleTap", finger.params);
         case "fixed,fixed":
           return this.targetElement.trigger("fixed,fixed", finger.params);
+        case "drag,drag":
+          if (firstFinger.params.x > secondFinger.params.x) {
+            Object.swap(firstFinger, secondFinger);
+          }
+          informations = {
+            first: firstFinger.params,
+            second: secondFinger.params,
+            global: {
+              distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
+            }
+          };
+          deltaX = secondFinger.params.x - secondFinger.params.startX;
+          deltaY = secondFinger.params.y - secondFinger.params.startY;
+          alert("" + deltaX + " " + deltaY);
+          alert(getDirection(deltaX, deltaY));
+          return this.targetElement.trigger("" + (getDirection(deltaX, deltaY)) + "," + (getDirection(deltaX, deltaY)), informations);
       }
     };
     return Analyser;
   })();
   window.onload = function() {
-    /*
-    	$('blue').bind "up", (params) ->
-    		$('white').innerHTML += "up <br />"
-    	$('blue').bind "down", (params) ->
-    		$('white').innerHTML += "down <br />"
-    	*/
-    /*
-    $('blue').bind "left", (params) ->
-    		$('blue').style.width = (params.x + 20) + "px"
-    		$('blue').style.height = (params.y + 20) + "px"
-    	*/    var analyser;
-    $('blue').bind("fixed,down", function(params) {
+    var analyser;
+    $('blue').bind("down,down", function(params) {
       return $('blue').style.backgroundColor = "rgb(255,0,0)";
     });
     analyser = new Analyser(2, $('blue'));
-    $('blue').addEventListener('touchstart', function(event) {
-      return analyser.notify(event.touches[0].identifier, "fixed", event.touches[0]);
-    });
     return $('blue').addEventListener('touchmove', function(event) {
       if (event.touches.length === 2) {
-        return analyser.notify(event.touches[1].identifier, "drag", event.touches[1]);
+        analyser.notify(1, "drag", event.touches[1]);
+        return analyser.notify(2, "drag", event.touches[0]);
       }
     });
   };

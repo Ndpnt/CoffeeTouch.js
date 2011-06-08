@@ -9,25 +9,13 @@ distanceBetweenTwoPoints = (x1, y1, x2, y2) ->
 
 getDirection = (deltaX, deltaY) ->
 	if deltaX > 0 and deltaY < 0 ## Right top side of the circle
-		if Math.abs(deltaX) > Math.abs(deltaY)
-			"right"
-		else
-			"up"
+		if Math.abs(deltaX) > Math.abs(deltaY) then "right" else "up"
 	if deltaX > 0 and deltaY > 0 ## Right bottom side of the circle
-		if Math.abs(deltaX) > Math.abs(deltaY) 
-			"right"
-		else
-			"down"
+		if Math.abs(deltaX) > Math.abs(deltaY) then "right" else "down"
 	if deltaX < 0 and deltaY < 0 ## Left top side of the circle
-		if Math.abs(deltaX) > Math.abs(deltaY) 
-			"left"
-		else
-			"up"
+		if Math.abs(deltaX) > Math.abs(deltaY) then "left" else "up"
 	if deltaX < 0 and deltaY > 0 ## Left top side of the circle
-		if Math.abs(deltaX) > Math.abs(deltaY)
-			"left"
-		else
-			"down"
+		if Math.abs(deltaX) > Math.abs(deltaY) then "left" else "down"
 
 ## Finger Object which contains an Id, a gesture and all important parameters
 ## Params:
@@ -121,6 +109,7 @@ class Analyser
 
 				@targetElement.trigger "tap,tap", informations
 				@targetElement.trigger "two:tap", informations
+				
 			when "fixed,drag", "drag,fixed"
 				## Detection of finger order. First one will be the first from the left
 				if firstFinger.params.x > secondFinger.params.x
@@ -134,12 +123,10 @@ class Analyser
 				if firstFinger.gestureName == "fixed"
 					deltaX = secondFinger.params.x - secondFinger.params.startX
 					deltaY = secondFinger.params.y - secondFinger.params.startY
-##					alert getDirection(deltaX, deltaY)
 					@targetElement.trigger "fixed,#{getDirection(deltaX, deltaY)}", informations
 				else 
 					deltaX = firstFinger.params.x - firstFinger.params.startX
 					deltaY = firstFinger.params.y - firstFinger.params.startY
-##					alert getDirection(deltaX, deltaY)
 					@targetElement.trigger "#{getDirection(deltaX, deltaY)},fixed", informations
 			
 			when "doubleTap,doubleTap"
@@ -147,34 +134,31 @@ class Analyser
 				
 			when "fixed,fixed"
 				@targetElement.trigger "fixed,fixed", finger.params
-##			when "drag,drag"
+				
+			when "drag,drag"
 				## Et c'est là qu'on souffre
-##				if 
-##					@targetElement.trigger "drag", finger.params
-
-window.onload = ->
-	###
-	$('blue').bind "up", (params) ->
-		$('white').innerHTML += "up <br />"
-	$('blue').bind "down", (params) ->
-		$('white').innerHTML += "down <br />"
-	###
-	###
-$('blue').bind "left", (params) ->
-		$('blue').style.width = (params.x + 20) + "px"
-		$('blue').style.height = (params.y + 20) + "px"
-	###
-	
-	$('blue').bind "fixed,down", (params) ->
+				if firstFinger.params.x > secondFinger.params.x
+					Object.swap firstFinger, secondFinger
+				informations =
+					first: firstFinger.params
+					second: secondFinger.params
+					global:
+						distance: distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
+				deltaX = secondFinger.params.x - secondFinger.params.startX
+				deltaY = secondFinger.params.y - secondFinger.params.startY
+				alert "#{deltaX} #{deltaY}"
+				alert getDirection(deltaX, deltaY)
+				@targetElement.trigger "#{getDirection(deltaX, deltaY)},#{getDirection(deltaX, deltaY)}", informations
+				
+window.onload = ->	
+	$('blue').bind "down,down", (params) ->
 		$('blue').style.backgroundColor = "rgb(255,0,0)"
-		##$('blue').style.width = (params.second.x + 20) + "px"
 		
 	
 	analyser = new Analyser 2, $('blue')
-	$('blue').addEventListener 'touchstart',(event) ->
-		analyser.notify event.touches[0].identifier, "fixed", event.touches[0]
 	$('blue').addEventListener 'touchmove',(event) ->
 		if event.touches.length == 2
-			analyser.notify event.touches[1].identifier, "drag", event.touches[1]
+			analyser.notify 1, "drag", event.touches[1]
+			analyser.notify 2, "drag", event.touches[0]
 		
 	
