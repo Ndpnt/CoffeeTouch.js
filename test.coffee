@@ -7,6 +7,7 @@ Object::bind = (eventName, callback) ->
 	calls = @_callbacks or @_callbacks = {}
 	list = @_callbacks[eventName] or @_callbacks[eventName] = []
 	list.push callback
+	###
 	### 
 	## Modifications start here
 	###
@@ -40,6 +41,7 @@ Object::bind = (eventName, callback) ->
 	for evtName in ['touchcancel','touchend']
 		@touchProperties.isTouched = false
 	
+	###
 	return this
 
 Object::unbind = (ev, callback) ->
@@ -78,11 +80,45 @@ Object.prototype.trigger =  function(ev) {
 
 $ = (element) ->
 	document.getElementById element
+
 ###
 ## Exemple of use
 ###
+###
+
 window.onload = ->
-	
+	$('blue').addEventListener 'touchstart', (event) ->
+		$('white').innerHTML += " START: " + event.touches[0].identifier + "<br />"
+	$('blue').addEventListener 'touchmove', (event) ->
+		$('white').innerHTML += " MOVE: " + event.touches[0].identifier + "<br />"
+	$('blue').addEventListener 'touchend', (event) ->
+		$('white').innerHTML += " END: " + event.touches[0].identifier + "<br />"
+###
+
+`
+/*
+  window.onload = function() {
+     return $('blue').addEventListener('touchmove', function(event) {
+	  var prop, str;
+      str = '';
+      for (prop in event.changedTouches) {
+        str += prop + " value :" + event[prop] + "<br />";
+      }
+      return $('white').innerHTML += str;
+      });
+  };
+*/
+  
+`
+##	$('blue').addEventListener 'touchmove', (event) ->
+
+###
+		$('white').innerHTML += "Number of fingers: " + event.touches.length
+		$('white').innerHTML += " first: " + event.touches[0].pageX
+		$('white').innerHTML += " second: " + event.touches[1].pageX
+###
+
+###
 	$('blue').bind "tap", ->
 		alert "I've been taped"
 
@@ -91,3 +127,4 @@ window.onload = ->
 
 	$('red').bind "press", ->
 		alert "I've been pressed"
+###
