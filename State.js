@@ -1,5 +1,18 @@
 (function() {
-  var $, Drag, FirstTouch, FirstTouchDouble, GenericState, NoTouch, NoTouchDouble, StateMachine, xthrow;
+  /*
+  	tap
+  	doubletap
+  	drag
+  	dragend
+  
+  	automate 	touch[x]
+  	1		1
+  	
+  	1 2		1 2
+  	1 2 3		1 2 3
+  	1 3		1 2
+  
+  */  var $, Drag, EventRouter, FirstTouch, FirstTouchDouble, GenericState, NoTouch, NoTouchDouble, StateMachine;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -9,11 +22,13 @@
     return child;
   };
   StateMachine = (function() {
-    function StateMachine() {
+    function StateMachine(identifier) {
+      this.identifier = identifier;
       this.currentState = new NoTouch(this);
+      this.analyser = new Analyser;
     }
-    StateMachine.prototype.apply = function(event, param) {
-      return this.currentState.apply(event, param);
+    StateMachine.prototype.apply = function(eventName, eventObj) {
+      return this.currentState.apply(eventName, eventObj);
     };
     StateMachine.prototype.setState = function(newState) {
       return this.currentState = newState;
@@ -33,18 +48,23 @@
       if (this.machine.currentState != null) {
         this.param = this.machine.currentState.param;
       } else {
-        this.param = {};
+        this.param = {
+          'identifier': this.machine.identifier
+        };
       }
       this.init();
     }
-    GenericState.prototype.apply = function(event, param) {
-      return this[event](param);
+    GenericState.prototype.apply = function(eventName, eventObj) {
+      this.eventObj = eventObj;
+      return this[eventName](this.eventObj);
     };
     GenericState.prototype.touchstart = function() {};
     GenericState.prototype.touchmove = function() {};
     GenericState.prototype.touchend = function() {};
-    GenericState.prototype.xthrow = function(name, params) {
-      return $("debug").innerHTML = "throw " + name + " params: " + this.param.initX + "\n" + $("debug").innerHTML;
+    GenericState.prototype.xthrow = function(name, index) {
+      this.param.nbFingers = this.eventObj.touches.length;
+      $("debug").innerHTML = "throw " + name + " param: " + dump(this.param) + "\n" + $("debug").innerHTML;
+      return this.machine.analyser.add(name, this.param, index);
     };
     return GenericState;
   })();
@@ -57,8 +77,6 @@
       return "NoTouch state";
     };
     NoTouch.prototype.touchstart = function(event) {
-      this.param.initX = event.touches[0].clientX;
-      this.param.llsdfsdf = "ok";
       return this.machine.setState(new FirstTouch(this.machine));
     };
     return NoTouch;
@@ -71,8 +89,12 @@
     FirstTouch.prototype.description = function() {
       return "FirstTouch state";
     };
+    FirstTouch.prototype.init = function() {
+      this.param.initX = event.touches[0].clientX;
+      return this.param.initY = event.touches[0].clientY;
+    };
     FirstTouch.prototype.touchend = function() {
-      this.xthrow("@tap", this.params);
+      this.xthrow("@tap");
       return this.machine.setState(new NoTouchDouble(this.machine));
     };
     FirstTouch.prototype.touchmove = function() {
@@ -124,6 +146,8 @@
       return "Drag state";
     };
     Drag.prototype.touchmove = function() {
+      this.param.currentX = event.touches[0].clientX;
+      this.param.currentY = event.touches[0].clientY;
       return this.xthrow("@drag");
     };
     Drag.prototype.touchend = function() {
@@ -132,9 +156,55 @@
     };
     return Drag;
   })();
-  xthrow = function(name, params) {
-    return $("debug").innerHTML = "throw " + name + "params: " + params + "\n" + $('debug').innerHTML;
-  };
+  
+function dump(arr,level) {
+		var dumped_text = "["
+		for(var item in arr) {
+			var value = arr[item];
+			if(typeof(value)=='function') continue;
+			dumped_text += item + "=" + value + " ";
+		}
+
+	return dumped_text + "]";
+}
+function print_r(obj) {
+  win_print_r = window.open('about:blank', 'win_print_r');
+  win_print_r.document.write('<html><body>');
+  r_print_r(obj, win_print_r);
+  win_print_r.document.write('</body></html>');
+ }
+
+ function r_print_r(theObj, win_print_r) {
+  if(theObj.constructor == Array ||
+   theObj.constructor == Object){
+   if (win_print_r == null)
+    win_print_r = window.open('about:blank', 'win_print_r');
+   }
+   for(var p in theObj){
+    if(theObj[p].constructor == Array||
+     theObj[p].constructor == Object){
+     win_print_r.document.write("<li>["+p+"] =>"+typeof(theObj)+"</li>");
+     win_print_r.document.write("<ul>")
+     r_print_r(theObj[p], win_print_r);
+     win_print_r.document.write("</ul>")
+    } else {
+     win_print_r.document.write("<li>["+p+"] =>"+theObj[p]+"</li>");
+    }
+   }
+  win_print_r.document.write("</ul>")
+ }
+
+Object.prototype.keys = function ()
+{
+  var keys = [];
+  for(var i in this) if (this.hasOwnProperty(i))
+  {
+    keys.push(i);
+  }
+  return keys;
+}
+
+;
   $ = function(element) {
     return document.getElementById(element);
   };
@@ -144,26 +214,63 @@
     list = this._callbacks[eventName] || (this._callbacks[eventName] = []);
     return list.push(callback);
   };
+  EventRouter = (function() {
+    function EventRouter(element) {
+      var that;
+      this.element = element;
+      this.machines = {};
+      that = this;
+      this.element.addEventListener("touchstart", function(event) {
+        return that.touchstart(event);
+      });
+      this.element.addEventListener("touchend", function(event) {
+        return that.touchend(event);
+      });
+      this.element.addEventListener("touchmove", function(event) {
+        return that.touchmove(event);
+      });
+    }
+    EventRouter.prototype.touchstart = function(event) {
+      var i, iMachine, _i, _len, _ref, _results;
+      _ref = event.changedTouches;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        i = _ref[_i];
+        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine) : void 0);
+      }
+      return _results;
+    };
+    EventRouter.prototype.touchend = function(event) {
+      var exists, iMKey, iTouch, _i, _j, _len, _len2, _ref, _ref2, _results;
+      _ref = this.machines.keys();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        iMKey = _ref[_i];
+        exists = false;
+        _ref2 = event.changedTouches;
+        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+          iTouch = _ref2[_j];
+          if (iTouch.identifier === iMKey) {
+            exists = true;
+          }
+        }
+        _results.push(!exists ? this.machines[iMKey].apply("touchend", event) : void 0);
+      }
+      return _results;
+    };
+    EventRouter.prototype.touchmove = function(event) {
+      var i, _i, _len, _ref, _results;
+      _ref = event.changedTouches;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        i = _ref[_i];
+        _results.push(this.machines[i.identifier].apply("touchmove", event));
+      }
+      return _results;
+    };
+    return EventRouter;
+  })();
   window.onload = function() {
-    var machine;
-    machine = new StateMachine;
-    $("body").addEventListener("mousedown", function(event) {
-      return machine.apply("touchstart");
-    });
-    $("body").addEventListener("mouseup", function(event) {
-      return machine.apply("touchend");
-    });
-    $("body").addEventListener("mousemove", function(event) {
-      return machine.apply("touchmove");
-    });
-    $("body").addEventListener("touchstart", function(event) {
-      return machine.apply("touchstart", event);
-    });
-    $("body").addEventListener("touchend", function(event) {
-      return machine.apply("touchend", event);
-    });
-    return $("body").addEventListener("touchmove", function(event) {
-      return machine.apply("touchmove", event);
-    });
+    return new EventRouter($("body"));
   };
 }).call(this);
