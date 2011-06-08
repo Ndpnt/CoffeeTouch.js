@@ -15,7 +15,7 @@
 
 ####################### State Machine ####################### 
 class StateMachine
-	constructor: (@identifier)-> 
+	constructor: (@identifier, @router)-> 
 		@currentState = new NoTouch(this)
 		@analyser = new Analyser
 	apply: (eventName, eventObj) -> @currentState.apply(eventName, eventObj)
@@ -29,28 +29,28 @@ class GenericState
 	init: -> # Defined par les sous classes
 	constructor: (@machine) ->
 		if @machine.currentState?
-			@param = @machine.currentState.param
+			@eventObj = @machine.currentState.eventObj
 		else
-			@param = {'identifier':@machine.identifier}
+			@eventObj = {}
 		this.init()
 
-	apply: (eventName, @eventObj) ->
-		this[eventName](@eventObj)	
+	apply: (eventName, arg) ->
+		Object.merge(@eventObj, arg)
+		this[eventName]()	
 
 	touchstart: -> #throw "undefined"
 	touchmove: -> #throw "undefined"
 	touchend: -> #throw "undefined"
 
-	xthrow: (name, index) ->
-		@param.nbFingers = @eventObj.touches.length
-		$("debug").innerHTML = "throw " + name + " param: " + dump(@param) + "\n" + $("debug").innerHTML #Futur trigger
-		@machine.analyser.add(name, @param, index)
+	notify: (name) ->
+		@machine.router.broadcast(name, @eventObj)
+	
 
 
 
 class NoTouch extends GenericState
 	description: -> "NoTouch state"
-	touchstart: (event) ->
+	touchstart: ->
 		@machine.setState(new FirstTouch @machine)
 		
 
@@ -58,26 +58,37 @@ class NoTouch extends GenericState
 class FirstTouch extends GenericState
 	description: -> "FirstTouch state"
 	init: ->
-		@param.initX = event.touches[0].clientX
-		@param.initY = event.touches[0].clientY
-	touchend: ->
-
-		@xthrow "@tap"
-		@machine.setState(new NoTouchDouble @machine)
-	touchmove: ->
-		@xthrow "@drag"
-		@machine.setState(new Drag @machine)
+		_machine = @machine
+		@fixedtimer = setTimeout (->(_machine.setState new Fixed _machine)), 500
+		@eventObj.initX = @eventObj.clientX
+		@eventObj.initY = @eventObj.clientY
 		
+	touchend: ->
+		clearTimeout @fixedtimer
+		@notify "@tap"
+		@machine.setState new NoTouch @machine
 
+	touchmove: ->
+		clearTimeout @fixedtimer
+		@notify "@drag"
+		@machine.setState new Drag @machine
+
+		
+class Fixed extends GenericState
+	description: -> "Fixed state"
+	init: ->
+		@notify "@fixed"
 
 
 class NoTouchDouble extends GenericState
-	description: -> "NoTouch wait double state"
+	description: -> "NoTouch (wait double) state"
 	init: -> 
 		that = this;
-		setTimeout (-> that.machine.setState(new NoTouch that.machine)), 400
+		#@doubleTimer = setTimeout (-> alert('x');that.machine.setState(new NoTouch that.machine)), 400
 
 	touchstart: ->
+		alert('a');
+		clearTimeout @doubleTimer
 		@machine.setState(new FirstTouchDouble @machine)
 
 
@@ -85,7 +96,8 @@ class NoTouchDouble extends GenericState
 class FirstTouchDouble extends GenericState
 	description: -> "FirstTouch double state"
 	touchend: ->
-		@xthrow "@doubletap"
+		alert('b');
+		@notify "@doubletap"
 		@machine.setState(new NoTouch @machine)
 	
 
@@ -93,11 +105,9 @@ class FirstTouchDouble extends GenericState
 class Drag extends GenericState
 	description: -> "Drag state"
 	touchmove: ->
-		@param.currentX = event.touches[0].clientX
-		@param.currentY = event.touches[0].clientY
-		@xthrow "@drag"
+		@notify "@drag"
 	touchend: ->
-		@xthrow "@dragend"
+		@notify "@dragend"
 		@machine.setState(new NoTouch @machine)
 
 
@@ -150,6 +160,15 @@ Object.prototype.keys = function ()
   return keys;
 }
 
+Object.merge = function(destination, source) {
+    for (var property in source) {
+        if (source.hasOwnProperty(property)) {
+            destination[property] = source[property];
+        }
+    }
+    return destination;
+};
+
 `
 
 $ = (element) ->
@@ -180,7 +199,8 @@ class Analyser
 
 class EventRouter
 	constructor: (@element) ->
-		@machines = {}	
+		@machines = {}
+		@nbmachines = 0	
 		that = this
 		@element.addEventListener "touchstart", (event) -> that.touchstart(event)
 		@element.addEventListener "touchend", (event) -> that.touchend(event)
@@ -188,28 +208,45 @@ class EventRouter
 
 
 	touchstart: (event) ->
+		event.preventDefault()
 		for i in event.changedTouches
 			if !@machines[i.identifier]?
-				iMachine = new StateMachine i.identifier
+				iMachine = new StateMachine i.identifier, this
 				iMachine.apply "touchstart", i
 				@machines[i.identifier] = iMachine
+				@nbmachines++
+				@analyser = new Analyser @nbmachines, @element
 
 
 	touchend: (event) ->
-			for iMKey in @machines.keys()
-				exists = false			
-				for iTouch in event.changedTouches
-					if iTouch.identifier == iMKey
-						exists = true
-				if !exists
-					@machines[iMKey].apply("touchend", event)					
+		event.preventDefault()
+		for iMKey in @machines.keys()
+			iMKey = parseInt(iMKey)
+			exists = false			
+			for iTouch in event.touches
+				if iTouch.identifier == iMKey
+					exists = true
+
+			if !exists
+				@machines[iMKey].apply("touchend", {})
+				delete @machines[iMKey]	
+				@nbmachines--
+				
 			
 	 
 	touchmove: (event) ->
+		event.preventDefault()
 		for i in event.changedTouches
-			@machines[i.identifier].apply("touchmove", event)		
+			if !@machines[i.identifier]? 
+				iMachine = new StateMachine i.identifier, this
+				iMachine.apply "touchstart", i
+				@machines[i.identifier] = iMachine
+			@machines[i.identifier].apply("touchmove", i)		
+			
 
-
+	broadcast: (name, eventObj) ->
+		analyser.notify name, eventObj
+		$("debug").innerHTML = "Router: [" + name + "] " + dump(eventObj) + "\n" + $("debug").innerHTML
 	
 window.onload = ->
 	new EventRouter $("body")

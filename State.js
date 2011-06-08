@@ -12,7 +12,7 @@
   	1 2 3		1 2 3
   	1 3		1 2
   
-  */  var $, Analyser, Drag, EventRouter, FirstTouch, FirstTouchDouble, GenericState, NoTouch, NoTouchDouble, StateMachine;
+  */  var $, Analyser, Drag, EventRouter, FirstTouch, FirstTouchDouble, Fixed, GenericState, NoTouch, NoTouchDouble, StateMachine;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -22,8 +22,9 @@
     return child;
   };
   StateMachine = (function() {
-    function StateMachine(identifier) {
+    function StateMachine(identifier, router) {
       this.identifier = identifier;
+      this.router = router;
       this.currentState = new NoTouch(this);
       this.analyser = new Analyser;
     }
@@ -46,25 +47,21 @@
     function GenericState(machine) {
       this.machine = machine;
       if (this.machine.currentState != null) {
-        this.param = this.machine.currentState.param;
+        this.eventObj = this.machine.currentState.eventObj;
       } else {
-        this.param = {
-          'identifier': this.machine.identifier
-        };
+        this.eventObj = {};
       }
       this.init();
     }
-    GenericState.prototype.apply = function(eventName, eventObj) {
-      this.eventObj = eventObj;
-      return this[eventName](this.eventObj);
+    GenericState.prototype.apply = function(eventName, arg) {
+      Object.merge(this.eventObj, arg);
+      return this[eventName]();
     };
     GenericState.prototype.touchstart = function() {};
     GenericState.prototype.touchmove = function() {};
     GenericState.prototype.touchend = function() {};
-    GenericState.prototype.xthrow = function(name, index) {
-      this.param.nbFingers = this.eventObj.touches.length;
-      $("debug").innerHTML = "throw " + name + " param: " + dump(this.param) + "\n" + $("debug").innerHTML;
-      return this.machine.analyser.add(name, this.param, index);
+    GenericState.prototype.notify = function(name) {
+      return this.machine.router.broadcast(name, this.eventObj);
     };
     return GenericState;
   })();
@@ -76,7 +73,7 @@
     NoTouch.prototype.description = function() {
       return "NoTouch state";
     };
-    NoTouch.prototype.touchstart = function(event) {
+    NoTouch.prototype.touchstart = function() {
       return this.machine.setState(new FirstTouch(this.machine));
     };
     return NoTouch;
@@ -90,18 +87,38 @@
       return "FirstTouch state";
     };
     FirstTouch.prototype.init = function() {
-      this.param.initX = event.touches[0].clientX;
-      return this.param.initY = event.touches[0].clientY;
+      var _machine;
+      _machine = this.machine;
+      this.fixedtimer = setTimeout((function() {
+        return _machine.setState(new Fixed(_machine));
+      }), 500);
+      this.eventObj.initX = this.eventObj.clientX;
+      return this.eventObj.initY = this.eventObj.clientY;
     };
     FirstTouch.prototype.touchend = function() {
-      this.xthrow("@tap");
-      return this.machine.setState(new NoTouchDouble(this.machine));
+      clearTimeout(this.fixedtimer);
+      this.notify("@tap");
+      return this.machine.setState(new NoTouch(this.machine));
     };
     FirstTouch.prototype.touchmove = function() {
-      this.xthrow("@drag");
+      clearTimeout(this.fixedtimer);
+      this.notify("@drag");
       return this.machine.setState(new Drag(this.machine));
     };
     return FirstTouch;
+  })();
+  Fixed = (function() {
+    __extends(Fixed, GenericState);
+    function Fixed() {
+      Fixed.__super__.constructor.apply(this, arguments);
+    }
+    Fixed.prototype.description = function() {
+      return "Fixed state";
+    };
+    Fixed.prototype.init = function() {
+      return this.notify("@fixed");
+    };
+    return Fixed;
   })();
   NoTouchDouble = (function() {
     __extends(NoTouchDouble, GenericState);
@@ -109,16 +126,15 @@
       NoTouchDouble.__super__.constructor.apply(this, arguments);
     }
     NoTouchDouble.prototype.description = function() {
-      return "NoTouch wait double state";
+      return "NoTouch (wait double) state";
     };
     NoTouchDouble.prototype.init = function() {
       var that;
-      that = this;
-      return setTimeout((function() {
-        return that.machine.setState(new NoTouch(that.machine));
-      }), 400);
+      return that = this;
     };
     NoTouchDouble.prototype.touchstart = function() {
+      alert('a');
+      clearTimeout(this.doubleTimer);
       return this.machine.setState(new FirstTouchDouble(this.machine));
     };
     return NoTouchDouble;
@@ -132,7 +148,8 @@
       return "FirstTouch double state";
     };
     FirstTouchDouble.prototype.touchend = function() {
-      this.xthrow("@doubletap");
+      alert('b');
+      this.notify("@doubletap");
       return this.machine.setState(new NoTouch(this.machine));
     };
     return FirstTouchDouble;
@@ -146,12 +163,10 @@
       return "Drag state";
     };
     Drag.prototype.touchmove = function() {
-      this.param.currentX = event.touches[0].clientX;
-      this.param.currentY = event.touches[0].clientY;
-      return this.xthrow("@drag");
+      return this.notify("@drag");
     };
     Drag.prototype.touchend = function() {
-      this.xthrow("@dragend");
+      this.notify("@dragend");
       return this.machine.setState(new NoTouch(this.machine));
     };
     return Drag;
@@ -204,6 +219,15 @@ Object.prototype.keys = function ()
   return keys;
 }
 
+Object.merge = function(destination, source) {
+    for (var property in source) {
+        if (source.hasOwnProperty(property)) {
+            destination[property] = source[property];
+        }
+    }
+    return destination;
+};
+
 ;
   $ = function(element) {
     return document.getElementById(element);
@@ -246,41 +270,53 @@ Object.prototype.keys = function ()
     }
     EventRouter.prototype.touchstart = function(event) {
       var i, iMachine, _i, _len, _ref, _results;
+      event.preventDefault();
       _ref = event.changedTouches;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
-        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine) : void 0);
+        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine) : void 0);
       }
       return _results;
     };
     EventRouter.prototype.touchend = function(event) {
       var exists, iMKey, iTouch, _i, _j, _len, _len2, _ref, _ref2, _results;
+      event.preventDefault();
       _ref = this.machines.keys();
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         iMKey = _ref[_i];
+        iMKey = parseInt(iMKey);
         exists = false;
-        _ref2 = event.changedTouches;
+        _ref2 = event.touches;
         for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
           iTouch = _ref2[_j];
           if (iTouch.identifier === iMKey) {
             exists = true;
           }
         }
-        _results.push(!exists ? this.machines[iMKey].apply("touchend", event) : void 0);
+        _results.push(!exists ? (this.machines[iMKey].apply("touchend", {}), delete this.machines[iMKey]) : void 0);
       }
       return _results;
     };
     EventRouter.prototype.touchmove = function(event) {
-      var i, _i, _len, _ref, _results;
+      var i, iMachine, _i, _len, _ref, _results;
+      event.preventDefault();
       _ref = event.changedTouches;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
-        _results.push(this.machines[i.identifier].apply("touchmove", event));
+        if (!(this.machines[i.identifier] != null)) {
+          iMachine = new StateMachine(i.identifier, this);
+          iMachine.apply("touchstart", i);
+          this.machines[i.identifier] = iMachine;
+        }
+        _results.push(this.machines[i.identifier].apply("touchmove", i));
       }
       return _results;
+    };
+    EventRouter.prototype.broadcast = function(name, eventObj) {
+      return $("debug").innerHTML = "Router: [" + name + "] " + dump(eventObj) + "\n" + $("debug").innerHTML;
     };
     return EventRouter;
   })();
