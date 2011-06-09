@@ -8,40 +8,6 @@
     calls = this._callbacks || (this._callbacks = {});
     list = this._callbacks[eventName] || (this._callbacks[eventName] = []);
     list.push(callback);
-    /*
-    	*/
-    /*
-    
-    	that = this
-    	## Initializing specific properties for this given object
-    	@touchProperties = {};
-    	@touchProperties.dateLastTouch = 0
-    	
-    	this.addEventListener 'touchstart', (event) ->
-    		@touchProperties.isTouched = true
-    
-    		## Tap
-    		## If a simple tap is done, trigger "tap"
-    		this.trigger "tap"
-    
-    		## Double Tap
-    		## If two tap are separated from 500 ms, trigger "doubletap"
-    		_t = (new Date()).getTime()
-    		if (_t - @touchProperties.dateLastTouch) < 1000
-    			this.trigger "doubletap"
-    		@touchProperties.dateLastTouch = _t
-    		
-    		## Press
-    		setTimeout(-> 
-    			if that.touchProperties.isTouched == true
-    				that.trigger "press"
-    		, 5000);
-    
-    	
-    	for evtName in ['touchcancel','touchend']
-    		@touchProperties.isTouched = false
-    	
-    	*/
     return this;
   };
   Object.prototype.unbind = function(ev, callback) {
