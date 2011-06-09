@@ -32,9 +32,6 @@ class GenericState
 
 	notify: (name) ->
 		@machine.router.broadcast(name, @eventObj)
-	
-
-
 
 class NoTouch extends GenericState
 	description: -> "NoTouch state"
@@ -174,7 +171,6 @@ class EventRouter
 				iMachine = new StateMachine i.identifier, this
 				iMachine.apply "touchstart", i
 				@machines[i.identifier] = iMachine
-				$('debug').innerHTML += event.touches.length
 				@analyser = new Analyser event.touches.length, @element
 
 
@@ -205,7 +201,6 @@ class EventRouter
 
 	broadcast: (name, eventObj) ->
 		@analyser.notify(eventObj.identifier, name, eventObj)
-##		$("debug").innerHTML = " Router: [" + name + "] " + dump(eventObj) + " \n " + $("debug").innerHTML
 ###
 ------------------------------------------------------------------------------------------------------------------------------ Analyser
 ###
@@ -220,19 +215,21 @@ distanceBetweenTwoPoints = (x1, y1, x2, y2) ->
 
 getDirection = (deltaX, deltaY) ->
 	if deltaX > 0 and deltaY < 0 ## Right top side of the circle
-		if Math.abs(deltaX) > Math.abs(deltaY) then "right" else "up"
+		if Math.abs(deltaX) > Math.abs(deltaY) then return "right" else return "up"
 	if deltaX > 0 and deltaY > 0 ## Right bottom side of the circle
-		if Math.abs(deltaX) > Math.abs(deltaY) then "right" else "down"
+		if Math.abs(deltaX) > Math.abs(deltaY) then return "right" else return "down"
 	if deltaX < 0 and deltaY < 0 ## Left top side of the circle
-		if Math.abs(deltaX) > Math.abs(deltaY) then "left" else "up"
+		if Math.abs(deltaX) > Math.abs(deltaY) then return "left" else return "up"
 	if deltaX < 0 and deltaY > 0 ## Left top side of the circle
-		if Math.abs(deltaX) > Math.abs(deltaY) then "left" else "down"
+		if Math.abs(deltaX) > Math.abs(deltaY) then return "left" else return "down"
+	return "diagonal"
 
 ## Finger Object which contains an Id, a gesture and all important parameters
 ## Params:
 ##		fingerId
 ##		gestureName
 ##		params
+## TODO panX panY
 class FingerGesture
 	constructor: (@fingerId, @gestureName, eventObj) ->
 		date = new Date()
@@ -256,6 +253,7 @@ class Analyser
 	## Create an analyser object with total number of fingers and an array of all fingers as attribute
 	constructor: (@totalNbFingers, @targetElement) ->
 		@fingersArray = {}
+		@firstAnalysis = true
 	
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
 	notify: (fingerID, gestureName, params) ->
@@ -265,7 +263,7 @@ class Analyser
 			@fingersArray[fingerID] =  new FingerGesture(fingerID, gestureName, params)
 		
 		@analyse @totalNbFingers if _.size(@fingersArray) is @totalNbFingers
-		
+				
 	
 	## Redirect to the correct analysis method depending the number of finger	
 	analyse: (nbFingers) ->
@@ -284,16 +282,20 @@ class Analyser
 		for key of @fingersArray
 			if @fingersArray.hasOwnProperty key
 				finger = @fingersArray[key]
-
+		@informations = 
+			first: finger.params
+			global: {}
+		
 		switch finger.gestureName
-			when "tap" then @targetElement.trigger "tap", finger.params
-			when "doubleTap" then @targetElement.trigger "doubleTap", finger.params
-			when "fixed" then @targetElement.trigger "fixed", finger.params
+			when "tap" then @informations.global.type = "tap"
+			when "doubleTap" then @informations.global.type = "doubleTap"
+			when "fixed" then @informations.global.type ="fixed"
 			when "drag"
 				deltaX = finger.params.x - finger.params.startX
 				deltaY = finger.params.y - finger.params.startY
-				@targetElement.trigger getDirection(deltaX, deltaY), finger.params 
-				
+				@informations.global.type = getDirection(deltaX, deltaY)
+		@targetElement.trigger(@informations.global.type, @informations)
+		
 	###----------------------------------------------------------------------------------------------------------------
 	## Two Finger Gesture
 	###
@@ -307,52 +309,61 @@ class Analyser
 				firstFinger = @fingersArray[key] if i == 1
 				secondFinger = @fingersArray[key] if i == 2
 		gestureName = firstFinger.gestureName + "," + secondFinger.gestureName
-
-		## Detection of finger order. First one will be the first from the left
-		if firstFinger.params.x > secondFinger.params.x
-			Object.swap firstFinger, secondFinger
-		informations =
-			first: firstFinger.params
-			second: secondFinger.params
+		if @firstAnalysis
+			## Detection of finger order. First one will be the first from the left
+			if firstFinger.params.x > secondFinger.params.x
+				Object.swap firstFinger, secondFinger
+			@informations =
+				first: firstFinger.params
+				second: secondFinger.params
+				global:
+					scale: 1
+					initialDistance: distanceBetweenTwoPoints firstFinger.params.startX, firstFinger.params.startY, secondFinger.params.startX, secondFinger.params.startY
+			@firstAnalysis = false
 		switch gestureName
 			when "tap,tap"
-				informations.global = 
-					distance: distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
+				@informations.global.distance = distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
 
-				@targetElement.trigger "tap,tap", informations
-				@targetElement.trigger "two:tap", informations
-				
+				@informations.global.type = "tap,tap"
+				@targetElement.trigger "two:tap", @informations
+
 			when "fixed,drag", "drag,fixed"
 				## Detection of finger order. First one will be the first from the left
-				informations.global =
-					distance: distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
-
+				@informations.global.distance = distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
 				if firstFinger.gestureName == "fixed"
 					deltaX = secondFinger.params.x - secondFinger.params.startX
 					deltaY = secondFinger.params.y - secondFinger.params.startY
-					@targetElement.trigger "fixed,#{getDirection(deltaX, deltaY)}", informations
+					@informations.global.type = "fixed,#{getDirection(deltaX, deltaY)}"
 				else 
 					deltaX = firstFinger.params.x - firstFinger.params.startX
 					deltaY = firstFinger.params.y - firstFinger.params.startY
-					@targetElement.trigger "#{getDirection(deltaX, deltaY)},fixed", informations
+					@informations.global.type = "#{getDirection(deltaX, deltaY)},fixed"
 			
 			when "doubleTap,doubleTap"
-				@targetElement.trigger "doubleTap,doubleTap", informations
+				@informations.global.type = "doubleTap,doubleTap"
 				
 			when "fixed,fixed"
-				@targetElement.trigger "fixed,fixed", informations
+				@informations.global.type = "fixed,fixed"
 				
 			when "drag,drag"
+				initialDistance = @informations.global.initialDistance
+				scale = @informations.global.scale
 				## Et c'est là qu'on souffre
-				informations.global =
-					distance: distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
-				deltaX = secondFinger.params.x - secondFinger.params.startX
-				deltaY = secondFinger.params.y - secondFinger.params.startY
-				@targetElement.trigger "#{getDirection(deltaX, deltaY)},#{getDirection(deltaX, deltaY)}", informations
+				@informations.global.distance = distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
+				@informations.global.scale =  (@informations.global.distance / @informations.global.initialDistance) ##/
+				if @informations.global.scale < 0.8
+					@informations.global.type = "pinch"
+				else if @informations.global.scale > 1.2
+					@informations.global.type = "spread"
+				else
+					deltaX1 = firstFinger.params.x - firstFinger.params.startX
+					deltaY1 = firstFinger.params.y - firstFinger.params.startY
+					deltaX2 = secondFinger.params.x - secondFinger.params.startX
+					deltaY2 = secondFinger.params.y - secondFinger.params.startY
+					@informations.global.type = "#{getDirection(deltaX1, deltaY1)},#{getDirection(deltaX2, deltaY2)}"
+		@targetElement.trigger @informations.global.type, @informations
 				
 window.onload = ->	
 	new EventRouter $("blue")
-	$("blue").bind "fixed,down", (params) ->
-		alert "??"
-##		$("debug").innerHTML += params.second.x
-	
+	$("blue").bind "all", (a, params) ->
+		$("debug").innerHTML = params.global.type + "<br />" + $("debug").innerHTML
