@@ -89,11 +89,18 @@ class FirstTouchDouble extends GenericState
 
 
 class Drag extends GenericState
-	description: -> "Drag state"
+	description: ->"Drag state"
+	init: ->
+		@isTap = true
+		that = this		
+		setTimeout (->that.isTap = false), 200
 	touchmove: ->
 		@notify "drag"
 	touchend: ->
-		@notify "dragend"
+		if @isTap
+			@notify "tap"
+		else
+			@notify "dragend"
 		@machine.setState(new NoTouch @machine)
 
 
@@ -204,7 +211,7 @@ class EventRouter
 
 	broadcast: (name, eventObj) ->
 		@analyser.notify(eventObj.identifier, name, eventObj)
-		$("debug").innerHTML = " Router: [" + name + "] " + dump(eventObj) + " \n " + $("debug").innerHTML
+		$("debug").innerHTML = "[<strong>" + name + "</strong>] " + dump(eventObj) + " <br /> " + $("debug").innerHTML
 ###
 ------------------------------------------------------------------------------------------------------------------------------ Analyser
 ###
@@ -360,6 +367,5 @@ class Analyser
 				
 window.onload = ->	
 	new EventRouter $("blue")
-	$("blue").bind "tap,tap", (params) ->
-		alert "Tap-Tap!!"
+
 	

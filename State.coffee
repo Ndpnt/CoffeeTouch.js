@@ -86,11 +86,18 @@ class FirstTouchDouble extends GenericState
 
 
 class Drag extends GenericState
-	description: -> "Drag state"
+	description: ->"Drag state"
+	init: ->
+		@isTap = true
+		that = this		
+		setTimeout(->that.isTap = false), 200
 	touchmove: ->
-		@notify "@drag"
+		@notify "drag"
 	touchend: ->
-		@notify "@dragend"
+		if @isTap
+			@notifiy "tap"
+		else
+			@notify "dragend"
 		@machine.setState(new NoTouch @machine)
 
 
