@@ -42,6 +42,3 @@ Object.prototype.trigger =  function(ev) {
 	  return this;
 	};
 `
-
-$ = (element) ->
-	document.getElementById element

@@ -49,8 +49,4 @@ Object.prototype.trigger =  function(ev) {
 	  }
 	  return this;
 	};
-;
-  $ = function(element) {
-    return document.getElementById(element);
-  };
 }).call(this);
