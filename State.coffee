@@ -1,18 +1,3 @@
-###
-	tap
-	doubletap
-	drag
-	dragend
-
-	automate 	touch[x]
-	1		1
-	
-	1 2		1 2
-	1 2 3		1 2 3
-	1 3		1 2
-
-###
-
 ####################### State Machine ####################### 
 class StateMachine
 	constructor: (@identifier, @router)-> 
@@ -87,7 +72,6 @@ class NoTouchDouble extends GenericState
 		#@doubleTimer = setTimeout (-> alert('x');that.machine.setState(new NoTouch that.machine)), 400
 
 	touchstart: ->
-		alert('a');
 		clearTimeout @doubleTimer
 		@machine.setState(new FirstTouchDouble @machine)
 
@@ -96,7 +80,6 @@ class NoTouchDouble extends GenericState
 class FirstTouchDouble extends GenericState
 	description: -> "FirstTouch double state"
 	touchend: ->
-		alert('b');
 		@notify "@doubletap"
 		@machine.setState(new NoTouch @machine)
 	
@@ -168,15 +151,7 @@ Object.merge = function(destination, source) {
     }
     return destination;
 };
-
 `
-$ = (element) ->
-	document.getElementById element
-
-Object::bind = (eventName, callback) ->
-	calls = @_callbacks or @_callbacks = {}
-	list = @_callbacks[eventName] or @_callbacks[eventName] = []
-	list.push callback
 
 ####################### EventRouter   ####################### 
 
@@ -228,12 +203,9 @@ class EventRouter
 			
 
 	broadcast: (name, eventObj) ->
-		analyser.notify name, eventObj
+		@analyser.notify(eventObj.identifier, name, eventObj)
 		$("debug").innerHTML = "Router: [" + name + "] " + dump(eventObj) + "\n" + $("debug").innerHTML
 	
-window.onload = ->
-	new EventRouter $("body")
-
 
 
 

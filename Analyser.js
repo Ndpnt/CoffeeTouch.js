@@ -1,92 +1,292 @@
 (function() {
   /*
-  ## The bind, unbind and trigger function have been taken from Backbone Framework.
-  ## The bind function has been changed
-  */  var $, Analyser, FingerGesture, distanceBetweenTwoPoints, getDirection;
-  Object.prototype.bind = function(eventName, callback) {
-    var calls, list;
-    calls = this._callbacks || (this._callbacks = {});
-    list = this._callbacks[eventName] || (this._callbacks[eventName] = []);
-    list.push(callback);
-    /*
-    	*/
-    /*
-    
-    	that = this
-    	## Initializing specific properties for this given object
-    	@touchProperties = {};
-    	@touchProperties.dateLastTouch = 0
-    	
-    	this.addEventListener 'touchstart', (event) ->
-    		@touchProperties.isTouched = true
-    
-    		## Tap
-    		## If a simple tap is done, trigger "tap"
-    		this.trigger "tap"
-    
-    		## Double Tap
-    		## If two tap are separated from 500 ms, trigger "doubletap"
-    		_t = (new Date()).getTime()
-    		if (_t - @touchProperties.dateLastTouch) < 1000
-    			this.trigger "doubletap"
-    		@touchProperties.dateLastTouch = _t
-    		
-    		## Press
-    		setTimeout(-> 
-    			if that.touchProperties.isTouched == true
-    				that.trigger "press"
-    		, 5000);
-    
-    	
-    	for evtName in ['touchcancel','touchend']
-    		@touchProperties.isTouched = false
-    	
-    	*/
-    return this;
+  ------------------------------------------------------------------------------------------------------------------------------ State
+  */  var Analyser, Drag, EventRouter, FingerGesture, FirstTouch, FirstTouchDouble, Fixed, GenericState, NoTouch, NoTouchDouble, StateMachine, distanceBetweenTwoPoints, getDirection;
+  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
   };
-  Object.prototype.unbind = function(ev, callback) {
-    var calls, i, list, _i, _len;
-    if (!ev) {
-      this._callbacks = {};
-    } else if (calls = this._callbacks) {
-      if (!callback) {
-        calls[ev] = [];
+  StateMachine = (function() {
+    function StateMachine(identifier, router) {
+      this.identifier = identifier;
+      this.router = router;
+      this.currentState = new NoTouch(this);
+      this.analyser = new Analyser;
+    }
+    StateMachine.prototype.apply = function(eventName, eventObj) {
+      return this.currentState.apply(eventName, eventObj);
+    };
+    StateMachine.prototype.setState = function(newState) {
+      return this.currentState = newState;
+    };
+    StateMachine.prototype.getState = function() {
+      return this.currentState;
+    };
+    return StateMachine;
+  })();
+  GenericState = (function() {
+    GenericState.prototype.description = function() {
+      return "Generic state";
+    };
+    GenericState.prototype.init = function() {};
+    function GenericState(machine) {
+      this.machine = machine;
+      if (this.machine.currentState != null) {
+        this.eventObj = this.machine.currentState.eventObj;
       } else {
-        list = calls[ev];
-        if (!list) {
-          return this;
+        this.eventObj = {};
+      }
+      this.init();
+    }
+    GenericState.prototype.apply = function(eventName, arg) {
+      Object.merge(this.eventObj, arg);
+      return this[eventName]();
+    };
+    GenericState.prototype.touchstart = function() {};
+    GenericState.prototype.touchmove = function() {};
+    GenericState.prototype.touchend = function() {};
+    GenericState.prototype.notify = function(name) {
+      return this.machine.router.broadcast(name, this.eventObj);
+    };
+    return GenericState;
+  })();
+  NoTouch = (function() {
+    function NoTouch() {
+      NoTouch.__super__.constructor.apply(this, arguments);
+    }
+    __extends(NoTouch, GenericState);
+    NoTouch.prototype.description = function() {
+      return "NoTouch state";
+    };
+    NoTouch.prototype.touchstart = function() {
+      return this.machine.setState(new FirstTouch(this.machine));
+    };
+    return NoTouch;
+  })();
+  FirstTouch = (function() {
+    function FirstTouch() {
+      FirstTouch.__super__.constructor.apply(this, arguments);
+    }
+    __extends(FirstTouch, GenericState);
+    FirstTouch.prototype.description = function() {
+      return "FirstTouch state";
+    };
+    FirstTouch.prototype.init = function() {
+      var _machine;
+      _machine = this.machine;
+      this.fixedtimer = setTimeout((function() {
+        return _machine.setState(new Fixed(_machine));
+      }), 500);
+      this.eventObj.initX = this.eventObj.clientX;
+      return this.eventObj.initY = this.eventObj.clientY;
+    };
+    FirstTouch.prototype.touchend = function() {
+      clearTimeout(this.fixedtimer);
+      this.notify("tap");
+      return this.machine.setState(new NoTouch(this.machine));
+    };
+    FirstTouch.prototype.touchmove = function() {
+      clearTimeout(this.fixedtimer);
+      this.notify("drag");
+      return this.machine.setState(new Drag(this.machine));
+    };
+    return FirstTouch;
+  })();
+  Fixed = (function() {
+    function Fixed() {
+      Fixed.__super__.constructor.apply(this, arguments);
+    }
+    __extends(Fixed, GenericState);
+    Fixed.prototype.description = function() {
+      return "Fixed state";
+    };
+    Fixed.prototype.init = function() {
+      return this.notify("fixed");
+    };
+    return Fixed;
+  })();
+  NoTouchDouble = (function() {
+    function NoTouchDouble() {
+      NoTouchDouble.__super__.constructor.apply(this, arguments);
+    }
+    __extends(NoTouchDouble, GenericState);
+    NoTouchDouble.prototype.description = function() {
+      return "NoTouch (wait double) state";
+    };
+    NoTouchDouble.prototype.init = function() {
+      var that;
+      return that = this;
+    };
+    NoTouchDouble.prototype.touchstart = function() {
+      clearTimeout(this.doubleTimer);
+      return this.machine.setState(new FirstTouchDouble(this.machine));
+    };
+    return NoTouchDouble;
+  })();
+  FirstTouchDouble = (function() {
+    function FirstTouchDouble() {
+      FirstTouchDouble.__super__.constructor.apply(this, arguments);
+    }
+    __extends(FirstTouchDouble, GenericState);
+    FirstTouchDouble.prototype.description = function() {
+      return "FirstTouch double state";
+    };
+    FirstTouchDouble.prototype.touchend = function() {
+      this.notify("doubletap");
+      return this.machine.setState(new NoTouch(this.machine));
+    };
+    return FirstTouchDouble;
+  })();
+  Drag = (function() {
+    function Drag() {
+      Drag.__super__.constructor.apply(this, arguments);
+    }
+    __extends(Drag, GenericState);
+    Drag.prototype.description = function() {
+      return "Drag state";
+    };
+    Drag.prototype.touchmove = function() {
+      return this.notify("drag");
+    };
+    Drag.prototype.touchend = function() {
+      this.notify("dragend");
+      return this.machine.setState(new NoTouch(this.machine));
+    };
+    return Drag;
+  })();
+  
+function dump(arr,level) {
+		var dumped_text = "["
+		for(var item in arr) {
+			var value = arr[item];
+			if(typeof(value)=='function') continue;
+			dumped_text += item + "=" + value + " ";
+		}
+
+	return dumped_text + "]";
+}
+function print_r(obj) {
+  win_print_r = window.open('about:blank', 'win_print_r');
+  win_print_r.document.write('<html><body>');
+  r_print_r(obj, win_print_r);
+  win_print_r.document.write('</body></html>');
+ }
+
+ function r_print_r(theObj, win_print_r) {
+  if(theObj.constructor == Array ||
+   theObj.constructor == Object){
+   if (win_print_r == null)
+    win_print_r = window.open('about:blank', 'win_print_r');
+   }
+   for(var p in theObj){
+    if(theObj[p].constructor == Array||
+     theObj[p].constructor == Object){
+     win_print_r.document.write("<li>["+p+"] =>"+typeof(theObj)+"</li>");
+     win_print_r.document.write("<ul>")
+     r_print_r(theObj[p], win_print_r);
+     win_print_r.document.write("</ul>")
+    } else {
+     win_print_r.document.write("<li>["+p+"] =>"+theObj[p]+"</li>");
+    }
+   }
+  win_print_r.document.write("</ul>")
+ }
+
+Object.prototype.keys = function ()
+{
+  var keys = [];
+  for(var i in this) if (this.hasOwnProperty(i))
+  {
+    keys.push(i);
+  }
+  return keys;
+}
+
+Object.merge = function(destination, source) {
+    for (var property in source) {
+        if (source.hasOwnProperty(property)) {
+            destination[property] = source[property];
         }
-        for (_i = 0, _len = list.length; _i < _len; _i++) {
-          i = list[_i];
-          if (callback === list[i]) {
-            list.splice(i, 1);
-            break;
+    }
+    return destination;
+};
+;
+  EventRouter = (function() {
+    function EventRouter(element) {
+      var that;
+      this.element = element;
+      this.machines = {};
+      that = this;
+      this.element.addEventListener("touchstart", function(event) {
+        return that.touchstart(event);
+      });
+      this.element.addEventListener("touchend", function(event) {
+        return that.touchend(event);
+      });
+      this.element.addEventListener("touchmove", function(event) {
+        return that.touchmove(event);
+      });
+    }
+    EventRouter.prototype.touchstart = function(event) {
+      var i, iMachine, _i, _len, _ref, _results;
+      event.preventDefault();
+      _ref = event.changedTouches;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        i = _ref[_i];
+        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine, this.analyser = new Analyser(event.touches.length, this.element)) : void 0);
+      }
+      return _results;
+    };
+    EventRouter.prototype.touchend = function(event) {
+      var exists, iMKey, iTouch, _i, _j, _len, _len2, _ref, _ref2, _results;
+      event.preventDefault();
+      _ref = this.machines.keys();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        iMKey = _ref[_i];
+        iMKey = parseInt(iMKey);
+        exists = false;
+        _ref2 = event.touches;
+        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+          iTouch = _ref2[_j];
+          if (iTouch.identifier === iMKey) {
+            exists = true;
           }
         }
+        _results.push(!exists ? (this.machines[iMKey].apply("touchend", {}), delete this.machines[iMKey]) : void 0);
       }
-    }
-    return this;
-  };
-  
-Object.prototype.trigger =  function(ev) {
-	  var list, calls, i, l;
-	  if (!(calls = this._callbacks)) return this;
-	  if (list = calls[ev]) {
-	    for (i = 0, l = list.length; i < l; i++) {
-	      list[i].apply(this, Array.prototype.slice.call(arguments, 1));
-	    }
-	  }
-	  if (list = calls['all']) {
-	    for (i = 0, l = list.length; i < l; i++) {
-	      list[i].apply(this, arguments);
-	    }
-	  }
-	  return this;
-	};
-;
-  $ = function(element) {
-    return document.getElementById(element);
-  };
+      return _results;
+    };
+    EventRouter.prototype.touchmove = function(event) {
+      var i, iMachine, _i, _len, _ref, _results;
+      event.preventDefault();
+      _ref = event.changedTouches;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        i = _ref[_i];
+        if (!(this.machines[i.identifier] != null)) {
+          iMachine = new StateMachine(i.identifier, this);
+          iMachine.apply("touchstart", i);
+          this.machines[i.identifier] = iMachine;
+        }
+        _results.push(this.machines[i.identifier].apply("touchmove", i));
+      }
+      return _results;
+    };
+    EventRouter.prototype.broadcast = function(name, eventObj) {
+      this.analyser.notify(eventObj.identifier, name, eventObj);
+      return $("debug").innerHTML = " Router: [" + name + "] " + dump(eventObj) + " \n " + $("debug").innerHTML;
+    };
+    return EventRouter;
+  })();
+  /*
+  ------------------------------------------------------------------------------------------------------------------------------ Analyser
+  */
   Object.swap = function(obj1, obj2) {
     var temp;
     temp = obj2;
@@ -278,24 +478,15 @@ Object.prototype.trigger =  function(ev) {
           };
           deltaX = secondFinger.params.x - secondFinger.params.startX;
           deltaY = secondFinger.params.y - secondFinger.params.startY;
-          alert("" + deltaX + " " + deltaY);
-          alert(getDirection(deltaX, deltaY));
           return this.targetElement.trigger("" + (getDirection(deltaX, deltaY)) + "," + (getDirection(deltaX, deltaY)), informations);
       }
     };
     return Analyser;
   })();
   window.onload = function() {
-    var analyser;
-    $('blue').bind("down,down", function(params) {
-      return $('blue').style.backgroundColor = "rgb(255,0,0)";
-    });
-    analyser = new Analyser(2, $('blue'));
-    return $('blue').addEventListener('touchmove', function(event) {
-      if (event.touches.length === 2) {
-        analyser.notify(1, "drag", event.touches[1]);
-        return analyser.notify(2, "drag", event.touches[0]);
-      }
+    new EventRouter($("blue"));
+    return $("blue").bind("tap,tap", function(params) {
+      return alert("Tap-Tap!!");
     });
   };
 }).call(this);
