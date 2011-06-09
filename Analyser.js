@@ -55,10 +55,10 @@
     return GenericState;
   })();
   NoTouch = (function() {
-    __extends(NoTouch, GenericState);
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(NoTouch, GenericState);
     NoTouch.prototype.description = function() {
       return "NoTouch state";
     };
@@ -68,10 +68,10 @@
     return NoTouch;
   })();
   FirstTouch = (function() {
-    __extends(FirstTouch, GenericState);
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(FirstTouch, GenericState);
     FirstTouch.prototype.description = function() {
       return "FirstTouch state";
     };
@@ -97,10 +97,10 @@
     return FirstTouch;
   })();
   Fixed = (function() {
-    __extends(Fixed, GenericState);
     function Fixed() {
       Fixed.__super__.constructor.apply(this, arguments);
     }
+    __extends(Fixed, GenericState);
     Fixed.prototype.description = function() {
       return "Fixed state";
     };
@@ -110,10 +110,10 @@
     return Fixed;
   })();
   Drag = (function() {
-    __extends(Drag, GenericState);
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
+    __extends(Drag, GenericState);
     Drag.prototype.description = function() {
       return "Drag state";
     };
@@ -222,11 +222,7 @@ Object.merge = function(destination, source) {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
-<<<<<<< HEAD
-        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine, this.analyser = new Analyser(event.touches.length, this.element)) : void 0);
-=======
         _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine, this.fingerCount = event.touches.length) : void 0);
->>>>>>> 376c05d342f56569f8bbcdaef2dc1001620e9496
       }
       return _results;
     };
@@ -276,7 +272,6 @@ Object.merge = function(destination, source) {
       this.savedTap = {};
     }
     EventGrouper.prototype.receive = function(name, eventObj, fingerCount, element) {
-      $("debug").innerHTML = ("Receiver.receive  " + name + " <br /> ") + $("debug").innerHTML;
       if (this.fingerCount !== fingerCount) {
         this.fingerCount = fingerCount;
         this.analyser = new Analyser(this.fingerCount, element);
@@ -293,7 +288,6 @@ Object.merge = function(destination, source) {
       return this.send(name, eventObj);
     };
     EventGrouper.prototype.send = function(name, eventObj) {
-      $("debug").innerHTML = ("Receiver.send " + name + " <br /> ") + $("debug").innerHTML;
       return this.analyser.notify(eventObj.identifier, name, eventObj);
     };
     return EventGrouper;
@@ -378,10 +372,7 @@ Object.merge = function(destination, source) {
         this.fingersArray[fingerID] = new FingerGesture(fingerID, gestureName, params);
       }
       if (_.size(this.fingersArray) === this.totalNbFingers) {
-        this.analyse(this.totalNbFingers);
-      }
-      if (_.size(this.fingersArray) === this.totalNbFingers) {
-        return $("debug").innerHTML = "" + gestureName + "<br /> " + $("debug").innerHTML;
+        return this.analyse(this.totalNbFingers);
       }
     };
     Analyser.prototype.analyse = function(nbFingers) {
@@ -415,7 +406,6 @@ Object.merge = function(destination, source) {
         global: {}
       };
       switch (finger.gestureName) {
-<<<<<<< HEAD
         case "tap":
           this.informations.global.type = "tap";
           break;
@@ -429,14 +419,6 @@ Object.merge = function(destination, source) {
           deltaX = finger.params.x - finger.params.startX;
           deltaY = finger.params.y - finger.params.startY;
           this.informations.global.type = getDirection(deltaX, deltaY);
-=======
-        case "drag":
-          deltaX = finger.params.x - finger.params.startX;
-          deltaY = finger.params.y - finger.params.startY;
-          return this.targetElement.trigger(getDirection(deltaX, deltaY), finger.params);
-        default:
-          return this.targetElement.trigger(finger.gestureName, finger.params);
->>>>>>> 376c05d342f56569f8bbcdaef2dc1001620e9496
       }
       return this.targetElement.trigger(this.informations.global.type, this.informations);
     };
@@ -444,51 +426,63 @@ Object.merge = function(destination, source) {
     	## Two Finger Gesture
     	*/
     Analyser.prototype.twoFingersGesture = function() {
-      var deltaX, deltaX1, deltaX2, deltaY, deltaY1, deltaY2, firstFinger, gestureName, i, initialDistance, key, scale, secondFinger;
+      var a1, a2, b1, b2, deltaX, deltaX1, deltaX2, deltaY, deltaY1, deltaY2, gestureName, i, initialDistance, key, scale, type;
       i = 0;
       gestureName = "";
-      for (key in this.fingersArray) {
-        if (this.fingersArray.hasOwnProperty(key)) {
-          i++;
-          if (i === 1) {
-            firstFinger = this.fingersArray[key];
-          }
-          if (i === 2) {
-            secondFinger = this.fingersArray[key];
+      if (this.firstAnalysis) {
+        for (key in this.fingersArray) {
+          if (this.fingersArray.hasOwnProperty(key)) {
+            i++;
+            if (i === 1) {
+              this.firstFinger = this.fingersArray[key];
+            }
+            if (i === 2) {
+              this.secondFinger = this.fingersArray[key];
+            }
           }
         }
-      }
-      gestureName = firstFinger.gestureName + "," + secondFinger.gestureName;
-      if (this.firstAnalysis) {
-        if (firstFinger.params.x > secondFinger.params.x) {
-          Object.swap(firstFinger, secondFinger);
+        if (this.firstFinger.params.x > this.secondFinger.params.x) {
+          Object.swap(this.firstFinger, this.secondFinger);
         }
         this.informations = {
-          first: firstFinger.params,
-          second: secondFinger.params,
+          first: this.firstFinger.params,
+          second: this.secondFinger.params,
           global: {
             scale: 1,
-            initialDistance: distanceBetweenTwoPoints(firstFinger.params.startX, firstFinger.params.startY, secondFinger.params.startX, secondFinger.params.startY)
+            initialDistance: distanceBetweenTwoPoints(this.firstFinger.params.startX, this.firstFinger.params.startY, this.secondFinger.params.startX, this.secondFinger.params.startY)
           }
         };
+        this.informations.global.distance = distanceBetweenTwoPoints(this.firstFinger.params.x, this.firstFinger.params.y, this.secondFinger.params.x, this.secondFinger.params.y);
         this.firstAnalysis = false;
       }
+      gestureName = this.firstFinger.gestureName + "," + this.secondFinger.gestureName;
       switch (gestureName) {
         case "tap,tap":
-          this.informations.global.distance = distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y);
           this.informations.global.type = "tap,tap";
           this.targetElement.trigger("two:tap", this.informations);
           break;
+        case "doubleTap,doubleTap":
+          this.informations.global.type = "" + this.firstFinger.gestureName + "," + this.secondFinger.gestureName;
+          this.targetElement.trigger("two:doubleTap", this.informations);
+          break;
+        case "fixed,tap":
+        case "tap,fixed":
+          this.informations.global.type = "" + this.firstFinger.gestureName + "," + this.secondFinger.gestureName;
+          break;
+        case "fixed,doubleTap":
+        case "doubleTap,fixed":
+          this.informations.global.type = "" + this.firstFinger.gestureName + "," + this.secondFinger.gestureName;
+          break;
         case "fixed,drag":
         case "drag,fixed":
-          this.informations.global.distance = distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y);
-          if (firstFinger.gestureName === "fixed") {
-            deltaX = secondFinger.params.x - secondFinger.params.startX;
-            deltaY = secondFinger.params.y - secondFinger.params.startY;
+          this.informations.global.distance = distanceBetweenTwoPoints(this.firstFinger.params.x, this.firstFinger.params.y, this.secondFinger.params.x, this.secondFinger.params.y);
+          if (this.firstFinger.gestureName === "fixed") {
+            deltaX = this.secondFinger.params.x - this.secondFinger.params.startX;
+            deltaY = this.secondFinger.params.y - this.secondFinger.params.startY;
             this.informations.global.type = "fixed," + (getDirection(deltaX, deltaY));
           } else {
-            deltaX = firstFinger.params.x - firstFinger.params.startX;
-            deltaY = firstFinger.params.y - firstFinger.params.startY;
+            deltaX = this.firstFinger.params.x - this.firstFinger.params.startX;
+            deltaY = this.firstFinger.params.y - this.firstFinger.params.startY;
             this.informations.global.type = "" + (getDirection(deltaX, deltaY)) + ",fixed";
           }
           break;
@@ -501,32 +495,76 @@ Object.merge = function(destination, source) {
         case "drag,drag":
           initialDistance = this.informations.global.initialDistance;
           scale = this.informations.global.scale;
-          this.informations.global.distance = distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y);
+          this.informations.global.distance = distanceBetweenTwoPoints(this.firstFinger.params.x, this.firstFinger.params.y, this.secondFinger.params.x, this.secondFinger.params.y);
           this.informations.global.scale = this.informations.global.distance / this.informations.global.initialDistance;
+          a1 = (this.firstFinger.params.startY - this.firstFinger.params.y) / (this.firstFinger.params.startX - this.firstFinger.params.x);
+          a2 = (this.secondFinger.params.y - this.secondFinger.params.startY) / (this.secondFinger.params.x - this.secondFinger.params.startX);
+          b1 = this.firstFinger.params.y - (a1 * this.firstFinger.params.x);
+          b2 = this.secondFinger.params.y - (a2 * this.secondFinger.params.x);
+          $("debug").innerHTML = " angle1: " + Math.round(Math.atan2(this.firstFinger.params.x, this.firstFinger.params.y) * 100) / 100 + " angle2 :" + Math.round(Math.atan2(this.secondFinger.params.x, this.secondFinger.params.y) * 100) / 100 + "<br />" + $("debug").innerHTML;
           if (this.informations.global.scale < 0.8) {
             this.informations.global.type = "pinch";
           } else if (this.informations.global.scale > 1.2) {
             this.informations.global.type = "spread";
           } else {
-            deltaX1 = firstFinger.params.x - firstFinger.params.startX;
-            deltaY1 = firstFinger.params.y - firstFinger.params.startY;
-            deltaX2 = secondFinger.params.x - secondFinger.params.startX;
-            deltaY2 = secondFinger.params.y - secondFinger.params.startY;
-            this.informations.global.type = "" + (getDirection(deltaX1, deltaY1)) + "," + (getDirection(deltaX2, deltaY2));
+            deltaX1 = this.firstFinger.params.x - this.firstFinger.params.startX;
+            deltaY1 = this.firstFinger.params.y - this.firstFinger.params.startY;
+            deltaX2 = this.secondFinger.params.x - this.secondFinger.params.startX;
+            deltaY2 = this.secondFinger.params.y - this.secondFinger.params.startY;
+            type = "" + (getDirection(deltaX1, deltaY1)) + "," + (getDirection(deltaX2, deltaY2));
+            switch (type) {
+              case "right,left":
+                this.informations.global.type = "rotate:cw";
+                break;
+              case "left,right":
+                this.informations.global.type = "rotate:ccw";
+                break;
+              case "up,down":
+                this.informations.global.type = "rotate:cw";
+                break;
+              case "down,up":
+                this.informations.global.type = "rotate:ccw";
+                break;
+              default:
+                this.informations.global.type = type;
+            }
           }
       }
       return this.targetElement.trigger(this.informations.global.type, this.informations);
     };
+    /*----------------------------------------------------------------------------------------------------------------
+    	## Three Finger Gesture
+    	*/
+    Analyser.prototype.threeFingersGesture = function() {
+      var gestureName, i, key;
+      i = 0;
+      gestureName = "";
+      this.fingers = [];
+      if (this.firstAnalysis) {
+        for (key in this.fingersArray) {
+          if (this.fingersArray.hasOwnProperty(key)) {
+            i++;
+            this.fingers.push(this.fingersArray[key]);
+          }
+        }
+        this.fingers.sort(function(a, b) {
+          return a.startX - b.startY;
+        });
+        this.informations = {
+          first: this.fingers[0].params,
+          second: this.fingers[1].params,
+          third: this.fingers[2].params
+        };
+        this.firstAnalysis = false;
+      }
+      return gestureName = "" + this.fingers[0].gestureName + "," + this.fingers[1].gestureName + "," + this.fingers[2].gestureName;
+    };
     return Analyser;
   })();
   window.onload = function() {
-<<<<<<< HEAD
     new EventRouter($("blue"));
     return $("blue").bind("all", function(a, params) {
       return $("debug").innerHTML = params.global.type + "<br />" + $("debug").innerHTML;
     });
-=======
-    return new EventRouter($("blue"));
->>>>>>> 376c05d342f56569f8bbcdaef2dc1001620e9496
   };
 }).call(this);
