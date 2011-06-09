@@ -238,7 +238,7 @@ Object.merge = function(destination, source) {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
-        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine, this.analyser = new Analyser(event.touches.length, this.element)) : void 0);
+        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine, $('debug').innerHTML += event.touches.length, this.analyser = new Analyser(event.touches.length, this.element)) : void 0);
       }
       return _results;
     };
@@ -279,8 +279,7 @@ Object.merge = function(destination, source) {
       return _results;
     };
     EventRouter.prototype.broadcast = function(name, eventObj) {
-      this.analyser.notify(eventObj.identifier, name, eventObj);
-      return $("debug").innerHTML = " Router: [" + name + "] " + dump(eventObj) + " \n " + $("debug").innerHTML;
+      return this.analyser.notify(eventObj.identifier, name, eventObj);
     };
     return EventRouter;
   })();
@@ -425,31 +424,24 @@ Object.merge = function(destination, source) {
         }
       }
       gestureName = firstFinger.gestureName + "," + secondFinger.gestureName;
+      if (firstFinger.params.x > secondFinger.params.x) {
+        Object.swap(firstFinger, secondFinger);
+      }
+      informations = {
+        first: firstFinger.params,
+        second: secondFinger.params
+      };
       switch (gestureName) {
         case "tap,tap":
-          if (firstFinger.params.x > secondFinger.params.x) {
-            Object.swap(firstFinger, secondFinger);
-          }
-          informations = {
-            first: firstFinger.params,
-            second: secondFinger.params,
-            global: {
-              distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
-            }
+          informations.global = {
+            distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
           };
           this.targetElement.trigger("tap,tap", informations);
           return this.targetElement.trigger("two:tap", informations);
         case "fixed,drag":
         case "drag,fixed":
-          if (firstFinger.params.x > secondFinger.params.x) {
-            Object.swap(firstFinger, secondFinger);
-          }
-          informations = {
-            first: firstFinger.params,
-            second: secondFinger.params,
-            global: {
-              distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
-            }
+          informations.global = {
+            distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
           };
           if (firstFinger.gestureName === "fixed") {
             deltaX = secondFinger.params.x - secondFinger.params.startX;
@@ -462,19 +454,12 @@ Object.merge = function(destination, source) {
           }
           break;
         case "doubleTap,doubleTap":
-          return this.targetElement.trigger("doubleTap,doubleTap", finger.params);
+          return this.targetElement.trigger("doubleTap,doubleTap", informations);
         case "fixed,fixed":
-          return this.targetElement.trigger("fixed,fixed", finger.params);
+          return this.targetElement.trigger("fixed,fixed", informations);
         case "drag,drag":
-          if (firstFinger.params.x > secondFinger.params.x) {
-            Object.swap(firstFinger, secondFinger);
-          }
-          informations = {
-            first: firstFinger.params,
-            second: secondFinger.params,
-            global: {
-              distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
-            }
+          informations.global = {
+            distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
           };
           deltaX = secondFinger.params.x - secondFinger.params.startX;
           deltaY = secondFinger.params.y - secondFinger.params.startY;
@@ -485,8 +470,8 @@ Object.merge = function(destination, source) {
   })();
   window.onload = function() {
     new EventRouter($("blue"));
-    return $("blue").bind("tap,tap", function(params) {
-      return alert("Tap-Tap!!");
+    return $("blue").bind("fixed,down", function(params) {
+      return alert("??");
     });
   };
 }).call(this);
