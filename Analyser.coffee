@@ -441,7 +441,7 @@ class Analyser
 				@targetElement.trigger "three:fixed", @informations
 		@targetElement.trigger @informations.global.type, @informations
 				
-window.onload = ->	
-	new EventRouter $("blue")
-	$("blue").bind "all", (a, params) ->
-		$("debug").innerHTML = params.global.type + "<br />" + $("debug").innerHTML
+window.onload = ->
+
+
+

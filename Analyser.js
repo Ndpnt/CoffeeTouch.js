@@ -570,9 +570,29 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    new EventRouter($("blue"));
-    return $("blue").bind("all", function(a, params) {
-      return $("debug").innerHTML = params.global.type + "<br />" + $("debug").innerHTML;
+    var $, xAngle, yAngle;
+    $ = function(element) {
+      return document.getElementById(element);
+    };
+    yAngle = 0;
+    new EventRouter(document.getElementById("body"));
+    xAngle = 0;
+    yAngle = 0;
+    $('body').bind("left", function(a, params) {
+      yAngle -= 90;
+      return $('cube').style.webkitTransform = " rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg)";
+    });
+    $('body').bind("right", function(a, params) {
+      yAngle += 90;
+      return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg)";
+    });
+    $('body').bind("up", function(a, params) {
+      xAngle += 90;
+      return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg)";
+    });
+    return $('body').bind("down", function(a, params) {
+      xAngle += 90;
+      return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg)";
     });
   };
 }).call(this);
