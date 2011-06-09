@@ -244,12 +244,16 @@ getDirection = (deltaX, deltaY) ->
 		if Math.abs(deltaX) > Math.abs(deltaY) then return "left" else return "down"
 	return "diagonal"
 
+getDragDirection = (finger) ->
+	deltaX = finger.params.x - finger.params.startX
+	deltaY = finger.params.y - finger.params.startY
+	getDirection deltaX, deltaY	
+
 ## Finger Object which contains an Id, a gesture and all important parameters
 ## Params:
 ##		fingerId
 ##		gestureName
 ##		params
-## TODO panX panY
 class FingerGesture
 	constructor: (@fingerId, @gestureName, eventObj) ->
 		date = new Date()
@@ -258,22 +262,28 @@ class FingerGesture
 		@params.startY = eventObj.clientY
 		@params.timeStart = date.getTime()
 		@params.timeElasped = 0
+		@params.panX = 0
+		@params.panY = 0
 		@updatePosition(eventObj)
 
 	update: (@gestureName, eventObj) ->
 		date = new Date()
 		@params.timeElasped = date.getTime() - @params.timeStart
+		@params.dragDirection = getDragDirection(this) if @gestureName == "drag"
 		@updatePosition(eventObj)
 
 	updatePosition: (eventObj) ->
 		@params.x = eventObj.clientX
 		@params.y = eventObj.clientY
+		@params.panX = @params.startX - @params.x
+		@params.panY = @params.startY - @params.ys
+		
 
 class Analyser
 	## Create an analyser object with total number of fingers and an array of all fingers as attribute
 	constructor: (@totalNbFingers, @targetElement) ->
-		@fingersArray = {}
-		@fingers = []
+		@fingersArray = {} 	## Hash with fingerId: fingerGestureObject
+		@fingers = [] 		## Array with all fingers
 		@firstAnalysis = true
 	
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
@@ -313,10 +323,11 @@ class Analyser
 			when "tap" then @informations.global.type = "tap"
 			when "doubleTap" then @informations.global.type = "doubleTap"
 			when "fixed" then @informations.global.type ="fixed"
+			when "fixedEnd" then @informations.global.type ="press"
 			when "drag"
-				deltaX = finger.params.x - finger.params.startX
-				deltaY = finger.params.y - finger.params.startY
-				@informations.global.type = getDirection(deltaX, deltaY)
+				@informations.global.type = finger.params.dragDirection ## getDragDirection(finger)
+			when "dragEnd" then @informations.global.type ="dragEnd"
+			
 		@targetElement.trigger(@informations.global.type, @informations)
 
 	###----------------------------------------------------------------------------------------------------------------
@@ -360,6 +371,7 @@ class Analyser
 				
 			when "fixed,tap", "tap,fixed"
 				@informations.global.type = "#{@firstFinger.gestureName},#{@secondFinger.gestureName}"
+
 			when "fixed,doubleTap", "doubleTap,fixed"
 				@informations.global.type = "#{@firstFinger.gestureName},#{@secondFinger.gestureName}"
 
@@ -367,19 +379,20 @@ class Analyser
 				## Detection of finger order. First one will be the first from the left
 				@informations.global.distance = distanceBetweenTwoPoints @firstFinger.params.x, @firstFinger.params.y, @secondFinger.params.x, @secondFinger.params.y
 				if @firstFinger.gestureName == "fixed"
-					deltaX = @secondFinger.params.x - @secondFinger.params.startX
-					deltaY = @secondFinger.params.y - @secondFinger.params.startY
-					@informations.global.type = "fixed,#{getDirection(deltaX, deltaY)}"
+					@informations.global.type = "fixed,#{@secondFinger.params.dragDirection}"
+					## @informations.global.type = "fixed,#{getDragDirection(@secondFinger)}"
 				else 
-					deltaX = @firstFinger.params.x - @firstFinger.params.startX
-					deltaY = @firstFinger.params.y - @firstFinger.params.startY
-					@informations.global.type = "#{getDirection(deltaX, deltaY)},fixed"
+					@informations.global.type = "#{@firstFinger.params.dragDirection},fixed"
+					## @informations.global.type = "#{getDragDirection(@firstFinger.)},fixed"
 			
 			when "doubleTap,doubleTap"
 				@informations.global.type = "doubleTap,doubleTap"
 				
 			when "fixed,fixed"
 				@informations.global.type = "fixed,fixed"
+
+			when "fixedEnd,fixedEnd"
+				@informations.global.type = "press,press"
 				
 			when "drag,drag"
 				@informations.global.distance = distanceBetweenTwoPoints @firstFinger.params.x, @firstFinger.params.y, @secondFinger.params.x, @secondFinger.params.y
@@ -398,11 +411,7 @@ class Analyser
 				else if @informations.global.scale > 1.2
 					@informations.global.type = "spread"
 				else
-					deltaX1 = @firstFinger.params.x - @firstFinger.params.startX
-					deltaY1 = @firstFinger.params.y - @firstFinger.params.startY
-					deltaX2 = @secondFinger.params.x - @secondFinger.params.startX
-					deltaY2 = @secondFinger.params.y - @secondFinger.params.startY
-					type = "#{getDirection(deltaX1, deltaY1)},#{getDirection(deltaX2, deltaY2)}"
+					type = "#{getDragDirection(@firstFinger)},#{getDragDirection(@secondFinger)}"
 					switch type
 						when "right,left"
 							@informations.global.type = "rotate:cw"
@@ -415,6 +424,7 @@ class Analyser
 						else
 							@informations.global.type = type
 		@targetElement.trigger @informations.global.type, @informations
+
 	###----------------------------------------------------------------------------------------------------------------
 	## Three Finger Gesture
 	###
@@ -436,9 +446,72 @@ class Analyser
 			when "tap,tap,tap"
 				@informations.global.type = "tap,tap,tap"
 				@targetElement.trigger "three:tap", @informations
+
+			when "doubleTap,doubleTap,doubleTap"
+				@informations.global.type = "doubleTap,doubleTap,doubleTap"
+				@targetElement.trigger "three:doubleTap", @informations
+
 			when "fixed,fixed,fixed"
 				@informations.global.type = "fixed,fixed,fixed"
 				@targetElement.trigger "three:fixed", @informations
+
+			when "fixed,fixed,tap", "fixed,tap,fixed", "tap,fixed,fixed"
+				@informations.global.type = "#{@fingers[0].gestureName},#{@fingers[1].gestureName},#{@fingers[2].gestureName}"
+				@targetElement.trigger "two:fixed,tap", @informations
+				@targetElement.trigger "tap,two:fixed", @informations
+
+			when "fixed,tap,tap", "tap,tap,fixed", "tap,fixed,tap"
+				@informations.global.type = "#{@fingers[0].gestureName},#{@fingers[1].gestureName},#{@fingers[2].gestureName}"
+				@targetElement.trigger "two:tap,fixed", @informations
+				@targetElement.trigger "fixed,two:tap", @informations
+
+			when "fixed,fixed,doubleTap", "fixed,doubleTap,fixed", "doubleTap,fixed,fixed"
+				@informations.global.type = "#{@fingers[0].gestureName},#{@fingers[1].gestureName},#{@fingers[2].gestureName}"
+				@targetElement.trigger "two:fixed,doubleTap", @informations
+				@targetElement.trigger "doubleTap,two:fixed", @informations
+
+			when "fixed,doubleTap,doubleTap", "doubleTap,doubleTap,fixed", "doubleTap,fixed,doubleTap"
+				@informations.global.type = "#{@fingers[0].gestureName},#{@fingers[1].gestureName},#{@fingers[2].gestureName}"
+				@targetElement.trigger "two:doubleTap,fixed", @informations
+				@targetElement.trigger "fixed,two:doubleTap", @informations
+
+			when "fixed,fixed,drag", "fixed,drag,fixed", "drag,fixed,fixed"
+				type = ""
+				i = 0
+				for finger in @fingers
+					if finger.gestureName == "drag"
+						type += finger.params.dragDirection
+					else 
+						type += finger.gestureName
+					i++
+					type += "," if i < @fingers.length
+				@informations.global.type = type
+				@targetElement.trigger "two:fixed,drag", @informations
+				@targetElement.trigger "drag,two:fixed", @informations
+
+			when "fixed,drag,drag", "drag,fixed,drag", "drag,drag,fixed"
+				type = ""
+				i = 0
+				for finger in @fingers
+					if finger.gestureName == "drag"
+						type += finger.params.dragDirection
+					else 
+						type += finger.gestureName
+					i++
+					type += "," if i < @fingers.length
+				@informations.global.type = type
+				@targetElement.trigger "two:drag,fixed", @informations
+				@targetElement.trigger "fixed,two:drag", @informations
+			when "drag,drag,drag"
+				type = ""
+				i = 0
+				for finger in @fingers
+					i++
+					type += finger.params.dragDirection
+					type += "," if i < @fingers.length
+				@informations.global.type = type
+				@targetElement.trigger "three:drag", @informations
+
 		@targetElement.trigger @informations.global.type, @informations
 				
 window.onload = ->
