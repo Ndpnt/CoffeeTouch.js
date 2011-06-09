@@ -1,5 +1,5 @@
 ###
------------------------------------------------------------------------------------------------------------------------------- State
+#------------------------------------------------------------------------------------------------------------------------------ State
 ###
 
 ####################### State Machine ####################### 
@@ -68,36 +68,20 @@ class Fixed extends GenericState
 		@notify "fixed"
 
 
-class NoTouchDouble extends GenericState
-	description: -> "NoTouch (wait double) state"
-	init: -> 
-		that = this;
-		#@doubleTimer = setTimeout (-> alert('x');that.machine.setState(new NoTouch that.machine)), 400
-
-	touchstart: ->
-		clearTimeout @doubleTimer
-		@machine.setState(new FirstTouchDouble @machine)
-
-
-
-class FirstTouchDouble extends GenericState
-	description: -> "FirstTouch double state"
-	touchend: ->
-		@notify "doubletap"
-		@machine.setState(new NoTouch @machine)
-	
-
 
 class Drag extends GenericState
 	description: ->"Drag state"
 	init: ->
 		@isTap = true
+		@initialX = @eventObj.clientX
+		@initialY = @eventObj.clientY	
+		@delta = 25
 		that = this		
-		setTimeout (->that.isTap = false), 200
+		setTimeout (->that.isTap = false), 150
 	touchmove: ->
 		@notify "drag"
 	touchend: ->
-		if @isTap
+		if @isTap && (Math.abs(@eventObj.clientX - @initialX) < @delta) && (Math.abs(@eventObj.clientY - @initialY) < @delta)
 			@notify "tap"
 		else
 			@notify "dragend"
@@ -167,6 +151,7 @@ Object.merge = function(destination, source) {
 
 class EventRouter
 	constructor: (@element) ->
+		@grouper = new EventGrouper
 		@machines = {}
 		that = this
 		@element.addEventListener "touchstart", (event) -> that.touchstart(event)
@@ -181,7 +166,7 @@ class EventRouter
 				iMachine = new StateMachine i.identifier, this
 				iMachine.apply "touchstart", i
 				@machines[i.identifier] = iMachine
-				@analyser = new Analyser event.touches.length, @element
+				@fingerCount = event.touches.length
 
 
 	touchend: (event) ->
@@ -210,11 +195,41 @@ class EventRouter
 			
 
 	broadcast: (name, eventObj) ->
+		@grouper.receive name, eventObj, @fingerCount, @element
+
+
+class EventGrouper
+	constructor: ->
+		@savedTap = {}
+	
+	receive: (name, eventObj, fingerCount, element) ->
+		$("debug").innerHTML = "Receiver.receive  #{name} <br /> " + $("debug").innerHTML
+
+		if @fingerCount != fingerCount
+			@fingerCount = fingerCount
+			@analyser = new Analyser @fingerCount, element
+		
+		##
+		if name == "tap"
+			if @savedTap[eventObj.identifier]? && ((new Date().getTime()) - @savedTap[eventObj.identifier].time) < 400
+				@send "doubleTap", eventObj
+	
+			else
+				@savedTap[eventObj.identifier] =  {}
+				@savedTap[eventObj.identifier].event = eventObj
+				@savedTap[eventObj.identifier].time = new Date().getTime()
+		##
+
+		@send name, eventObj
+
+	send: (name, eventObj) ->
+		$("debug").innerHTML = "Receiver.send #{name} <br /> " + $("debug").innerHTML
 		@analyser.notify(eventObj.identifier, name, eventObj)
-		$("debug").innerHTML = "[<strong>" + name + "</strong>] " + dump(eventObj) + " <br /> " + $("debug").innerHTML
-###
------------------------------------------------------------------------------------------------------------------------------- Analyser
-###
+	
+		
+
+#------------------------------------------------------------------------------------------------------------------------------ Analyser
+##
 ## Methods helper
 Object.swap = (obj1, obj2) ->
 	temp = obj2
@@ -249,7 +264,7 @@ class FingerGesture
 		@params.timeElasped = 0
 		@updatePosition(eventObj)
 
-	update: (eventObj) ->
+	update: (@gestureName, eventObj) ->
 		date = new Date()
 		@params.timeElasped = date.getTime() - @params.timeStart
 		@updatePosition(eventObj)
@@ -266,12 +281,12 @@ class Analyser
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
 	notify: (fingerID, gestureName, params) ->
 		if @fingersArray[fingerID]?
-			@fingersArray[fingerID].update params
+			@fingersArray[fingerID].update gestureName, params
 		else
 			@fingersArray[fingerID] =  new FingerGesture(fingerID, gestureName, params)
 		
 		@analyse @totalNbFingers if _.size(@fingersArray) is @totalNbFingers
-		
+		$("debug").innerHTML = "" + gestureName + "<br /> " + $("debug").innerHTML  if _.size(@fingersArray) is @totalNbFingers
 	
 	## Redirect to the correct analysis method depending the number of finger	
 	analyse: (nbFingers) ->
@@ -287,18 +302,20 @@ class Analyser
 	## One Finger Gesture
 	###
 	oneFingerGesture: ->
+		
 		for key of @fingersArray
 			if @fingersArray.hasOwnProperty key
 				finger = @fingersArray[key]
 
 		switch finger.gestureName
-			when "tap" then @targetElement.trigger "tap", finger.params
-			when "doubleTap" then @targetElement.trigger "doubleTap", finger.params
-			when "fixed" then @targetElement.trigger "fixed", finger.params
 			when "drag"
 				deltaX = finger.params.x - finger.params.startX
 				deltaY = finger.params.y - finger.params.startY
-				@targetElement.trigger getDirection(deltaX, deltaY), finger.params 
+				@targetElement.trigger getDirection(deltaX, deltaY), finger.params
+			else
+				@targetElement.trigger finger.gestureName, finger.params
+				
+
 				
 	###----------------------------------------------------------------------------------------------------------------
 	## Two Finger Gesture
@@ -313,29 +330,25 @@ class Analyser
 				firstFinger = @fingersArray[key] if i == 1
 				secondFinger = @fingersArray[key] if i == 2
 		gestureName = firstFinger.gestureName + "," + secondFinger.gestureName
+
+		## Detection of finger order. First one will be the first from the left
+		if firstFinger.params.x > secondFinger.params.x
+			Object.swap firstFinger, secondFinger
+		informations =
+			first: firstFinger.params
+			second: secondFinger.params
 		switch gestureName
 			when "tap,tap"
-				## Detection of finger order. First one will be the first from the left
-				if firstFinger.params.x > secondFinger.params.x
-					Object.swap firstFinger, secondFinger
-				informations =
-					first: firstFinger.params
-					second: secondFinger.params
-					global:
-						distance: distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
+				informations.global = 
+					distance: distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
 
 				@targetElement.trigger "tap,tap", informations
 				@targetElement.trigger "two:tap", informations
 				
 			when "fixed,drag", "drag,fixed"
 				## Detection of finger order. First one will be the first from the left
-				if firstFinger.params.x > secondFinger.params.x
-					Object.swap firstFinger, secondFinger
-				informations =
-					first: firstFinger.params
-					second: secondFinger.params
-					global:
-						distance: distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
+				informations.global =
+					distance: distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
 
 				if firstFinger.gestureName == "fixed"
 					deltaX = secondFinger.params.x - secondFinger.params.startX
@@ -347,20 +360,15 @@ class Analyser
 					@targetElement.trigger "#{getDirection(deltaX, deltaY)},fixed", informations
 			
 			when "doubleTap,doubleTap"
-				@targetElement.trigger "doubleTap,doubleTap", finger.params
+				@targetElement.trigger "doubleTap,doubleTap", informations
 				
 			when "fixed,fixed"
-				@targetElement.trigger "fixed,fixed", finger.params
+				@targetElement.trigger "fixed,fixed", informations
 				
 			when "drag,drag"
 				## Et c'est là qu'on souffre
-				if firstFinger.params.x > secondFinger.params.x
-					Object.swap firstFinger, secondFinger
-				informations =
-					first: firstFinger.params
-					second: secondFinger.params
-					global:
-						distance: distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
+				informations.global =
+					distance: distanceBetweenTwoPoints firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y
 				deltaX = secondFinger.params.x - secondFinger.params.startX
 				deltaY = secondFinger.params.y - secondFinger.params.startY
 				@targetElement.trigger "#{getDirection(deltaX, deltaY)},#{getDirection(deltaX, deltaY)}", informations

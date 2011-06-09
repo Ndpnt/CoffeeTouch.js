@@ -1,7 +1,7 @@
 (function() {
   /*
-  ------------------------------------------------------------------------------------------------------------------------------ State
-  */  var Analyser, Drag, EventRouter, FingerGesture, FirstTouch, FirstTouchDouble, Fixed, GenericState, NoTouch, NoTouchDouble, StateMachine, distanceBetweenTwoPoints, getDirection;
+  #------------------------------------------------------------------------------------------------------------------------------ State
+  */  var Analyser, Drag, EventGrouper, EventRouter, FingerGesture, FirstTouch, Fixed, GenericState, NoTouch, StateMachine, distanceBetweenTwoPoints, getDirection;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -109,38 +109,6 @@
     };
     return Fixed;
   })();
-  NoTouchDouble = (function() {
-    __extends(NoTouchDouble, GenericState);
-    function NoTouchDouble() {
-      NoTouchDouble.__super__.constructor.apply(this, arguments);
-    }
-    NoTouchDouble.prototype.description = function() {
-      return "NoTouch (wait double) state";
-    };
-    NoTouchDouble.prototype.init = function() {
-      var that;
-      return that = this;
-    };
-    NoTouchDouble.prototype.touchstart = function() {
-      clearTimeout(this.doubleTimer);
-      return this.machine.setState(new FirstTouchDouble(this.machine));
-    };
-    return NoTouchDouble;
-  })();
-  FirstTouchDouble = (function() {
-    __extends(FirstTouchDouble, GenericState);
-    function FirstTouchDouble() {
-      FirstTouchDouble.__super__.constructor.apply(this, arguments);
-    }
-    FirstTouchDouble.prototype.description = function() {
-      return "FirstTouch double state";
-    };
-    FirstTouchDouble.prototype.touchend = function() {
-      this.notify("doubletap");
-      return this.machine.setState(new NoTouch(this.machine));
-    };
-    return FirstTouchDouble;
-  })();
   Drag = (function() {
     __extends(Drag, GenericState);
     function Drag() {
@@ -152,17 +120,20 @@
     Drag.prototype.init = function() {
       var that;
       this.isTap = true;
+      this.initialX = this.eventObj.clientX;
+      this.initialY = this.eventObj.clientY;
+      this.delta = 25;
       that = this;
       return setTimeout((function() {
         return that.isTap = false;
-      }), 200);
+      }), 150);
     };
     Drag.prototype.touchmove = function() {
       return this.notify("drag");
     };
     Drag.prototype.touchend = function() {
-      if (this.isTap) {
-        this.notifiy("tap");
+      if (this.isTap && (Math.abs(this.eventObj.clientX - this.initialX) < this.delta) && (Math.abs(this.eventObj.clientY - this.initialY) < this.delta)) {
+        this.notify("tap");
       } else {
         this.notify("dragend");
       }
@@ -231,6 +202,7 @@ Object.merge = function(destination, source) {
     function EventRouter(element) {
       var that;
       this.element = element;
+      this.grouper = new EventGrouper;
       this.machines = {};
       that = this;
       this.element.addEventListener("touchstart", function(event) {
@@ -250,7 +222,7 @@ Object.merge = function(destination, source) {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
-        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine, this.analyser = new Analyser(event.touches.length, this.element)) : void 0);
+        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine, this.fingerCount = event.touches.length) : void 0);
       }
       return _results;
     };
@@ -291,14 +263,37 @@ Object.merge = function(destination, source) {
       return _results;
     };
     EventRouter.prototype.broadcast = function(name, eventObj) {
-      this.analyser.notify(eventObj.identifier, name, eventObj);
-      return $("debug").innerHTML = "[<strong>" + name + "</strong>] " + dump(eventObj) + " <br /> " + $("debug").innerHTML;
+      return this.grouper.receive(name, eventObj, this.fingerCount, this.element);
     };
     return EventRouter;
   })();
-  /*
-  ------------------------------------------------------------------------------------------------------------------------------ Analyser
-  */
+  EventGrouper = (function() {
+    function EventGrouper() {
+      this.savedTap = {};
+    }
+    EventGrouper.prototype.receive = function(name, eventObj, fingerCount, element) {
+      $("debug").innerHTML = ("Receiver.receive  " + name + " <br /> ") + $("debug").innerHTML;
+      if (this.fingerCount !== fingerCount) {
+        this.fingerCount = fingerCount;
+        this.analyser = new Analyser(this.fingerCount, element);
+      }
+      if (name === "tap") {
+        if ((this.savedTap[eventObj.identifier] != null) && ((new Date().getTime()) - this.savedTap[eventObj.identifier].time) < 400) {
+          this.send("doubleTap", eventObj);
+        } else {
+          this.savedTap[eventObj.identifier] = {};
+          this.savedTap[eventObj.identifier].event = eventObj;
+          this.savedTap[eventObj.identifier].time = new Date().getTime();
+        }
+      }
+      return this.send(name, eventObj);
+    };
+    EventGrouper.prototype.send = function(name, eventObj) {
+      $("debug").innerHTML = ("Receiver.send " + name + " <br /> ") + $("debug").innerHTML;
+      return this.analyser.notify(eventObj.identifier, name, eventObj);
+    };
+    return EventGrouper;
+  })();
   Object.swap = function(obj1, obj2) {
     var temp;
     temp = obj2;
@@ -351,8 +346,9 @@ Object.merge = function(destination, source) {
       this.params.timeElasped = 0;
       this.updatePosition(eventObj);
     }
-    FingerGesture.prototype.update = function(eventObj) {
+    FingerGesture.prototype.update = function(gestureName, eventObj) {
       var date;
+      this.gestureName = gestureName;
       date = new Date();
       this.params.timeElasped = date.getTime() - this.params.timeStart;
       return this.updatePosition(eventObj);
@@ -371,12 +367,15 @@ Object.merge = function(destination, source) {
     }
     Analyser.prototype.notify = function(fingerID, gestureName, params) {
       if (this.fingersArray[fingerID] != null) {
-        this.fingersArray[fingerID].update(params);
+        this.fingersArray[fingerID].update(gestureName, params);
       } else {
         this.fingersArray[fingerID] = new FingerGesture(fingerID, gestureName, params);
       }
       if (_.size(this.fingersArray) === this.totalNbFingers) {
-        return this.analyse(this.totalNbFingers);
+        this.analyse(this.totalNbFingers);
+      }
+      if (_.size(this.fingersArray) === this.totalNbFingers) {
+        return $("debug").innerHTML = "" + gestureName + "<br /> " + $("debug").innerHTML;
       }
     };
     Analyser.prototype.analyse = function(nbFingers) {
@@ -406,16 +405,12 @@ Object.merge = function(destination, source) {
         }
       }
       switch (finger.gestureName) {
-        case "tap":
-          return this.targetElement.trigger("tap", finger.params);
-        case "doubleTap":
-          return this.targetElement.trigger("doubleTap", finger.params);
-        case "fixed":
-          return this.targetElement.trigger("fixed", finger.params);
         case "drag":
           deltaX = finger.params.x - finger.params.startX;
           deltaY = finger.params.y - finger.params.startY;
           return this.targetElement.trigger(getDirection(deltaX, deltaY), finger.params);
+        default:
+          return this.targetElement.trigger(finger.gestureName, finger.params);
       }
     };
     /*----------------------------------------------------------------------------------------------------------------
@@ -437,31 +432,24 @@ Object.merge = function(destination, source) {
         }
       }
       gestureName = firstFinger.gestureName + "," + secondFinger.gestureName;
+      if (firstFinger.params.x > secondFinger.params.x) {
+        Object.swap(firstFinger, secondFinger);
+      }
+      informations = {
+        first: firstFinger.params,
+        second: secondFinger.params
+      };
       switch (gestureName) {
         case "tap,tap":
-          if (firstFinger.params.x > secondFinger.params.x) {
-            Object.swap(firstFinger, secondFinger);
-          }
-          informations = {
-            first: firstFinger.params,
-            second: secondFinger.params,
-            global: {
-              distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
-            }
+          informations.global = {
+            distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
           };
           this.targetElement.trigger("tap,tap", informations);
           return this.targetElement.trigger("two:tap", informations);
         case "fixed,drag":
         case "drag,fixed":
-          if (firstFinger.params.x > secondFinger.params.x) {
-            Object.swap(firstFinger, secondFinger);
-          }
-          informations = {
-            first: firstFinger.params,
-            second: secondFinger.params,
-            global: {
-              distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
-            }
+          informations.global = {
+            distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
           };
           if (firstFinger.gestureName === "fixed") {
             deltaX = secondFinger.params.x - secondFinger.params.startX;
@@ -474,19 +462,12 @@ Object.merge = function(destination, source) {
           }
           break;
         case "doubleTap,doubleTap":
-          return this.targetElement.trigger("doubleTap,doubleTap", finger.params);
+          return this.targetElement.trigger("doubleTap,doubleTap", informations);
         case "fixed,fixed":
-          return this.targetElement.trigger("fixed,fixed", finger.params);
+          return this.targetElement.trigger("fixed,fixed", informations);
         case "drag,drag":
-          if (firstFinger.params.x > secondFinger.params.x) {
-            Object.swap(firstFinger, secondFinger);
-          }
-          informations = {
-            first: firstFinger.params,
-            second: secondFinger.params,
-            global: {
-              distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
-            }
+          informations.global = {
+            distance: distanceBetweenTwoPoints(firstFinger.params.x, firstFinger.params.y, secondFinger.params.x, secondFinger.params.y)
           };
           deltaX = secondFinger.params.x - secondFinger.params.startX;
           deltaY = secondFinger.params.y - secondFinger.params.startY;
