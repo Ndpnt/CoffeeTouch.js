@@ -363,13 +363,16 @@ Object.merge = function(destination, source) {
       this.totalNbFingers = totalNbFingers;
       this.targetElement = targetElement;
       this.fingersArray = {};
+      this.fingers = [];
       this.firstAnalysis = true;
     }
-    Analyser.prototype.notify = function(fingerID, gestureName, params) {
+    Analyser.prototype.notify = function(fingerID, gestureName, eventObj) {
+      this.eventObj = eventObj;
       if (this.fingersArray[fingerID] != null) {
-        this.fingersArray[fingerID].update(gestureName, params);
+        this.fingersArray[fingerID].update(gestureName, this.eventObj);
       } else {
-        this.fingersArray[fingerID] = new FingerGesture(fingerID, gestureName, params);
+        this.fingersArray[fingerID] = new FingerGesture(fingerID, gestureName, this.eventObj);
+        this.fingers.push(this.fingersArray[fingerID]);
       }
       if (_.size(this.fingersArray) === this.totalNbFingers) {
         return this.analyse(this.totalNbFingers);
@@ -426,7 +429,7 @@ Object.merge = function(destination, source) {
     	## Two Finger Gesture
     	*/
     Analyser.prototype.twoFingersGesture = function() {
-      var a1, a2, b1, b2, deltaX, deltaX1, deltaX2, deltaY, deltaY1, deltaY2, gestureName, i, initialDistance, key, scale, type;
+      var a1, a2, b1, b2, deltaX, deltaX1, deltaX2, deltaY, deltaY1, deltaY2, gestureName, i, key, type;
       i = 0;
       gestureName = "";
       if (this.firstAnalysis) {
@@ -441,7 +444,11 @@ Object.merge = function(destination, source) {
             }
           }
         }
-        if (this.firstFinger.params.x > this.secondFinger.params.x) {
+        if (Math.abs(this.secondFinger.params.startX - this.firstFinger.params.startX) < 20) {
+          if (this.firstFinger.params.startY > this.secondFinger.params.startY) {
+            Object.swap(this.firstFinger, this.secondFinger);
+          }
+        } else if (this.firstFinger.params.startX > this.secondFinger.params.startX) {
           Object.swap(this.firstFinger, this.secondFinger);
         }
         this.informations = {
@@ -493,15 +500,12 @@ Object.merge = function(destination, source) {
           this.informations.global.type = "fixed,fixed";
           break;
         case "drag,drag":
-          initialDistance = this.informations.global.initialDistance;
-          scale = this.informations.global.scale;
           this.informations.global.distance = distanceBetweenTwoPoints(this.firstFinger.params.x, this.firstFinger.params.y, this.secondFinger.params.x, this.secondFinger.params.y);
           this.informations.global.scale = this.informations.global.distance / this.informations.global.initialDistance;
           a1 = (this.firstFinger.params.startY - this.firstFinger.params.y) / (this.firstFinger.params.startX - this.firstFinger.params.x);
           a2 = (this.secondFinger.params.y - this.secondFinger.params.startY) / (this.secondFinger.params.x - this.secondFinger.params.startX);
           b1 = this.firstFinger.params.y - (a1 * this.firstFinger.params.x);
           b2 = this.secondFinger.params.y - (a2 * this.secondFinger.params.x);
-          $("debug").innerHTML = " angle1: " + Math.round(Math.atan2(this.firstFinger.params.x, this.firstFinger.params.y) * 100) / 100 + " angle2 :" + Math.round(Math.atan2(this.secondFinger.params.x, this.secondFinger.params.y) * 100) / 100 + "<br />" + $("debug").innerHTML;
           if (this.informations.global.scale < 0.8) {
             this.informations.global.type = "pinch";
           } else if (this.informations.global.scale > 1.2) {
@@ -536,28 +540,32 @@ Object.merge = function(destination, source) {
     	## Three Finger Gesture
     	*/
     Analyser.prototype.threeFingersGesture = function() {
-      var gestureName, i, key;
+      var gestureName, i;
       i = 0;
       gestureName = "";
-      this.fingers = [];
       if (this.firstAnalysis) {
-        for (key in this.fingersArray) {
-          if (this.fingersArray.hasOwnProperty(key)) {
-            i++;
-            this.fingers.push(this.fingersArray[key]);
-          }
-        }
-        this.fingers.sort(function(a, b) {
-          return a.startX - b.startY;
+        this.fingers = this.fingers.sort(function(a, b) {
+          return a.params.startX - b.params.startX;
         });
         this.informations = {
           first: this.fingers[0].params,
           second: this.fingers[1].params,
-          third: this.fingers[2].params
+          third: this.fingers[2].params,
+          global: {}
         };
         this.firstAnalysis = false;
       }
-      return gestureName = "" + this.fingers[0].gestureName + "," + this.fingers[1].gestureName + "," + this.fingers[2].gestureName;
+      gestureName = "" + this.fingers[0].gestureName + "," + this.fingers[1].gestureName + "," + this.fingers[2].gestureName;
+      switch (gestureName) {
+        case "tap,tap,tap":
+          this.informations.global.type = "tap,tap,tap";
+          this.targetElement.trigger("three:tap", this.informations);
+          break;
+        case "fixed,fixed,fixed":
+          this.informations.global.type = "fixed,fixed,fixed";
+          this.targetElement.trigger("three:fixed", this.informations);
+      }
+      return this.targetElement.trigger(this.informations.global.type, this.informations);
     };
     return Analyser;
   })();

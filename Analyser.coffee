@@ -273,14 +273,16 @@ class Analyser
 	## Create an analyser object with total number of fingers and an array of all fingers as attribute
 	constructor: (@totalNbFingers, @targetElement) ->
 		@fingersArray = {}
+		@fingers = []
 		@firstAnalysis = true
 	
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
-	notify: (fingerID, gestureName, params) ->
+	notify: (fingerID, gestureName, @eventObj) ->
 		if @fingersArray[fingerID]?
-			@fingersArray[fingerID].update gestureName, params
+			@fingersArray[fingerID].update gestureName, @eventObj
 		else
-			@fingersArray[fingerID] =  new FingerGesture(fingerID, gestureName, params)
+			@fingersArray[fingerID] =  new FingerGesture(fingerID, gestureName, @eventObj)
+			@fingers.push @fingersArray[fingerID]
 		
 		@analyse @totalNbFingers if _.size(@fingersArray) is @totalNbFingers
 		##$("debug").innerHTML = "" + gestureName + "<br /> " + $("debug").innerHTML  if _.size(@fingersArray) is @totalNbFingers
@@ -331,8 +333,12 @@ class Analyser
 					@firstFinger = @fingersArray[key] if i == 1
 					@secondFinger = @fingersArray[key] if i == 2
 			## Detection of finger order. First one will be the first from the left
-			if @firstFinger.params.x > @secondFinger.params.x
+			if (Math.abs(@secondFinger.params.startX - @firstFinger.params.startX) < 20)
+				if @firstFinger.params.startY > @secondFinger.params.startY
+					Object.swap @firstFinger, @secondFinger
+			else if @firstFinger.params.startX > @secondFinger.params.startX
 				Object.swap @firstFinger, @secondFinger
+
 			@informations =
 				first: @firstFinger.params
 				second: @secondFinger.params
@@ -341,6 +347,7 @@ class Analyser
 					initialDistance: distanceBetweenTwoPoints @firstFinger.params.startX, @firstFinger.params.startY, @secondFinger.params.startX, @secondFinger.params.startY
 			@informations.global.distance = distanceBetweenTwoPoints @firstFinger.params.x, @firstFinger.params.y, @secondFinger.params.x, @secondFinger.params.y
 			@firstAnalysis = false
+
 		gestureName = @firstFinger.gestureName + "," + @secondFinger.gestureName
 		switch gestureName
 			when "tap,tap"
@@ -375,9 +382,6 @@ class Analyser
 				@informations.global.type = "fixed,fixed"
 				
 			when "drag,drag"
-				initialDistance = @informations.global.initialDistance
-				scale = @informations.global.scale
-
 				@informations.global.distance = distanceBetweenTwoPoints @firstFinger.params.x, @firstFinger.params.y, @secondFinger.params.x, @secondFinger.params.y
 				@informations.global.scale =  (@informations.global.distance / @informations.global.initialDistance) ##/
 				
@@ -387,7 +391,7 @@ class Analyser
 				b1 = @firstFinger.params.y - (a1 * @firstFinger.params.x);
 				b2 = @secondFinger.params.y - (a2 * @secondFinger.params.x);
 				##$("debug").innerHTML = " b1: " + Math.round(b1) + " b2 :" + Math.round(b2) + "<br />" + $("debug").innerHTML
-				$("debug").innerHTML = " angle1: " + Math.round(Math.atan2(@firstFinger.params.x,@firstFinger.params.y) * 100)/100 + " angle2 :" + Math.round(Math.atan2(@secondFinger.params.x, @secondFinger.params.y) * 100)/100 + "<br />" + $("debug").innerHTML
+##				$("debug").innerHTML = " angle1: " + Math.round(Math.atan2(@firstFinger.params.x,@firstFinger.params.y) * 100)/100 + " angle2 :" + Math.round(Math.atan2(@secondFinger.params.x, @secondFinger.params.y) * 100)/100 + "<br />" + $("debug").innerHTML
 
 				if @informations.global.scale < 0.8
 					@informations.global.type = "pinch"
@@ -418,20 +422,24 @@ class Analyser
 		## Gesture Name detection
 		i = 0
 		gestureName = ""
-		@fingers = []
 		if @firstAnalysis
-			for key of @fingersArray
-				if @fingersArray.hasOwnProperty key
-					i++
-					@fingers.push @fingersArray[key]
-			@fingers.sort (a,b) ->
-				return a.startX - b.startY			
+			@fingers = @fingers.sort (a,b) ->
+				return a.params.startX - b.params.startX
 			@informations =
 				first: @fingers[0].params
 				second: @fingers[1].params
 				third: @fingers[2].params
+				global: {}
 			@firstAnalysis = false
 		gestureName = "#{@fingers[0].gestureName},#{@fingers[1].gestureName},#{@fingers[2].gestureName}"
+		switch gestureName
+			when "tap,tap,tap"
+				@informations.global.type = "tap,tap,tap"
+				@targetElement.trigger "three:tap", @informations
+			when "fixed,fixed,fixed"
+				@informations.global.type = "fixed,fixed,fixed"
+				@targetElement.trigger "three:fixed", @informations
+		@targetElement.trigger @informations.global.type, @informations
 				
 window.onload = ->	
 	new EventRouter $("blue")
