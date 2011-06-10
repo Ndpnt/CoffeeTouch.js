@@ -1,9 +1,10 @@
 ###
-## The bind, unbind and trigger function have been taken from Backbone Framework.
-## The bind function has been changed
+ The bind, unbind and trigger function have been taken from Backbone Framework.
+ The bind function has been changed
 ###
 
 Object::bind = (eventName, callback) ->
+	new EventRouter this
 	calls = @_callbacks or @_callbacks = {}
 	list = @_callbacks[eventName] or @_callbacks[eventName] = []
 	list.push callback

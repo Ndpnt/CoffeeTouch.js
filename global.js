@@ -2,9 +2,9 @@
   /*
   ## The bind, unbind and trigger function have been taken from Backbone Framework.
   ## The bind function has been changed
-  */  var $;
-  Object.prototype.bind = function(eventName, callback) {
+  */  Object.prototype.bind = function(eventName, callback) {
     var calls, list;
+    new EventRouter(this);
     calls = this._callbacks || (this._callbacks = {});
     list = this._callbacks[eventName] || (this._callbacks[eventName] = []);
     list.push(callback);
@@ -49,4 +49,5 @@ Object.prototype.trigger =  function(ev) {
 	  }
 	  return this;
 	};
+;
 }).call(this);

@@ -517,5 +517,3 @@ class Analyser
 
 		@targetElement.trigger @informations.global.type, @informations
 				
-window.onload = ->
-
