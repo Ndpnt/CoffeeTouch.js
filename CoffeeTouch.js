@@ -339,16 +339,12 @@ Object.merge = function(destination, source) {
             exists = true;
           }
         }
-<<<<<<< HEAD
-        _results.push(!exists ? (this.machines[iMKey].apply("touchend", {}), delete this.machines[iMKey], this.fingerCount = event.touches.length) : void 0);
-=======
         if (!exists) {
           this.machines[iMKey].apply("touchend", {});
           delete this.machines[iMKey];
         }
->>>>>>> 015099051f9a88597e85e2535e51f6a0c49f8214
       }
-      return this.grouper.refreshFIngerCount(this.fingerCount);
+      return this.grouper.refreshFingerCount(this.fingerCount, this.element);
     };
     EventRouter.prototype.touchmove = function(event) {
       var i, iMachine, _i, _len, _ref, _results;
@@ -376,14 +372,14 @@ Object.merge = function(destination, source) {
       this.savedTap = {};
       this.fingerCount = 0;
     }
-    EventGrouper.prototype.refreshFingerCount = function(newCount) {
+    EventGrouper.prototype.refreshFingerCount = function(newCount, element) {
       if (this.fingerCount !== newCount) {
         this.fingerCount = newCount;
         return this.analyser = new Analyser(this.fingerCount, element);
       }
     };
     EventGrouper.prototype.receive = function(name, eventObj, fingerCount, element) {
-      this.refreshFingerCount(fingerCount);
+      this.refreshFingerCount(fingerCount, element);
       if (name === "tap") {
         if ((this.savedTap[eventObj.identifier] != null) && ((new Date().getTime()) - this.savedTap[eventObj.identifier].time) < 400) {
           this.send("doubleTap", eventObj);

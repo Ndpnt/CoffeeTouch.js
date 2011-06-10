@@ -31,7 +31,7 @@ class EventRouter
 			if !exists
 				@machines[iMKey].apply("touchend", {})
 				delete @machines[iMKey]	
-		@grouper.refreshFIngerCount @fingerCount		
+		@grouper.refreshFingerCount @fingerCount, @element
 			
 	 
 	touchmove: (event) ->
@@ -53,13 +53,13 @@ class EventGrouper
 		@savedTap = {}
 		@fingerCount = 0
 	
-	refreshFingerCount: (newCount) ->
+	refreshFingerCount: (newCount, element) ->
 		if @fingerCount != newCount
 			@fingerCount = newCount
 			@analyser = new Analyser @fingerCount, element
 
 	receive: (name, eventObj, fingerCount, element) ->
-		@refreshFingerCount fingerCount
+		@refreshFingerCount fingerCount, element
 		##
 		if name == "tap"
 			if @savedTap[eventObj.identifier]? && ((new Date().getTime()) - @savedTap[eventObj.identifier].time) < 400
