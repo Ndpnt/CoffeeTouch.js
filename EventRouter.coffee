@@ -1,5 +1,4 @@
 ####################### EventRouter   ####################### 
-
 class EventRouter
 	constructor: (@element) ->
 		@grouper = new EventGrouper
@@ -54,7 +53,6 @@ class EventGrouper
 		@savedTap = {}
 	
 	receive: (name, eventObj, fingerCount, element) ->
-		##$("debug").innerHTML = "Receiver.receive  #{name} <br /> " + $("debug").innerHTML
 
 		if @fingerCount != fingerCount
 			@fingerCount = fingerCount
@@ -74,10 +72,6 @@ class EventGrouper
 		@send name, eventObj
 
 	send: (name, eventObj) ->
-		##$("debug").innerHTML = "Receiver.send #{name} <br /> " + $("debug").innerHTML
+		$("debug").innerHTML = "Receiver.send #{name} #{eventObj.identifier}<br /> " + $("debug").innerHTML
 		@analyser.notify(eventObj.identifier, name, eventObj)
-
-window.onload = ->	
-	new EventRouter $("blue")
-	$("blue").bind "all", (a, params) ->
-		$("debug").innerHTML = params.global.type + "<br />" + $("debug").innerHTML
+	
