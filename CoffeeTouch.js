@@ -14,7 +14,7 @@
   Element.prototype.bind = function(eventName, callback) {
     var calls, list;
     if (!(this.router != null)) {
-      new EventRouter(this);
+      this.router = new EventRouter(this);
     }
     calls = this._callbacks || (this._callbacks = {});
     list = this._callbacks[eventName] || (this._callbacks[eventName] = []);
@@ -166,10 +166,10 @@ Object.merge = function(destination, source) {
     return GenericState;
   })();
   NoTouch = (function() {
-    __extends(NoTouch, GenericState);
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(NoTouch, GenericState);
     NoTouch.prototype.description = function() {
       return "NoTouch state";
     };
@@ -179,10 +179,10 @@ Object.merge = function(destination, source) {
     return NoTouch;
   })();
   FirstTouch = (function() {
-    __extends(FirstTouch, GenericState);
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(FirstTouch, GenericState);
     FirstTouch.prototype.description = function() {
       return "FirstTouch state";
     };
@@ -208,10 +208,10 @@ Object.merge = function(destination, source) {
     return FirstTouch;
   })();
   Fixed = (function() {
-    __extends(Fixed, GenericState);
     function Fixed() {
       Fixed.__super__.constructor.apply(this, arguments);
     }
+    __extends(Fixed, GenericState);
     Fixed.prototype.description = function() {
       return "Fixed state";
     };
@@ -224,10 +224,10 @@ Object.merge = function(destination, source) {
     return Fixed;
   })();
   Drag = (function() {
-    __extends(Drag, GenericState);
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
+    __extends(Drag, GenericState);
     Drag.prototype.description = function() {
       return "Drag state";
     };
@@ -378,7 +378,6 @@ Object.merge = function(destination, source) {
       return this.send(name, eventObj);
     };
     EventGrouper.prototype.send = function(name, eventObj) {
-      $("debug").innerHTML = ("Receiver.send " + name + " " + eventObj.identifier + "<br /> ") + $("debug").innerHTML;
       return this.analyser.notify(eventObj.identifier, name, eventObj);
     };
     return EventGrouper;
