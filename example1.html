@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html>
+	<head>
+		<meta name="viewport" content="user-scalable=no, width=device-width" />
+		<title>Example 1</title>
+		
+		<!-- Include de l'api -->
+		<script src="_.js"></script>
+		<script src="API.js"></script>
+
+		<!-- Definition des fonction a trigger -->
+		<script language="JavaScript" type="text/javascript">
+			window.onload = function()
+				{
+					document.getElementById('div').bind("drag", resize);
+					document.getElementById('div').bind("tap", randomColor);
+
+				}
+
+			function randomColor(eventArg)
+			{
+				if(document.getElementById('div').style.backgroundColor == "red")
+					document.getElementById('div').style.backgroundColor = "blue";
+				else
+					document.getElementById('div').style.backgroundColor = "red";
+			}
+
+			function resize(eventArg)
+			{
+				document.getElementById('div').innerHTML = eventArg.direction;
+				if(eventArg.direction == "right")
+					document.getElementById('div').style.height = "20em"
+				else
+					document.getElementById('div').style.height = "10em"					
+			}
+		</script> 
+	</head>
+	<body>
+		<div id="div" style="height:15em; width:100%; background:red;">
+		</div>
+		<div id="debug">
+		</div>
+	</body>
+</html>
