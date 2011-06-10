@@ -7,8 +7,11 @@ class FingerGesture
 	constructor: (@fingerId, @gestureName, eventObj) ->
 		date = new Date()
 		@params = {}
-		@params.startX = eventObj.clientX
-		@params.startY = eventObj.clientY
+		@positions = []
+		@positions[0] = {}
+		@positionCount = 0
+		@params.startX = @positions[0].x = eventObj.clientX
+		@params.startY = @positions[0].y = eventObj.clientY
 		@params.timeStart = date.getTime()
 		@params.timeElasped = 0
 		@params.panX = 0
@@ -16,14 +19,18 @@ class FingerGesture
 		@updatePosition(eventObj)
 
 	update: (@gestureName, eventObj) ->
+		@positionCount++
+		@positions[@positionCount] = {}
+		@positions[@positionCount].x = eventObj.clientX
+		@positions[@positionCount].y = eventObj.clientY
 		date = new Date()
 		@params.timeElasped = date.getTime() - @params.timeStart
 		@params.dragDirection = getDragDirection(this) if @gestureName == "drag"
-		@updatePosition(eventObj)
+		@updatePosition eventObj
+
 
 	updatePosition: (eventObj) ->
 		@params.x = eventObj.clientX
 		@params.y = eventObj.clientY
 		@params.panX = @params.startX - @params.x
 		@params.panY = @params.startY - @params.y
-

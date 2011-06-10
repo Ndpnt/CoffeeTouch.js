@@ -11,12 +11,13 @@ class EventRouter
 
 	touchstart: (event) ->
 		event.preventDefault()
+		@fingerCount = event.touches.length
+		@grouper.refreshFingerCount @fingerCount, @element
 		for i in event.changedTouches
 			if !@machines[i.identifier]?
 				iMachine = new StateMachine i.identifier, this
 				iMachine.apply "touchstart", i
 				@machines[i.identifier] = iMachine
-				@fingerCount = event.touches.length
 
 
 	touchend: (event) ->
@@ -31,9 +32,9 @@ class EventRouter
 			if !exists
 				@machines[iMKey].apply("touchend", {})
 				delete @machines[iMKey]	
-				
-			
-	 
+		@fingerCount = event.touches.length
+		@grouper.refreshFingerCount @fingerCount, @element			
+
 	touchmove: (event) ->
 		event.preventDefault()
 		for i in event.changedTouches
@@ -52,13 +53,12 @@ class EventGrouper
 	constructor: ->
 		@savedTap = {}
 	
-	receive: (name, eventObj, fingerCount, element) ->
-
-		if @fingerCount != fingerCount
-			@fingerCount = fingerCount
+	refreshFingerCount: (newCount, element) ->
+		if @fingerCount != newCount
+			@fingerCount = newCount
 			@analyser = new Analyser @fingerCount, element
-		
-		##
+
+	receive: (name, eventObj, fingerCount, element) ->
 		if name == "tap"
 			if @savedTap[eventObj.identifier]? && ((new Date().getTime()) - @savedTap[eventObj.identifier].time) < 400
 				@send "doubleTap", eventObj
@@ -67,10 +67,10 @@ class EventGrouper
 				@savedTap[eventObj.identifier] =  {}
 				@savedTap[eventObj.identifier].event = eventObj
 				@savedTap[eventObj.identifier].time = new Date().getTime()
-		##
-
+	
 		@send name, eventObj
 
 	send: (name, eventObj) ->
+		#$("debug").innerHTML = "Grouper.Send  #{name} #{@fingerCount} <br/>" + $("debug").innerHTML
 		@analyser.notify(eventObj.identifier, name, eventObj)
 	

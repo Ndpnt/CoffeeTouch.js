@@ -119,7 +119,7 @@ Object.merge = function(destination, source) {
         }
     }
     return destination;
-};
+}
 ;
   StateMachine = (function() {
     function StateMachine(identifier, router) {
@@ -166,10 +166,10 @@ Object.merge = function(destination, source) {
     return GenericState;
   })();
   NoTouch = (function() {
+    __extends(NoTouch, GenericState);
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
-    __extends(NoTouch, GenericState);
     NoTouch.prototype.description = function() {
       return "NoTouch state";
     };
@@ -179,10 +179,10 @@ Object.merge = function(destination, source) {
     return NoTouch;
   })();
   FirstTouch = (function() {
+    __extends(FirstTouch, GenericState);
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
-    __extends(FirstTouch, GenericState);
     FirstTouch.prototype.description = function() {
       return "FirstTouch state";
     };
@@ -208,10 +208,10 @@ Object.merge = function(destination, source) {
     return FirstTouch;
   })();
   Fixed = (function() {
+    __extends(Fixed, GenericState);
     function Fixed() {
       Fixed.__super__.constructor.apply(this, arguments);
     }
-    __extends(Fixed, GenericState);
     Fixed.prototype.description = function() {
       return "Fixed state";
     };
@@ -224,10 +224,10 @@ Object.merge = function(destination, source) {
     return Fixed;
   })();
   Drag = (function() {
+    __extends(Drag, GenericState);
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
-    __extends(Drag, GenericState);
     Drag.prototype.description = function() {
       return "Drag state";
     };
@@ -262,8 +262,11 @@ Object.merge = function(destination, source) {
       this.gestureName = gestureName;
       date = new Date();
       this.params = {};
-      this.params.startX = eventObj.clientX;
-      this.params.startY = eventObj.clientY;
+      this.positions = [];
+      this.positions[0] = {};
+      this.positionCount = 0;
+      this.params.startX = this.positions[0].x = eventObj.clientX;
+      this.params.startY = this.positions[0].y = eventObj.clientY;
       this.params.timeStart = date.getTime();
       this.params.timeElasped = 0;
       this.params.panX = 0;
@@ -273,6 +276,10 @@ Object.merge = function(destination, source) {
     FingerGesture.prototype.update = function(gestureName, eventObj) {
       var date;
       this.gestureName = gestureName;
+      this.positionCount++;
+      this.positions[this.positionCount] = {};
+      this.positions[this.positionCount].x = eventObj.clientX;
+      this.positions[this.positionCount].y = eventObj.clientY;
       date = new Date();
       this.params.timeElasped = date.getTime() - this.params.timeStart;
       if (this.gestureName === "drag") {
@@ -308,19 +315,20 @@ Object.merge = function(destination, source) {
     EventRouter.prototype.touchstart = function(event) {
       var i, iMachine, _i, _len, _ref, _results;
       event.preventDefault();
+      this.fingerCount = event.touches.length;
+      this.grouper.refreshFingerCount(this.fingerCount, this.element);
       _ref = event.changedTouches;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
-        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine, this.fingerCount = event.touches.length) : void 0);
+        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine) : void 0);
       }
       return _results;
     };
     EventRouter.prototype.touchend = function(event) {
-      var exists, iMKey, iTouch, _i, _j, _len, _len2, _ref, _ref2, _results;
+      var exists, iMKey, iTouch, _i, _j, _len, _len2, _ref, _ref2;
       event.preventDefault();
       _ref = this.machines.keys();
-      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         iMKey = _ref[_i];
         iMKey = parseInt(iMKey);
@@ -332,9 +340,16 @@ Object.merge = function(destination, source) {
             exists = true;
           }
         }
-        _results.push(!exists ? (this.machines[iMKey].apply("touchend", {}), delete this.machines[iMKey]) : void 0);
+        if (!exists) {
+          this.machines[iMKey].apply("touchend", {});
+          delete this.machines[iMKey];
+        }
       }
-      return _results;
+<<<<<<< HEAD
+=======
+      this.fingerCount = event.touches.length;
+>>>>>>> e880b016fb62763bed450fb0e8cc42f1117b81d5
+      return this.grouper.refreshFingerCount(this.fingerCount, this.element);
     };
     EventRouter.prototype.touchmove = function(event) {
       var i, iMachine, _i, _len, _ref, _results;
@@ -361,11 +376,17 @@ Object.merge = function(destination, source) {
     function EventGrouper() {
       this.savedTap = {};
     }
-    EventGrouper.prototype.receive = function(name, eventObj, fingerCount, element) {
-      if (this.fingerCount !== fingerCount) {
-        this.fingerCount = fingerCount;
-        this.analyser = new Analyser(this.fingerCount, element);
+    EventGrouper.prototype.refreshFingerCount = function(newCount, element) {
+      if (this.fingerCount !== newCount) {
+        this.fingerCount = newCount;
+        return this.analyser = new Analyser(this.fingerCount, element);
       }
+    };
+    EventGrouper.prototype.receive = function(name, eventObj, fingerCount, element) {
+<<<<<<< HEAD
+      this.refreshFingerCount(fingerCount, element);
+=======
+>>>>>>> e880b016fb62763bed450fb0e8cc42f1117b81d5
       if (name === "tap") {
         if ((this.savedTap[eventObj.identifier] != null) && ((new Date().getTime()) - this.savedTap[eventObj.identifier].time) < 400) {
           this.send("doubleTap", eventObj);
@@ -419,8 +440,13 @@ Object.merge = function(destination, source) {
   */
   getDragDirection = function(finger) {
     var deltaX, deltaY;
-    deltaX = finger.params.x - finger.params.startX;
-    deltaY = finger.params.y - finger.params.startY;
+    if (finger.positionCount < 4) {
+      deltaX = finger.params.x - finger.startX;
+      deltaY = finger.params.y - finger.startY;
+    } else {
+      deltaX = finger.params.x - finger.positions[finger.positionCount - 4].x;
+      deltaY = finger.params.y - finger.positions[finger.positionCount - 4].y;
+    }
     return getDirection(deltaX, deltaY);
   };
   Analyser = (function() {
@@ -729,6 +755,8 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind('all', function(event) {});
+    return $("blue").bind('all', function(a, event) {
+      return $('debug').innerHTML = event.global.type;
+    });
   };
 }).call(this);

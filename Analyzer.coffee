@@ -12,8 +12,10 @@ class Analyser
 		else
 			@fingersArray[fingerID] =  new FingerGesture(fingerID, gestureName, @eventObj)
 			@fingers.push @fingersArray[fingerID]
-		
-		@analyse @totalNbFingers if _.size(@fingersArray) is @totalNbFingers
+
+		if _.size(@fingersArray) is @totalNbFingers
+			@analyse @totalNbFingers
+
 		##$("debug").innerHTML = "" + gestureName + "<br /> " + $("debug").innerHTML  if _.size(@fingersArray) is @totalNbFingers
 	
 	## Redirect to the correct analysis method depending the number of finger	
@@ -40,11 +42,11 @@ class Analyser
 		switch finger.gestureName
 			when "tap" then @informations.global.type = "tap"
 			when "doubletap" then @informations.global.type = "doubletap"
-			when "fixed" then @informations.global.type ="fixed"
-			when "fixedend" then @informations.global.type ="press"
+			when "fixed" then @informations.global.type = "fixed"
+			when "fixedend" then @informations.global.type = "press"
 			when "drag"
 				@informations.global.type = finger.params.dragDirection ## getDragDirection(finger)
-			when "dragend" then @informations.global.type ="dragend"
+			when "dragend" then @informations.global.type = "dragend"
 			else 
 				@informations.global.type = finger.gestureName
 			
@@ -140,7 +142,7 @@ class Analyser
 							@informations.global.type = "rotate:ccw"
 						else
 							@informations.global.type = type
-			else 
+			else
 				@informations.global.type = gestureName
 		@targetElement.trigger @informations.global.type, @informations
 
@@ -234,5 +236,5 @@ class Analyser
 		@targetElement.trigger @informations.global.type, @informations
 
 window.onload = ->
-	$("blue").bind 'all', (event) ->
-		
+	$("blue").bind 'all', (a, event) ->
+		$('debug').innerHTML = event.global.type

@@ -29,6 +29,10 @@ getDirection = (deltaX, deltaY) ->
 ###
 
 getDragDirection = (finger) ->
-	deltaX = finger.params.x - finger.params.startX
-	deltaY = finger.params.y - finger.params.startY
+	if finger.positionCount < 4
+		deltaX = finger.params.x - finger.startX
+		deltaY = finger.params.y - finger.startY
+	else
+		deltaX = finger.params.x - finger.positions[finger.positionCount - 4].x
+		deltaY = finger.params.y - finger.positions[finger.positionCount - 4].y
 	getDirection deltaX, deltaY	

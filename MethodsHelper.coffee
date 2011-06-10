@@ -104,5 +104,5 @@ Object.merge = function(destination, source) {
         }
     }
     return destination;
-};
+}
 `

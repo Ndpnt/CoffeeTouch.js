@@ -13,26 +13,29 @@
 		<script language="JavaScript" type="text/javascript">
 			window.onload = function()
 				{
-					document.getElementById('div').bind("drag", resize);
+					document.getElementById('div').bind("up", up);
+					document.getElementById('div').bind("down", down);
 					document.getElementById('div').bind("tap", randomColor);
 
 				}
 
 			function randomColor(eventArg)
 			{
+				
 				if(document.getElementById('div').style.backgroundColor == "red")
 					document.getElementById('div').style.backgroundColor = "blue";
 				else
 					document.getElementById('div').style.backgroundColor = "red";
 			}
 
-			function resize(eventArg)
+			function up(eventArg)
 			{
-				document.getElementById('div').innerHTML = eventArg.direction;
-				if(eventArg.direction == "right")
-					document.getElementById('div').style.height = "20em"
-				else
-					document.getElementById('div').style.height = "10em"					
+					document.getElementById('div').style.height = "10em";
+			}
+			function down(eventArg)
+			{
+					document.getElementById('div').innnerHTML = "down";
+					document.getElementById('div').style.height = "20em";
 			}
 		</script> 
 	</head>
