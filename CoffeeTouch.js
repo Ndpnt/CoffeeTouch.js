@@ -319,15 +319,15 @@ Object.merge = function(destination, source) {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
-        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine, this.fingerCount = event.touches.length) : void 0);
+        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine) : void 0);
       }
       return _results;
     };
     EventRouter.prototype.touchend = function(event) {
-      var exists, iMKey, iTouch, _i, _j, _len, _len2, _ref, _ref2, _results;
+      var exists, iMKey, iTouch, _i, _j, _len, _len2, _ref, _ref2;
       event.preventDefault();
+      this.fingerCount = event.touches.length;
       _ref = this.machines.keys();
-      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         iMKey = _ref[_i];
         iMKey = parseInt(iMKey);
@@ -339,9 +339,16 @@ Object.merge = function(destination, source) {
             exists = true;
           }
         }
+<<<<<<< HEAD
         _results.push(!exists ? (this.machines[iMKey].apply("touchend", {}), delete this.machines[iMKey], this.fingerCount = event.touches.length) : void 0);
+=======
+        if (!exists) {
+          this.machines[iMKey].apply("touchend", {});
+          delete this.machines[iMKey];
+        }
+>>>>>>> 015099051f9a88597e85e2535e51f6a0c49f8214
       }
-      return _results;
+      return this.grouper.refreshFIngerCount(this.fingerCount);
     };
     EventRouter.prototype.touchmove = function(event) {
       var i, iMachine, _i, _len, _ref, _results;
@@ -367,12 +374,16 @@ Object.merge = function(destination, source) {
   EventGrouper = (function() {
     function EventGrouper() {
       this.savedTap = {};
+      this.fingerCount = 0;
     }
-    EventGrouper.prototype.receive = function(name, eventObj, fingerCount, element) {
-      if (this.fingerCount !== fingerCount) {
-        this.fingerCount = fingerCount;
-        this.analyser = new Analyser(this.fingerCount, element);
+    EventGrouper.prototype.refreshFingerCount = function(newCount) {
+      if (this.fingerCount !== newCount) {
+        this.fingerCount = newCount;
+        return this.analyser = new Analyser(this.fingerCount, element);
       }
+    };
+    EventGrouper.prototype.receive = function(name, eventObj, fingerCount, element) {
+      this.refreshFingerCount(fingerCount);
       if (name === "tap") {
         if ((this.savedTap[eventObj.identifier] != null) && ((new Date().getTime()) - this.savedTap[eventObj.identifier].time) < 400) {
           this.send("doubleTap", eventObj);
@@ -385,7 +396,6 @@ Object.merge = function(destination, source) {
       return this.send(name, eventObj);
     };
     EventGrouper.prototype.send = function(name, eventObj) {
-      $("debug").innerHTML = ("Receiver.send " + name + " " + eventObj.identifier + "<br /> ") + $("debug").innerHTML;
       return this.analyser.notify(eventObj.identifier, name, eventObj);
     };
     return EventGrouper;
