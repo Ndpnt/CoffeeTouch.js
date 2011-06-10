@@ -13,7 +13,9 @@
   };
   Element.prototype.bind = function(eventName, callback) {
     var calls, list;
-    new EventRouter(this);
+    if (!(this.router != null)) {
+      new EventRouter(this);
+    }
     calls = this._callbacks || (this._callbacks = {});
     list = this._callbacks[eventName] || (this._callbacks[eventName] = []);
     list.push(callback);
@@ -119,9 +121,6 @@ Object.merge = function(destination, source) {
     return destination;
 };
 ;
-  /*
-  #--------------------------------------------------------------------------------- State
-  */
   StateMachine = (function() {
     function StateMachine(identifier, router) {
       this.identifier = identifier;
@@ -167,10 +166,10 @@ Object.merge = function(destination, source) {
     return GenericState;
   })();
   NoTouch = (function() {
+    __extends(NoTouch, GenericState);
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
-    __extends(NoTouch, GenericState);
     NoTouch.prototype.description = function() {
       return "NoTouch state";
     };
@@ -180,10 +179,10 @@ Object.merge = function(destination, source) {
     return NoTouch;
   })();
   FirstTouch = (function() {
+    __extends(FirstTouch, GenericState);
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
-    __extends(FirstTouch, GenericState);
     FirstTouch.prototype.description = function() {
       return "FirstTouch state";
     };
@@ -209,23 +208,26 @@ Object.merge = function(destination, source) {
     return FirstTouch;
   })();
   Fixed = (function() {
+    __extends(Fixed, GenericState);
     function Fixed() {
       Fixed.__super__.constructor.apply(this, arguments);
     }
-    __extends(Fixed, GenericState);
     Fixed.prototype.description = function() {
       return "Fixed state";
     };
     Fixed.prototype.init = function() {
       return this.notify("fixed");
     };
+    Fixed.prototype.touchend = function() {
+      return this.notify("fixedend");
+    };
     return Fixed;
   })();
   Drag = (function() {
+    __extends(Drag, GenericState);
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
-    __extends(Drag, GenericState);
     Drag.prototype.description = function() {
       return "Drag state";
     };
@@ -376,16 +378,11 @@ Object.merge = function(destination, source) {
       return this.send(name, eventObj);
     };
     EventGrouper.prototype.send = function(name, eventObj) {
+      $("debug").innerHTML = ("Receiver.send " + name + " " + eventObj.identifier + "<br /> ") + $("debug").innerHTML;
       return this.analyser.notify(eventObj.identifier, name, eventObj);
     };
     return EventGrouper;
   })();
-  window.onload = function() {
-    new EventRouter($("blue"));
-    return $("blue").bind("all", function(a, params) {
-      return $("debug").innerHTML = params.global.type + "<br />" + $("debug").innerHTML;
-    });
-  };
   Object.swap = function(obj1, obj2) {
     var temp;
     temp = obj2;
@@ -396,35 +393,19 @@ Object.merge = function(destination, source) {
     return Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
   };
   getDirection = function(deltaX, deltaY) {
-    if (deltaX > 0 && deltaY < 0) {
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        return "right";
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX < 0) {
+        return "left";
       } else {
-        return "up";
-      }
-    }
-    if (deltaX > 0 && deltaY > 0) {
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
         return "right";
+      }
+    } else {
+      if (deltaY < 0) {
+        return "up";
       } else {
         return "down";
       }
     }
-    if (deltaX < 0 && deltaY < 0) {
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        return "left";
-      } else {
-        return "up";
-      }
-    }
-    if (deltaX < 0 && deltaY > 0) {
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        return "left";
-      } else {
-        return "down";
-      }
-    }
-    return "diagonal";
   };
   getDragDirection = function(finger) {
     var deltaX, deltaY;
