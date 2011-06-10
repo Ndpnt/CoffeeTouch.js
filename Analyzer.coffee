@@ -7,6 +7,7 @@ class Analyser
 	
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
 	notify: (fingerID, gestureName, @eventObj) ->
+#		$('debug').innerHTML = @fingersArray[fingerID]? + "<br />" + $("debug").innerHTML 
 		if @fingersArray[fingerID]?
 			@fingersArray[fingerID].update gestureName, @eventObj
 		else
@@ -46,6 +47,8 @@ class Analyser
 			when "fixedend" then @informations.global.type = "press"
 			when "drag"
 				@informations.global.type = finger.params.dragDirection ## getDragDirection(finger)
+				if finger.params.dragDirection.contains("flick")
+					@targetElement.trigger("flick", @informations)
 			when "dragend" then @informations.global.type = "dragend"
 			else 
 				@informations.global.type = finger.gestureName
@@ -209,6 +212,8 @@ class Analyser
 				@informations.global.type = type
 				@targetElement.trigger "two:fixed,drag", @informations
 				@targetElement.trigger "drag,two:fixed", @informations
+				@targetElement.trigger "two:fixed,#{finger.params.dragDirection}", @informations
+				@targetElement.trigger "#{finger.params.dragDirection},two:fixed", @informations
 
 			when "fixed,drag,drag", "drag,fixed,drag", "drag,drag,fixed"
 				type = ""
@@ -223,6 +228,8 @@ class Analyser
 				@informations.global.type = type
 				@targetElement.trigger "two:drag,fixed", @informations
 				@targetElement.trigger "fixed,two:drag", @informations
+				@targetElement.trigger "two:#{finger.params.dragDirection},fixed", @informations
+				@targetElement.trigger "fixed,two:#{finger.params.dragDirection}", @informations
 			when "drag,drag,drag"
 				type = ""
 				i = 0
@@ -232,9 +239,15 @@ class Analyser
 					type += "," if i < @fingers.length
 				@informations.global.type = type
 				@targetElement.trigger "three:drag", @informations
+				@targetElement.trigger "three:#{finger.params.dragDirection}", @informations
 
 		@targetElement.trigger @informations.global.type, @informations
 
 window.onload = ->
-	$("blue").bind 'all', (a, event) ->
-		$('debug').innerHTML = event.global.type
+	$("blue").bind "flick:up", (name, event) ->
+		$('debug').innerHTML = event.global.type + "<br />" + $('debug').innerHTML
+###
+		if name.contains "flick"
+			$('debug').innerHTML = event.global.type + "<br />"
+			$('debug').innerHTML += name
+###
