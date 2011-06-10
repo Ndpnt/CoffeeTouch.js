@@ -1,0 +1,2 @@
+To compile:
+coffee -c -j CoffeeScript MethodsHelper.coffee StateMachine.coffee Finger.coffee EventRouter.coffee AnalyzerHelper.coffee Analyzer.coffee 

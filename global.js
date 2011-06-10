@@ -34,7 +34,7 @@
     return this;
   };
   
-Object.prototype.trigger =  function(ev) {
+  Object.prototype.trigger =  function(ev) {
 	  var list, calls, i, l;
 	  if (!(calls = this._callbacks)) return this;
 	  if (list = calls[ev]) {

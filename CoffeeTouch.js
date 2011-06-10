@@ -1,7 +1,8 @@
 (function() {
   /*
-  #------------------------------------------------------------------------------------------------------------------------------ State
-  */  var Analyser, Drag, EventGrouper, EventRouter, FingerGesture, FirstTouch, Fixed, GenericState, NoTouch, StateMachine, distanceBetweenTwoPoints, getDirection, getDragDirection;
+   The bind, unbind and trigger function have been taken from Backbone Framework.
+   The bind function has been changed
+  */  var $, Analyser, Drag, EventGrouper, EventRouter, FingerGesture, FirstTouch, Fixed, GenericState, NoTouch, StateMachine, distanceBetweenTwoPoints, getDirection, getDragDirection;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -10,6 +11,116 @@
     child.__super__ = parent.prototype;
     return child;
   };
+  Element.prototype.bind = function(eventName, callback) {
+    var calls, list;
+    calls = this._callbacks || (this._callbacks = {});
+    list = this._callbacks[eventName] || (this._callbacks[eventName] = []);
+    list.push(callback);
+    return this;
+  };
+  Element.prototype.unbind = function(ev, callback) {
+    var calls, i, list, _i, _len;
+    if (!ev) {
+      this._callbacks = {};
+    } else if (calls = this._callbacks) {
+      if (!callback) {
+        calls[ev] = [];
+      } else {
+        list = calls[ev];
+        if (!list) {
+          return this;
+        }
+        for (_i = 0, _len = list.length; _i < _len; _i++) {
+          i = list[_i];
+          if (callback === list[i]) {
+            list.splice(i, 1);
+            break;
+          }
+        }
+      }
+    }
+    return this;
+  };
+  
+Element.prototype.trigger =  function(ev) {
+	  var list, calls, i, l;
+	  if (!(calls = this._callbacks)) return this;
+	  if (list = calls[ev]) {
+	    for (i = 0, l = list.length; i < l; i++) {
+	      list[i].apply(this, Array.prototype.slice.call(arguments, 1));
+	    }
+	  }
+	  if (list = calls['all']) {
+	    for (i = 0, l = list.length; i < l; i++) {
+	      list[i].apply(this, arguments);
+	    }
+	  }
+	  return this;
+	};
+;
+  $ = function(element) {
+    return document.getElementById(element);
+  };
+  
+function dump(arr,level) {
+		var dumped_text = "["
+		for(var item in arr) {
+			var value = arr[item];
+			if(typeof(value)=='function') continue;
+			dumped_text += item + "=" + value + " ";
+		}
+
+	return dumped_text + "]";
+}
+function print_r(obj) {
+  win_print_r = window.open('about:blank', 'win_print_r');
+  win_print_r.document.write('<html><body>');
+  r_print_r(obj, win_print_r);
+  win_print_r.document.write('</body></html>');
+ }
+
+ function r_print_r(theObj, win_print_r) {
+  if(theObj.constructor == Array ||
+   theObj.constructor == Object){
+   if (win_print_r == null)
+    win_print_r = window.open('about:blank', 'win_print_r');
+   }
+   for(var p in theObj){
+    if(theObj[p].constructor == Array||
+     theObj[p].constructor == Object){
+     win_print_r.document.write("<li>["+p+"] =>"+typeof(theObj)+"</li>");
+     win_print_r.document.write("<ul>")
+     r_print_r(theObj[p], win_print_r);
+     win_print_r.document.write("</ul>")
+    } else {
+     win_print_r.document.write("<li>["+p+"] =>"+theObj[p]+"</li>");
+    }
+   }
+  win_print_r.document.write("</ul>")
+ }
+
+Object.prototype.keys = function ()
+{
+  var keys = [];
+  for(var i in this) if (this.hasOwnProperty(i))
+  {
+    keys.push(i);
+  }
+  return keys;
+}
+
+Object.merge = function(destination, source) {
+    for (var property in source) {
+        if (source.hasOwnProperty(property)) {
+            destination[property] = source[property];
+        }
+    }
+    return destination;
+};
+;
+  /*
+  #--------------------------------------------------------------------------------- State
+  */
   StateMachine = (function() {
     function StateMachine(identifier, router) {
       this.identifier = identifier;
@@ -141,63 +252,39 @@
     };
     return Drag;
   })();
-  
-function dump(arr,level) {
-		var dumped_text = "["
-		for(var item in arr) {
-			var value = arr[item];
-			if(typeof(value)=='function') continue;
-			dumped_text += item + "=" + value + " ";
-		}
-
-	return dumped_text + "]";
-}
-function print_r(obj) {
-  win_print_r = window.open('about:blank', 'win_print_r');
-  win_print_r.document.write('<html><body>');
-  r_print_r(obj, win_print_r);
-  win_print_r.document.write('</body></html>');
- }
-
- function r_print_r(theObj, win_print_r) {
-  if(theObj.constructor == Array ||
-   theObj.constructor == Object){
-   if (win_print_r == null)
-    win_print_r = window.open('about:blank', 'win_print_r');
-   }
-   for(var p in theObj){
-    if(theObj[p].constructor == Array||
-     theObj[p].constructor == Object){
-     win_print_r.document.write("<li>["+p+"] =>"+typeof(theObj)+"</li>");
-     win_print_r.document.write("<ul>")
-     r_print_r(theObj[p], win_print_r);
-     win_print_r.document.write("</ul>")
-    } else {
-     win_print_r.document.write("<li>["+p+"] =>"+theObj[p]+"</li>");
+  FingerGesture = (function() {
+    function FingerGesture(fingerId, gestureName, eventObj) {
+      var date;
+      this.fingerId = fingerId;
+      this.gestureName = gestureName;
+      date = new Date();
+      this.params = {};
+      this.params.startX = eventObj.clientX;
+      this.params.startY = eventObj.clientY;
+      this.params.timeStart = date.getTime();
+      this.params.timeElasped = 0;
+      this.params.panX = 0;
+      this.params.panY = 0;
+      this.updatePosition(eventObj);
     }
-   }
-  win_print_r.document.write("</ul>")
- }
-
-Object.prototype.keys = function ()
-{
-  var keys = [];
-  for(var i in this) if (this.hasOwnProperty(i))
-  {
-    keys.push(i);
-  }
-  return keys;
-}
-
-Object.merge = function(destination, source) {
-    for (var property in source) {
-        if (source.hasOwnProperty(property)) {
-            destination[property] = source[property];
-        }
-    }
-    return destination;
-};
-;
+    FingerGesture.prototype.update = function(gestureName, eventObj) {
+      var date;
+      this.gestureName = gestureName;
+      date = new Date();
+      this.params.timeElasped = date.getTime() - this.params.timeStart;
+      if (this.gestureName === "drag") {
+        this.params.dragDirection = getDragDirection(this);
+      }
+      return this.updatePosition(eventObj);
+    };
+    FingerGesture.prototype.updatePosition = function(eventObj) {
+      this.params.x = eventObj.clientX;
+      this.params.y = eventObj.clientY;
+      this.params.panX = this.params.startX - this.params.x;
+      return this.params.panY = this.params.startY - this.params.y;
+    };
+    return FingerGesture;
+  })();
   EventRouter = (function() {
     function EventRouter(element) {
       var that;
@@ -292,6 +379,12 @@ Object.merge = function(destination, source) {
     };
     return EventGrouper;
   })();
+  window.onload = function() {
+    new EventRouter($("blue"));
+    return $("blue").bind("all", function(a, params) {
+      return $("debug").innerHTML = params.global.type + "<br />" + $("debug").innerHTML;
+    });
+  };
   Object.swap = function(obj1, obj2) {
     var temp;
     temp = obj2;
@@ -338,39 +431,6 @@ Object.merge = function(destination, source) {
     deltaY = finger.params.y - finger.params.startY;
     return getDirection(deltaX, deltaY);
   };
-  FingerGesture = (function() {
-    function FingerGesture(fingerId, gestureName, eventObj) {
-      var date;
-      this.fingerId = fingerId;
-      this.gestureName = gestureName;
-      date = new Date();
-      this.params = {};
-      this.params.startX = eventObj.clientX;
-      this.params.startY = eventObj.clientY;
-      this.params.timeStart = date.getTime();
-      this.params.timeElasped = 0;
-      this.params.panX = 0;
-      this.params.panY = 0;
-      this.updatePosition(eventObj);
-    }
-    FingerGesture.prototype.update = function(gestureName, eventObj) {
-      var date;
-      this.gestureName = gestureName;
-      date = new Date();
-      this.params.timeElasped = date.getTime() - this.params.timeStart;
-      if (this.gestureName === "drag") {
-        this.params.dragDirection = getDragDirection(this);
-      }
-      return this.updatePosition(eventObj);
-    };
-    FingerGesture.prototype.updatePosition = function(eventObj) {
-      this.params.x = eventObj.clientX;
-      this.params.y = eventObj.clientY;
-      this.params.panX = this.params.startX - this.params.x;
-      return this.params.panY = this.params.startY - this.params.ys;
-    };
-    return FingerGesture;
-  })();
   Analyser = (function() {
     function Analyser(totalNbFingers, targetElement) {
       this.totalNbFingers = totalNbFingers;
@@ -672,10 +732,4 @@ Object.merge = function(destination, source) {
     };
     return Analyser;
   })();
-  window.onload = function() {
-    new EventRouter($("blue"));
-    return $("blue").bind("all", function(a, params) {
-      return $("debug").innerHTML = params.global.type + "<br />" + $("debug").innerHTML;
-    });
-  };
 }).call(this);
