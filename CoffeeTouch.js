@@ -119,7 +119,7 @@ Object.merge = function(destination, source) {
         }
     }
     return destination;
-};
+}
 ;
   StateMachine = (function() {
     function StateMachine(identifier, router) {
@@ -262,8 +262,11 @@ Object.merge = function(destination, source) {
       this.gestureName = gestureName;
       date = new Date();
       this.params = {};
-      this.params.startX = eventObj.clientX;
-      this.params.startY = eventObj.clientY;
+      this.positions = [];
+      this.positions[0] = {};
+      this.positionCount = 0;
+      this.params.startX = this.positions[0].x = eventObj.clientX;
+      this.params.startY = this.positions[0].y = eventObj.clientY;
       this.params.timeStart = date.getTime();
       this.params.timeElasped = 0;
       this.params.panX = 0;
@@ -273,6 +276,10 @@ Object.merge = function(destination, source) {
     FingerGesture.prototype.update = function(gestureName, eventObj) {
       var date;
       this.gestureName = gestureName;
+      this.positionCount++;
+      this.positions[this.positionCount] = {};
+      this.positions[this.positionCount].x = eventObj.clientX;
+      this.positions[this.positionCount].y = eventObj.clientY;
       date = new Date();
       this.params.timeElasped = date.getTime() - this.params.timeStart;
       if (this.gestureName === "drag") {
@@ -385,7 +392,6 @@ Object.merge = function(destination, source) {
       return this.send(name, eventObj);
     };
     EventGrouper.prototype.send = function(name, eventObj) {
-      $("debug").innerHTML = ("Grouper.Send  " + name + " " + this.fingerCount + " <br/>") + $("debug").innerHTML;
       return this.analyser.notify(eventObj.identifier, name, eventObj);
     };
     return EventGrouper;
@@ -427,8 +433,13 @@ Object.merge = function(destination, source) {
   */
   getDragDirection = function(finger) {
     var deltaX, deltaY;
-    deltaX = finger.params.x - finger.params.startX;
-    deltaY = finger.params.y - finger.params.startY;
+    if (finger.positionCount < 4) {
+      deltaX = finger.params.x - finger.startX;
+      deltaY = finger.params.y - finger.startY;
+    } else {
+      deltaX = finger.params.x - finger.positions[finger.positionCount - 4].x;
+      deltaY = finger.params.y - finger.positions[finger.positionCount - 4].y;
+    }
     return getDirection(deltaX, deltaY);
   };
   Analyser = (function() {
@@ -737,6 +748,8 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind('all', function(event) {});
+    return $("blue").bind('all', function(a, event) {
+      return $('debug').innerHTML = event.global.type;
+    });
   };
 }).call(this);

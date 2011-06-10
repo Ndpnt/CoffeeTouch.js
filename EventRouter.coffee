@@ -63,7 +63,6 @@ class EventGrouper
 
 	receive: (name, eventObj, fingerCount, element) ->
 	
-		##
 		if name == "tap"
 			if @savedTap[eventObj.identifier]? && ((new Date().getTime()) - @savedTap[eventObj.identifier].time) < 400
 				@send "doubleTap", eventObj
@@ -72,11 +71,10 @@ class EventGrouper
 				@savedTap[eventObj.identifier] =  {}
 				@savedTap[eventObj.identifier].event = eventObj
 				@savedTap[eventObj.identifier].time = new Date().getTime()
-		##
-
+	
 		@send name, eventObj
 
 	send: (name, eventObj) ->
-		$("debug").innerHTML = "Grouper.Send  #{name} #{@fingerCount} <br/>" + $("debug").innerHTML
+		#$("debug").innerHTML = "Grouper.Send  #{name} #{@fingerCount} <br/>" + $("debug").innerHTML
 		@analyser.notify(eventObj.identifier, name, eventObj)
 	
