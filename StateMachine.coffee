@@ -1,8 +1,4 @@
-###
-#--------------------------------------------------------------------------------- State
-###
-
-####################### State Machine #######################
+####################### State Machine ####################### 
 class StateMachine
 	constructor: (@identifier, @router)-> 
 		@currentState = new NoTouch(this)
@@ -32,6 +28,9 @@ class GenericState
 
 	notify: (name) ->
 		@machine.router.broadcast(name, @eventObj)
+	
+
+
 
 class NoTouch extends GenericState
 	description: -> "NoTouch state"
@@ -64,10 +63,12 @@ class Fixed extends GenericState
 	init: ->
 		@notify "fixed"
 
+	touchend: ->
+		@notify "fixedend"
 
 
 class Drag extends GenericState
-	description: -> "Drag state"
+	description: ->"Drag state"
 	init: ->
 		@isTap = true
 		@initialX = @eventObj.clientX

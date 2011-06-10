@@ -10,15 +10,12 @@ distanceBetweenTwoPoints = (x1, y1, x2, y2) ->
 	Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)))
 
 getDirection = (deltaX, deltaY) ->
-	if deltaX > 0 and deltaY < 0 ## Right top side of the circle
-		if Math.abs(deltaX) > Math.abs(deltaY) then return "right" else return "up"
-	if deltaX > 0 and deltaY > 0 ## Right bottom side of the circle
-		if Math.abs(deltaX) > Math.abs(deltaY) then return "right" else return "down"
-	if deltaX < 0 and deltaY < 0 ## Left top side of the circle
-		if Math.abs(deltaX) > Math.abs(deltaY) then return "left" else return "up"
-	if deltaX < 0 and deltaY > 0 ## Left top side of the circle
-		if Math.abs(deltaX) > Math.abs(deltaY) then return "left" else return "down"
-	return "diagonal"
+	if Math.abs(deltaX) > Math.abs(deltaY)
+		## Horizontal
+		if deltaX < 0 then "left" else "right"
+	else
+		if deltaY < 0 then "up" else "down"
+
 
 getDragDirection = (finger) ->
 	deltaX = finger.params.x - finger.params.startX
