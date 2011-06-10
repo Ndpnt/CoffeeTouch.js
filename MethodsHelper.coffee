@@ -4,7 +4,8 @@
 ###
 
 Element::bind = (eventName, callback) ->
-	new EventRouter this
+	if !this.router?
+		this.router = new EventRouter this
 	calls = @_callbacks or @_callbacks = {}
 	list = @_callbacks[eventName] or @_callbacks[eventName] = []
 	list.push callback
