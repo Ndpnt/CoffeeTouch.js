@@ -8,29 +8,43 @@ class FingerGesture
 		date = new Date()
 		@params = {}
 		@positions = []
-		@positions[0] = {}
+		@positions[0] = 
+			x: eventObj.clientX
+			y: eventObj.clientY
+			time: date.getTime()
 		@positionCount = 0
-		@params.startX = @positions[0].x = eventObj.clientX
-		@params.startY = @positions[0].y = eventObj.clientY
+		@params.startX = eventObj.clientX
+		@params.startY = eventObj.clientY
 		@params.timeStart = date.getTime()
 		@params.timeElasped = 0
 		@params.panX = 0
 		@params.panY = 0
 		@updatePosition(eventObj)
+		@params.speed = 0
+		@params.dragDirection = "none"
 
 	update: (@gestureName, eventObj) ->
 		@positionCount++
-		@positions[@positionCount] = {}
-		@positions[@positionCount].x = eventObj.clientX
-		@positions[@positionCount].y = eventObj.clientY
 		date = new Date()
+		@positions[@positionCount] =
+			x: eventObj.clientX
+			y: eventObj.clientY
+			time: date.getTime()
 		@params.timeElasped = date.getTime() - @params.timeStart
-		@params.dragDirection = getDragDirection(this) if @gestureName == "drag"
 		@updatePosition eventObj
-
+		if @gestureName == "drag"
+			movedX = @params.x - @positions[@positionCount - 1].x
+			movedY = @params.y - @positions[@positionCount - 1].y
+			@params.speed = Math.sqrt(movedX * movedX  + movedY  * movedY) / (@positions[@positionCount].time - @positions[@positionCount - 1].time) 
+			
+			if @params.speed > 3
+				@params.dragDirection = "flick:" + getDragDirection(this)
+			else
+				@params.dragDirection = getDragDirection(this)
+			@params.direction = Math.atan2(@params.panY, @params.panX)
 
 	updatePosition: (eventObj) ->
 		@params.x = eventObj.clientX
 		@params.y = eventObj.clientY
-		@params.panX = @params.startX - @params.x
-		@params.panY = @params.startY - @params.y
+		@params.panX = Math.abs(@params.startX - @params.x)
+		@params.panY = Math.abs(@params.startY - @params.y)

@@ -48,6 +48,9 @@ Element.prototype.trigger =  function(ev) {
 $ = (element) ->
 	document.getElementById element
 
+String::contains = (it) ->
+	this.indexOf(it) != -1;
+
 ####################### Misc          ####################### 
 `
 function dump(arr,level) {

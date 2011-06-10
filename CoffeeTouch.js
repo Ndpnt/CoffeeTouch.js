@@ -64,6 +64,9 @@ Element.prototype.trigger =  function(ev) {
   $ = function(element) {
     return document.getElementById(element);
   };
+  String.prototype.contains = function(it) {
+    return this.indexOf(it) !== -1;
+  };
   
 function dump(arr,level) {
 		var dumped_text = "["
@@ -263,35 +266,51 @@ Object.merge = function(destination, source) {
       date = new Date();
       this.params = {};
       this.positions = [];
-      this.positions[0] = {};
+      this.positions[0] = {
+        x: eventObj.clientX,
+        y: eventObj.clientY,
+        time: date.getTime()
+      };
       this.positionCount = 0;
-      this.params.startX = this.positions[0].x = eventObj.clientX;
-      this.params.startY = this.positions[0].y = eventObj.clientY;
+      this.params.startX = eventObj.clientX;
+      this.params.startY = eventObj.clientY;
       this.params.timeStart = date.getTime();
       this.params.timeElasped = 0;
       this.params.panX = 0;
       this.params.panY = 0;
       this.updatePosition(eventObj);
+      this.params.speed = 0;
+      this.params.dragDirection = "none";
     }
     FingerGesture.prototype.update = function(gestureName, eventObj) {
-      var date;
+      var date, movedX, movedY;
       this.gestureName = gestureName;
       this.positionCount++;
-      this.positions[this.positionCount] = {};
-      this.positions[this.positionCount].x = eventObj.clientX;
-      this.positions[this.positionCount].y = eventObj.clientY;
       date = new Date();
+      this.positions[this.positionCount] = {
+        x: eventObj.clientX,
+        y: eventObj.clientY,
+        time: date.getTime()
+      };
       this.params.timeElasped = date.getTime() - this.params.timeStart;
+      this.updatePosition(eventObj);
       if (this.gestureName === "drag") {
-        this.params.dragDirection = getDragDirection(this);
+        movedX = this.params.x - this.positions[this.positionCount - 1].x;
+        movedY = this.params.y - this.positions[this.positionCount - 1].y;
+        this.params.speed = Math.sqrt(movedX * movedX + movedY * movedY) / (this.positions[this.positionCount].time - this.positions[this.positionCount - 1].time);
+        if (this.params.speed > 3) {
+          this.params.dragDirection = "flick:" + getDragDirection(this);
+        } else {
+          this.params.dragDirection = getDragDirection(this);
+        }
+        return this.params.direction = Math.atan2(this.params.panY, this.params.panX);
       }
-      return this.updatePosition(eventObj);
     };
     FingerGesture.prototype.updatePosition = function(eventObj) {
       this.params.x = eventObj.clientX;
       this.params.y = eventObj.clientY;
-      this.params.panX = this.params.startX - this.params.x;
-      return this.params.panY = this.params.startY - this.params.y;
+      this.params.panX = Math.abs(this.params.startX - this.params.x);
+      return this.params.panY = Math.abs(this.params.startY - this.params.y);
     };
     return FingerGesture;
   })();
@@ -406,6 +425,22 @@ Object.merge = function(destination, source) {
     return Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
   };
   getDirection = function(deltaX, deltaY) {
+    /*
+    	direction = Math.atan2(deltaX, deltaY)
+    	pi = Math.PI
+    	if (pi / 4) > direction > (3 * (pi / 4))
+    		return "right"
+    	if (3 * (pi / 4)) > direction > - (3 * (pi / 4))
+    		return "up"
+    	if (3 * (pi / 4)) < direction < (3 * (pi / 4))
+    		return "left"
+    	if (pi / 4) > direction > - (pi / 4)
+    		return "down"
+    	return "-"
+    	
+    */    if ((deltaX === deltaY && deltaY === 0)) {
+      return "unknownDirection";
+    }
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
       if (deltaX < 0) {
         return "left";
@@ -433,13 +468,8 @@ Object.merge = function(destination, source) {
   */
   getDragDirection = function(finger) {
     var deltaX, deltaY;
-    if (finger.positionCount < 4) {
-      deltaX = finger.params.x - finger.startX;
-      deltaY = finger.params.y - finger.startY;
-    } else {
-      deltaX = finger.params.x - finger.positions[finger.positionCount - 4].x;
-      deltaY = finger.params.y - finger.positions[finger.positionCount - 4].y;
-    }
+    deltaX = finger.params.x - finger.positions[finger.positionCount - 1].x;
+    deltaY = finger.params.y - finger.positions[finger.positionCount - 1].y;
     return getDirection(deltaX, deltaY);
   };
   Analyser = (function() {
@@ -449,6 +479,7 @@ Object.merge = function(destination, source) {
       this.fingersArray = {};
       this.fingers = [];
       this.firstAnalysis = true;
+      this.stopAnalyze = false;
     }
     Analyser.prototype.notify = function(fingerID, gestureName, eventObj) {
       this.eventObj = eventObj;
@@ -458,7 +489,7 @@ Object.merge = function(destination, source) {
         this.fingersArray[fingerID] = new FingerGesture(fingerID, gestureName, this.eventObj);
         this.fingers.push(this.fingersArray[fingerID]);
       }
-      if (_.size(this.fingersArray) === this.totalNbFingers) {
+      if (_.size(this.fingersArray) === this.totalNbFingers && !this.stopAnalyze) {
         return this.analyse(this.totalNbFingers);
       }
     };
@@ -507,6 +538,10 @@ Object.merge = function(destination, source) {
           break;
         case "drag":
           this.informations.global.type = finger.params.dragDirection;
+          if (finger.params.dragDirection.contains("flick")) {
+            this.stopAnalyze = true;
+            this.targetElement.trigger("flick", this.informations);
+          }
           break;
         case "dragend":
           this.informations.global.type = "dragend";
@@ -705,6 +740,8 @@ Object.merge = function(destination, source) {
           this.informations.global.type = type;
           this.targetElement.trigger("two:fixed,drag", this.informations);
           this.targetElement.trigger("drag,two:fixed", this.informations);
+          this.targetElement.trigger("two:fixed," + finger.params.dragDirection, this.informations);
+          this.targetElement.trigger("" + finger.params.dragDirection + ",two:fixed", this.informations);
           break;
         case "fixed,drag,drag":
         case "drag,fixed,drag":
@@ -727,6 +764,8 @@ Object.merge = function(destination, source) {
           this.informations.global.type = type;
           this.targetElement.trigger("two:drag,fixed", this.informations);
           this.targetElement.trigger("fixed,two:drag", this.informations);
+          this.targetElement.trigger("two:" + finger.params.dragDirection + ",fixed", this.informations);
+          this.targetElement.trigger("fixed,two:" + finger.params.dragDirection, this.informations);
           break;
         case "drag,drag,drag":
           type = "";
@@ -742,14 +781,20 @@ Object.merge = function(destination, source) {
           }
           this.informations.global.type = type;
           this.targetElement.trigger("three:drag", this.informations);
+          this.targetElement.trigger("three:" + finger.params.dragDirection, this.informations);
       }
       return this.targetElement.trigger(this.informations.global.type, this.informations);
     };
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind('all', function(a, event) {
-      return $('debug').innerHTML = event.global.type;
+    return $("blue").bind("flick", function(event) {
+      return $('debug').innerHTML = event.global.type + "<br />" + $('debug').innerHTML;
     });
   };
+  /*
+  		if name.contains "flick"
+  			$('debug').innerHTML = event.global.type + "<br />"
+  			$('debug').innerHTML += name
+  */
 }).call(this);
