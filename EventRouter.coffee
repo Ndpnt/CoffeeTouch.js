@@ -16,11 +16,11 @@ class EventRouter
 				iMachine = new StateMachine i.identifier, this
 				iMachine.apply "touchstart", i
 				@machines[i.identifier] = iMachine
-				@fingerCount = event.touches.length
 
 
 	touchend: (event) ->
 		event.preventDefault()
+		@fingerCount = event.touches.length
 		for iMKey in @machines.keys()
 			iMKey = parseInt(iMKey)
 			exists = false			
@@ -31,7 +31,8 @@ class EventRouter
 			if !exists
 				@machines[iMKey].apply("touchend", {})
 				delete @machines[iMKey]	
-				
+
+		@grouper.refreshFIngerCount @fingerCount		
 			
 	 
 	touchmove: (event) ->
@@ -51,13 +52,16 @@ class EventRouter
 class EventGrouper
 	constructor: ->
 		@savedTap = {}
+		@fingerCount = 0
 	
-	receive: (name, eventObj, fingerCount, element) ->
-
-		if @fingerCount != fingerCount
-			@fingerCount = fingerCount
+	refreshFingerCount: (newCount) ->
+		if @fingerCount != newCount
+			@fingerCount = newCount
 			@analyser = new Analyser @fingerCount, element
-		
+
+	receive: (name, eventObj, fingerCount, element) ->
+		@refreshFingerCount fingerCount
+
 		##
 		if name == "tap"
 			if @savedTap[eventObj.identifier]? && ((new Date().getTime()) - @savedTap[eventObj.identifier].time) < 400
