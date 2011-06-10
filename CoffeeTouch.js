@@ -166,10 +166,10 @@ Object.merge = function(destination, source) {
     return GenericState;
   })();
   NoTouch = (function() {
-    __extends(NoTouch, GenericState);
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(NoTouch, GenericState);
     NoTouch.prototype.description = function() {
       return "NoTouch state";
     };
@@ -179,10 +179,10 @@ Object.merge = function(destination, source) {
     return NoTouch;
   })();
   FirstTouch = (function() {
-    __extends(FirstTouch, GenericState);
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(FirstTouch, GenericState);
     FirstTouch.prototype.description = function() {
       return "FirstTouch state";
     };
@@ -208,10 +208,10 @@ Object.merge = function(destination, source) {
     return FirstTouch;
   })();
   Fixed = (function() {
-    __extends(Fixed, GenericState);
     function Fixed() {
       Fixed.__super__.constructor.apply(this, arguments);
     }
+    __extends(Fixed, GenericState);
     Fixed.prototype.description = function() {
       return "Fixed state";
     };
@@ -224,10 +224,10 @@ Object.merge = function(destination, source) {
     return Fixed;
   })();
   Drag = (function() {
-    __extends(Drag, GenericState);
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
+    __extends(Drag, GenericState);
     Drag.prototype.description = function() {
       return "Drag state";
     };
@@ -345,10 +345,7 @@ Object.merge = function(destination, source) {
           delete this.machines[iMKey];
         }
       }
-<<<<<<< HEAD
-=======
       this.fingerCount = event.touches.length;
->>>>>>> e880b016fb62763bed450fb0e8cc42f1117b81d5
       return this.grouper.refreshFingerCount(this.fingerCount, this.element);
     };
     EventRouter.prototype.touchmove = function(event) {
@@ -383,10 +380,6 @@ Object.merge = function(destination, source) {
       }
     };
     EventGrouper.prototype.receive = function(name, eventObj, fingerCount, element) {
-<<<<<<< HEAD
-      this.refreshFingerCount(fingerCount, element);
-=======
->>>>>>> e880b016fb62763bed450fb0e8cc42f1117b81d5
       if (name === "tap") {
         if ((this.savedTap[eventObj.identifier] != null) && ((new Date().getTime()) - this.savedTap[eventObj.identifier].time) < 400) {
           this.send("doubleTap", eventObj);

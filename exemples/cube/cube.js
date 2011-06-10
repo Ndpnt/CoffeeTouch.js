@@ -6,24 +6,25 @@
     };
     xAngle = 0;
     yAngle = 0;
-    $('body').bind("left", function(params) {
-      yAngle -= params.first.y * 90 / window.screen.height;
-      return $('cube').style.webkitTransform = "rotateY(-" + yAngle + "deg)";
+    $('body').bind("flick:down", function(params) {
+      xAngle -= 90;
+      return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg)";
     });
-    $('body').bind("right", function(params) {
-      yAngle += params.first.y * 90 / window.screen.height;
-      return $('cube').style.webkitTransform = "rotateY(" + yAngle + "deg)";
+    $('body').bind("flick:up", function(params) {
+      xAngle += 90;
+      return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg)";
     });
-    $('body').bind("up", function(params) {
-      xAngle += params.first.x * 90 / window.screen.width;
-      return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg)";
+    $('body').bind("flick:left", function(params) {
+      yAngle -= 90;
+      return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg)";
     });
-    $('body').bind("down", function(params) {
-      xAngle -= params.first.x * 90 / window.screen.width;
-      return $('cube').style.webkitTransform = "rotateX(-" + xAngle + "deg)";
+    return $('body').bind("flick:right", function(params) {
+      yAngle += 90;
+      return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg)";
     });
-    return $('body').bind("all", function(a, params) {
-      return $('debug').innerHTML = params.global.type;
-    });
+    /*
+    $('body').bind "all", (a, params) ->
+    		$('debug').innerHTML = params.global.type
+    */
   };
 }).call(this);
