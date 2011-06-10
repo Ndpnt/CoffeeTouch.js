@@ -15,5 +15,7 @@ window.onload = ->
 		canvas.displayLine(params.first.x, params.first.y, params.second.x, params.second.y, "#0000AA")
 		canvas.displayLine(params.second.x, params.second.y, params.third.x, params.third.y, "#0000AA")
 		canvas.displayLine(params.first.x, params.first.y, params.third.x, params.third.y, "#0000AA")
-	$('canvas').bind "all", (a, params) ->
+	###
+$('canvas').bind "all", (a, params) ->
 		$('debug').innerHTML = params.global.type
+###

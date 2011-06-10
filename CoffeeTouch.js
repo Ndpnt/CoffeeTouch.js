@@ -477,20 +477,20 @@ Object.merge = function(destination, source) {
         case "tap":
           this.informations.global.type = "tap";
           break;
-        case "doubleTap":
-          this.informations.global.type = "doubleTap";
+        case "doubletap":
+          this.informations.global.type = "doubletap";
           break;
         case "fixed":
           this.informations.global.type = "fixed";
           break;
-        case "fixedEnd":
+        case "fixedend":
           this.informations.global.type = "press";
           break;
         case "drag":
           this.informations.global.type = finger.params.dragDirection;
           break;
-        case "dragEnd":
-          this.informations.global.type = "dragEnd";
+        case "dragend":
+          this.informations.global.type = "dragend";
           break;
         default:
           this.informations.global.type = finger.gestureName;
@@ -540,14 +540,14 @@ Object.merge = function(destination, source) {
           this.informations.global.type = "tap,tap";
           this.targetElement.trigger("two:tap", this.informations);
           break;
-        case "doubleTap,doubleTap":
+        case "doubletap,doubletap":
           this.informations.global.type = "" + this.firstFinger.gestureName + "," + this.secondFinger.gestureName;
-          this.targetElement.trigger("two:doubleTap", this.informations);
+          this.targetElement.trigger("two:doubletap", this.informations);
           break;
         case "fixed,tap":
         case "tap,fixed":
-        case "fixed,doubleTap":
-        case "doubleTap,fixed":
+        case "fixed,doubletap":
+        case "doubletap,fixed":
           this.informations.global.type = "" + this.firstFinger.gestureName + "," + this.secondFinger.gestureName;
           break;
         case "fixed,drag":
@@ -559,13 +559,13 @@ Object.merge = function(destination, source) {
             this.informations.global.type = "" + this.firstFinger.params.dragDirection + ",fixed";
           }
           break;
-        case "doubleTap,doubleTap":
-          this.informations.global.type = "doubleTap,doubleTap";
+        case "doubletap,doubletap":
+          this.informations.global.type = "doubletap,doubletap";
           break;
         case "fixed,fixed":
           this.informations.global.type = "fixed,fixed";
           break;
-        case "fixedEnd,fixedEnd":
+        case "fixedend,fixedend":
           this.informations.global.type = "press,press";
           break;
         case "drag,drag":
@@ -629,9 +629,9 @@ Object.merge = function(destination, source) {
           this.informations.global.type = "tap,tap,tap";
           this.targetElement.trigger("three:tap", this.informations);
           break;
-        case "doubleTap,doubleTap,doubleTap":
-          this.informations.global.type = "doubleTap,doubleTap,doubleTap";
-          this.targetElement.trigger("three:doubleTap", this.informations);
+        case "doubletap,doubletap,doubletap":
+          this.informations.global.type = "doubletap,doubletap,doubletap";
+          this.targetElement.trigger("three:doubletap", this.informations);
           break;
         case "fixed,fixed,fixed":
           this.informations.global.type = "fixed,fixed,fixed";
@@ -651,19 +651,19 @@ Object.merge = function(destination, source) {
           this.targetElement.trigger("two:tap,fixed", this.informations);
           this.targetElement.trigger("fixed,two:tap", this.informations);
           break;
-        case "fixed,fixed,doubleTap":
-        case "fixed,doubleTap,fixed":
-        case "doubleTap,fixed,fixed":
+        case "fixed,fixed,doubletap":
+        case "fixed,doubletap,fixed":
+        case "doubletap,fixed,fixed":
           this.informations.global.type = "" + this.fingers[0].gestureName + "," + this.fingers[1].gestureName + "," + this.fingers[2].gestureName;
-          this.targetElement.trigger("two:fixed,doubleTap", this.informations);
-          this.targetElement.trigger("doubleTap,two:fixed", this.informations);
+          this.targetElement.trigger("two:fixed,doubletap", this.informations);
+          this.targetElement.trigger("doubletap,two:fixed", this.informations);
           break;
-        case "fixed,doubleTap,doubleTap":
-        case "doubleTap,doubleTap,fixed":
-        case "doubleTap,fixed,doubleTap":
+        case "fixed,doubletap,doubletap":
+        case "doubletap,doubletap,fixed":
+        case "doubletap,fixed,doubletap":
           this.informations.global.type = "" + this.fingers[0].gestureName + "," + this.fingers[1].gestureName + "," + this.fingers[2].gestureName;
-          this.targetElement.trigger("two:doubleTap,fixed", this.informations);
-          this.targetElement.trigger("fixed,two:doubleTap", this.informations);
+          this.targetElement.trigger("two:doubletap,fixed", this.informations);
+          this.targetElement.trigger("fixed,two:doubletap", this.informations);
           break;
         case "fixed,fixed,drag":
         case "fixed,drag,fixed":
