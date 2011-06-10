@@ -76,6 +76,5 @@ class EventGrouper
 		@send name, eventObj
 
 	send: (name, eventObj) ->
-		$("debug").innerHTML = "Receiver.send #{name} #{eventObj.identifier}<br /> " + $("debug").innerHTML
 		@analyser.notify(eventObj.identifier, name, eventObj)
 	
