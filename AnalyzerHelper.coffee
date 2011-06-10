@@ -16,6 +16,17 @@ getDirection = (deltaX, deltaY) ->
 	else
 		if deltaY < 0 then "up" else "down"
 
+###
+	if deltaX > 0 and deltaY < 0 ## Right top side of the circle
+		if Math.abs(deltaX) > Math.abs(deltaY) then return "right" else return "up"
+	if deltaX > 0 and deltaY > 0 ## Right bottom side of the circle
+		if Math.abs(deltaX) > Math.abs(deltaY) then return "right" else return "down"
+	if deltaX < 0 and deltaY < 0 ## Left top side of the circle
+		if Math.abs(deltaX) > Math.abs(deltaY) then return "left" else return "up"
+	if deltaX < 0 and deltaY > 0 ## Left top side of the circle
+		if Math.abs(deltaX) > Math.abs(deltaY) then return "left" else return "down"
+	return "diagonal"
+###
 
 getDragDirection = (finger) ->
 	deltaX = finger.params.x - finger.params.startX

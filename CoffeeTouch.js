@@ -406,6 +406,17 @@ Object.merge = function(destination, source) {
       }
     }
   };
+  /*
+  	if deltaX > 0 and deltaY < 0 ## Right top side of the circle
+  		if Math.abs(deltaX) > Math.abs(deltaY) then return "right" else return "up"
+  	if deltaX > 0 and deltaY > 0 ## Right bottom side of the circle
+  		if Math.abs(deltaX) > Math.abs(deltaY) then return "right" else return "down"
+  	if deltaX < 0 and deltaY < 0 ## Left top side of the circle
+  		if Math.abs(deltaX) > Math.abs(deltaY) then return "left" else return "up"
+  	if deltaX < 0 and deltaY > 0 ## Left top side of the circle
+  		if Math.abs(deltaX) > Math.abs(deltaY) then return "left" else return "down"
+  	return "diagonal"
+  */
   getDragDirection = function(finger) {
     var deltaX, deltaY;
     deltaX = finger.params.x - finger.params.startX;
@@ -480,6 +491,9 @@ Object.merge = function(destination, source) {
           break;
         case "dragEnd":
           this.informations.global.type = "dragEnd";
+          break;
+        default:
+          this.informations.global.type = finger.gestureName;
       }
       return this.targetElement.trigger(this.informations.global.type, this.informations);
     };
@@ -532,8 +546,6 @@ Object.merge = function(destination, source) {
           break;
         case "fixed,tap":
         case "tap,fixed":
-          this.informations.global.type = "" + this.firstFinger.gestureName + "," + this.secondFinger.gestureName;
-          break;
         case "fixed,doubleTap":
         case "doubleTap,fixed":
           this.informations.global.type = "" + this.firstFinger.gestureName + "," + this.secondFinger.gestureName;
@@ -586,6 +598,9 @@ Object.merge = function(destination, source) {
                 this.informations.global.type = type;
             }
           }
+          break;
+        default:
+          this.informations.global.type = gestureName;
       }
       return this.targetElement.trigger(this.informations.global.type, this.informations);
     };
@@ -713,4 +728,7 @@ Object.merge = function(destination, source) {
     };
     return Analyser;
   })();
+  window.onload = function() {
+    return $("blue").bind('all', function(event) {});
+  };
 }).call(this);

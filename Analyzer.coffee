@@ -37,15 +37,16 @@ class Analyser
 		@informations = 
 			first: finger.params
 			global: {}
-		
 		switch finger.gestureName
 			when "tap" then @informations.global.type = "tap"
-			when "doubleTap" then @informations.global.type = "doubleTap"
+			when "doubletap" then @informations.global.type = "doubletap"
 			when "fixed" then @informations.global.type ="fixed"
-			when "fixedEnd" then @informations.global.type ="press"
+			when "fixedend" then @informations.global.type ="press"
 			when "drag"
 				@informations.global.type = finger.params.dragDirection ## getDragDirection(finger)
-			when "dragEnd" then @informations.global.type ="dragEnd"
+			when "dragend" then @informations.global.type ="dragend"
+			else 
+				@informations.global.type = finger.gestureName
 			
 		@targetElement.trigger(@informations.global.type, @informations)
 
@@ -84,14 +85,11 @@ class Analyser
 				@informations.global.type = "tap,tap"
 				@targetElement.trigger "two:tap", @informations
 				
-			when "doubleTap,doubleTap"
+			when "doubletap,doubletap"
 				@informations.global.type = "#{@firstFinger.gestureName},#{@secondFinger.gestureName}"
-				@targetElement.trigger "two:doubleTap", @informations
+				@targetElement.trigger "two:doubletap", @informations
 				
-			when "fixed,tap", "tap,fixed"
-				@informations.global.type = "#{@firstFinger.gestureName},#{@secondFinger.gestureName}"
-
-			when "fixed,doubleTap", "doubleTap,fixed"
+			when "fixed,tap", "tap,fixed", "fixed,doubletap", "doubletap,fixed"
 				@informations.global.type = "#{@firstFinger.gestureName},#{@secondFinger.gestureName}"
 
 			when "fixed,drag", "drag,fixed"
@@ -104,13 +102,13 @@ class Analyser
 					@informations.global.type = "#{@firstFinger.params.dragDirection},fixed"
 					## @informations.global.type = "#{getDragDirection(@firstFinger.)},fixed"
 			
-			when "doubleTap,doubleTap"
-				@informations.global.type = "doubleTap,doubleTap"
+			when "doubletap,doubletap"
+				@informations.global.type = "doubletap,doubletap"
 				
 			when "fixed,fixed"
 				@informations.global.type = "fixed,fixed"
 
-			when "fixedEnd,fixedEnd"
+			when "fixedend,fixedend"
 				@informations.global.type = "press,press"
 				
 			when "drag,drag"
@@ -142,6 +140,8 @@ class Analyser
 							@informations.global.type = "rotate:ccw"
 						else
 							@informations.global.type = type
+			else 
+				@informations.global.type = gestureName
 		@targetElement.trigger @informations.global.type, @informations
 
 	###----------------------------------------------------------------------------------------------------------------
@@ -166,9 +166,9 @@ class Analyser
 				@informations.global.type = "tap,tap,tap"
 				@targetElement.trigger "three:tap", @informations
 
-			when "doubleTap,doubleTap,doubleTap"
-				@informations.global.type = "doubleTap,doubleTap,doubleTap"
-				@targetElement.trigger "three:doubleTap", @informations
+			when "doubletap,doubletap,doubletap"
+				@informations.global.type = "doubletap,doubletap,doubletap"
+				@targetElement.trigger "three:doubletap", @informations
 
 			when "fixed,fixed,fixed"
 				@informations.global.type = "fixed,fixed,fixed"
@@ -184,15 +184,15 @@ class Analyser
 				@targetElement.trigger "two:tap,fixed", @informations
 				@targetElement.trigger "fixed,two:tap", @informations
 
-			when "fixed,fixed,doubleTap", "fixed,doubleTap,fixed", "doubleTap,fixed,fixed"
+			when "fixed,fixed,doubletap", "fixed,doubletap,fixed", "doubletap,fixed,fixed"
 				@informations.global.type = "#{@fingers[0].gestureName},#{@fingers[1].gestureName},#{@fingers[2].gestureName}"
-				@targetElement.trigger "two:fixed,doubleTap", @informations
-				@targetElement.trigger "doubleTap,two:fixed", @informations
+				@targetElement.trigger "two:fixed,doubletap", @informations
+				@targetElement.trigger "doubletap,two:fixed", @informations
 
-			when "fixed,doubleTap,doubleTap", "doubleTap,doubleTap,fixed", "doubleTap,fixed,doubleTap"
+			when "fixed,doubletap,doubletap", "doubletap,doubletap,fixed", "doubletap,fixed,doubletap"
 				@informations.global.type = "#{@fingers[0].gestureName},#{@fingers[1].gestureName},#{@fingers[2].gestureName}"
-				@targetElement.trigger "two:doubleTap,fixed", @informations
-				@targetElement.trigger "fixed,two:doubleTap", @informations
+				@targetElement.trigger "two:doubletap,fixed", @informations
+				@targetElement.trigger "fixed,two:doubletap", @informations
 
 			when "fixed,fixed,drag", "fixed,drag,fixed", "drag,fixed,fixed"
 				type = ""
@@ -232,3 +232,7 @@ class Analyser
 				@targetElement.trigger "three:drag", @informations
 
 		@targetElement.trigger @informations.global.type, @informations
+
+window.onload = ->
+	$("blue").bind 'all', (event) ->
+		
