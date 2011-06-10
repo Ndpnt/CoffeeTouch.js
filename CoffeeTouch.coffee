@@ -519,5 +519,3 @@ class Analyser
 				
 window.onload = ->
 
-
-

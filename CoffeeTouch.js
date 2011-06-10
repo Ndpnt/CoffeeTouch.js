@@ -1,7 +1,5 @@
 (function() {
-  /*
-  #------------------------------------------------------------------------------------------------------------------------------ State
-  */  var Analyser, Drag, EventGrouper, EventRouter, FingerGesture, FirstTouch, Fixed, GenericState, NoTouch, StateMachine, distanceBetweenTwoPoints, getDirection, getDragDirection;
+  var $, Analyser, Drag, EventGrouper, EventRouter, FingerGesture, FirstTouch, Fixed, GenericState, NoTouch, StateMachine, distanceBetweenTwoPoints, getDirection, getDragDirection;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -10,6 +8,12 @@
     child.__super__ = parent.prototype;
     return child;
   };
+  $ = function(element) {
+    return document.getElementById(element);
+  };
+  /*
+  #------------------------------------------------------------------------------------------------------------------------------ State
+  */
   StateMachine = (function() {
     function StateMachine(identifier, router) {
       this.identifier = identifier;
@@ -672,30 +676,5 @@ Object.merge = function(destination, source) {
     };
     return Analyser;
   })();
-  window.onload = function() {
-    var $, xAngle, yAngle;
-    $ = function(element) {
-      return document.getElementById(element);
-    };
-    yAngle = 0;
-    new EventRouter(document.getElementById("body"));
-    xAngle = 0;
-    yAngle = 0;
-    $('body').bind("left", function(a, params) {
-      yAngle -= 90;
-      return $('cube').style.webkitTransform = " rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg)";
-    });
-    $('body').bind("right", function(a, params) {
-      yAngle += 90;
-      return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg)";
-    });
-    $('body').bind("up", function(a, params) {
-      xAngle += 90;
-      return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg)";
-    });
-    return $('body').bind("down", function(a, params) {
-      xAngle += 90;
-      return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg)";
-    });
-  };
+  window.onload = function() {};
 }).call(this);
