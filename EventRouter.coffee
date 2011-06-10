@@ -31,6 +31,8 @@ class EventRouter
 			if !exists
 				@machines[iMKey].apply("touchend", {})
 				delete @machines[iMKey]	
+				@fingerCount = event.touches.length
+
 				
 			
 	 
@@ -53,7 +55,6 @@ class EventGrouper
 		@savedTap = {}
 	
 	receive: (name, eventObj, fingerCount, element) ->
-
 		if @fingerCount != fingerCount
 			@fingerCount = fingerCount
 			@analyser = new Analyser @fingerCount, element

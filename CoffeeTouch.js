@@ -119,7 +119,7 @@ Object.merge = function(destination, source) {
         }
     }
     return destination;
-};
+}
 ;
   StateMachine = (function() {
     function StateMachine(identifier, router) {
@@ -262,8 +262,11 @@ Object.merge = function(destination, source) {
       this.gestureName = gestureName;
       date = new Date();
       this.params = {};
-      this.params.startX = eventObj.clientX;
-      this.params.startY = eventObj.clientY;
+      this.positions = [];
+      this.positions[0] = {};
+      this.positionCount = 0;
+      this.params.startX = this.positions[0].x = eventObj.clientX;
+      this.params.startY = this.positions[0].y = eventObj.clientY;
       this.params.timeStart = date.getTime();
       this.params.timeElasped = 0;
       this.params.panX = 0;
@@ -273,6 +276,10 @@ Object.merge = function(destination, source) {
     FingerGesture.prototype.update = function(gestureName, eventObj) {
       var date;
       this.gestureName = gestureName;
+      this.positionCount++;
+      this.positions[this.positionCount] = {};
+      this.positions[this.positionCount].x = eventObj.clientX;
+      this.positions[this.positionCount].y = eventObj.clientY;
       date = new Date();
       this.params.timeElasped = date.getTime() - this.params.timeStart;
       if (this.gestureName === "drag") {
@@ -332,7 +339,7 @@ Object.merge = function(destination, source) {
             exists = true;
           }
         }
-        _results.push(!exists ? (this.machines[iMKey].apply("touchend", {}), delete this.machines[iMKey]) : void 0);
+        _results.push(!exists ? (this.machines[iMKey].apply("touchend", {}), delete this.machines[iMKey], this.fingerCount = event.touches.length) : void 0);
       }
       return _results;
     };
@@ -420,8 +427,13 @@ Object.merge = function(destination, source) {
   */
   getDragDirection = function(finger) {
     var deltaX, deltaY;
-    deltaX = finger.params.x - finger.params.startX;
-    deltaY = finger.params.y - finger.params.startY;
+    if (finger.positionCount < 4) {
+      deltaX = finger.params.x - finger.startX;
+      deltaY = finger.params.y - finger.startY;
+    } else {
+      deltaX = finger.params.x - finger.positions[finger.positionCount - 4].x;
+      deltaY = finger.params.y - finger.positions[finger.positionCount - 4].y;
+    }
     return getDirection(deltaX, deltaY);
   };
   Analyser = (function() {
@@ -478,20 +490,20 @@ Object.merge = function(destination, source) {
         case "tap":
           this.informations.global.type = "tap";
           break;
-        case "doubleTap":
-          this.informations.global.type = "doubleTap";
+        case "doubletap":
+          this.informations.global.type = "doubletap";
           break;
         case "fixed":
           this.informations.global.type = "fixed";
           break;
-        case "fixedEnd":
+        case "fixedend":
           this.informations.global.type = "press";
           break;
         case "drag":
           this.informations.global.type = finger.params.dragDirection;
           break;
-        case "dragEnd":
-          this.informations.global.type = "dragEnd";
+        case "dragend":
+          this.informations.global.type = "dragend";
           break;
         default:
           this.informations.global.type = finger.gestureName;
@@ -541,14 +553,14 @@ Object.merge = function(destination, source) {
           this.informations.global.type = "tap,tap";
           this.targetElement.trigger("two:tap", this.informations);
           break;
-        case "doubleTap,doubleTap":
+        case "doubletap,doubletap":
           this.informations.global.type = "" + this.firstFinger.gestureName + "," + this.secondFinger.gestureName;
-          this.targetElement.trigger("two:doubleTap", this.informations);
+          this.targetElement.trigger("two:doubletap", this.informations);
           break;
         case "fixed,tap":
         case "tap,fixed":
-        case "fixed,doubleTap":
-        case "doubleTap,fixed":
+        case "fixed,doubletap":
+        case "doubletap,fixed":
           this.informations.global.type = "" + this.firstFinger.gestureName + "," + this.secondFinger.gestureName;
           break;
         case "fixed,drag":
@@ -560,13 +572,13 @@ Object.merge = function(destination, source) {
             this.informations.global.type = "" + this.firstFinger.params.dragDirection + ",fixed";
           }
           break;
-        case "doubleTap,doubleTap":
-          this.informations.global.type = "doubleTap,doubleTap";
+        case "doubletap,doubletap":
+          this.informations.global.type = "doubletap,doubletap";
           break;
         case "fixed,fixed":
           this.informations.global.type = "fixed,fixed";
           break;
-        case "fixedEnd,fixedEnd":
+        case "fixedend,fixedend":
           this.informations.global.type = "press,press";
           break;
         case "drag,drag":
@@ -630,9 +642,9 @@ Object.merge = function(destination, source) {
           this.informations.global.type = "tap,tap,tap";
           this.targetElement.trigger("three:tap", this.informations);
           break;
-        case "doubleTap,doubleTap,doubleTap":
-          this.informations.global.type = "doubleTap,doubleTap,doubleTap";
-          this.targetElement.trigger("three:doubleTap", this.informations);
+        case "doubletap,doubletap,doubletap":
+          this.informations.global.type = "doubletap,doubletap,doubletap";
+          this.targetElement.trigger("three:doubletap", this.informations);
           break;
         case "fixed,fixed,fixed":
           this.informations.global.type = "fixed,fixed,fixed";
@@ -652,19 +664,19 @@ Object.merge = function(destination, source) {
           this.targetElement.trigger("two:tap,fixed", this.informations);
           this.targetElement.trigger("fixed,two:tap", this.informations);
           break;
-        case "fixed,fixed,doubleTap":
-        case "fixed,doubleTap,fixed":
-        case "doubleTap,fixed,fixed":
+        case "fixed,fixed,doubletap":
+        case "fixed,doubletap,fixed":
+        case "doubletap,fixed,fixed":
           this.informations.global.type = "" + this.fingers[0].gestureName + "," + this.fingers[1].gestureName + "," + this.fingers[2].gestureName;
-          this.targetElement.trigger("two:fixed,doubleTap", this.informations);
-          this.targetElement.trigger("doubleTap,two:fixed", this.informations);
+          this.targetElement.trigger("two:fixed,doubletap", this.informations);
+          this.targetElement.trigger("doubletap,two:fixed", this.informations);
           break;
-        case "fixed,doubleTap,doubleTap":
-        case "doubleTap,doubleTap,fixed":
-        case "doubleTap,fixed,doubleTap":
+        case "fixed,doubletap,doubletap":
+        case "doubletap,doubletap,fixed":
+        case "doubletap,fixed,doubletap":
           this.informations.global.type = "" + this.fingers[0].gestureName + "," + this.fingers[1].gestureName + "," + this.fingers[2].gestureName;
-          this.targetElement.trigger("two:doubleTap,fixed", this.informations);
-          this.targetElement.trigger("fixed,two:doubleTap", this.informations);
+          this.targetElement.trigger("two:doubletap,fixed", this.informations);
+          this.targetElement.trigger("fixed,two:doubletap", this.informations);
           break;
         case "fixed,fixed,drag":
         case "fixed,drag,fixed":
@@ -730,6 +742,8 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind('all', function(event) {});
+    return $("blue").bind('all', function(a, event) {
+      return $('debug').innerHTML = event.global.type;
+    });
   };
 }).call(this);
