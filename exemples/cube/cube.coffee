@@ -3,21 +3,21 @@ window.onload = ->
 		document.getElementById element
 	xAngle = 0
 	yAngle = 0
-	$('cube').bind "left", (params) ->
+	$('body').bind "left", (params) ->
 		yAngle -= 90;
 		$('cube').style.webkitTransform = "rotateY(-" + params.first.y + "deg)"
 	
-	$('cube').bind "right", (params) ->
+	$('body').bind "right", (params) ->
 		yAngle += 90;
 		$('cube').style.webkitTransform = "rotateY(" + params.first.y + "deg)"
 	
-	$('cube').bind "up", (params) ->
+	$('body').bind "up", (params) ->
 		xAngle += 90;
 		$('cube').style.webkitTransform = "rotateX(" + params.first.x + "deg)"
 		
-	$('cube').bind "down", (params) ->
+	$('body').bind "down", (params) ->
 		xAngle -= 90;
 		$('cube').style.webkitTransform = "rotateX(-" + params.first.x + "deg)"
 
-	$('cube').bind "all", (a, params) ->
+	$('body').bind "all", (a, params) ->
 		$('debug').innerHTML = params.global.type
