@@ -4,6 +4,7 @@ class Analyser
 		@fingersArray = {} 	## Hash with fingerId: fingerGestureObject
 		@fingers = [] 		## Array with all fingers
 		@firstAnalysis = true
+		@stopAnalyze = false;
 	
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
 	notify: (fingerID, gestureName, @eventObj) ->
@@ -14,7 +15,7 @@ class Analyser
 			@fingersArray[fingerID] =  new FingerGesture(fingerID, gestureName, @eventObj)
 			@fingers.push @fingersArray[fingerID]
 
-		if _.size(@fingersArray) is @totalNbFingers
+		if _.size(@fingersArray) is @totalNbFingers and !@stopAnalyze
 			@analyse @totalNbFingers
 
 		##$("debug").innerHTML = "" + gestureName + "<br /> " + $("debug").innerHTML  if _.size(@fingersArray) is @totalNbFingers
@@ -48,6 +49,7 @@ class Analyser
 			when "drag"
 				@informations.global.type = finger.params.dragDirection ## getDragDirection(finger)
 				if finger.params.dragDirection.contains("flick")
+					@stopAnalyze = true
 					@targetElement.trigger("flick", @informations)
 			when "dragend" then @informations.global.type = "dragend"
 			else 
@@ -244,7 +246,7 @@ class Analyser
 		@targetElement.trigger @informations.global.type, @informations
 
 window.onload = ->
-	$("blue").bind "flick:up", (name, event) ->
+	$("blue").bind "flick", (event) ->
 		$('debug').innerHTML = event.global.type + "<br />" + $('debug').innerHTML
 ###
 		if name.contains "flick"

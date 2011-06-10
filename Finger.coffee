@@ -37,7 +37,7 @@ class FingerGesture
 			movedY = @params.y - @positions[@positionCount - 1].y
 			@params.speed = Math.sqrt(movedX * movedX  + movedY  * movedY) / (@positions[@positionCount].time - @positions[@positionCount - 1].time) 
 			
-			if @params.speed > 1.1
+			if @params.speed > 3
 				@params.dragDirection = "flick:" + getDragDirection(this)
 			else
 				@params.dragDirection = getDragDirection(this)

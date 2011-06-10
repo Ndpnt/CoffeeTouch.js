@@ -2,7 +2,7 @@
   /*
    The bind, unbind and trigger function have been taken from Backbone Framework.
    The bind function has been changed
-  */  var $, Drag, EventGrouper, EventRouter, FingerGesture, FirstTouch, Fixed, GenericState, NoTouch, StateMachine, distanceBetweenTwoPoints, getDirection, getDragDirection;
+  */  var $, Analyser, Drag, EventGrouper, EventRouter, FingerGesture, FirstTouch, Fixed, GenericState, NoTouch, StateMachine, distanceBetweenTwoPoints, getDirection, getDragDirection;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -298,7 +298,7 @@ Object.merge = function(destination, source) {
         movedX = this.params.x - this.positions[this.positionCount - 1].x;
         movedY = this.params.y - this.positions[this.positionCount - 1].y;
         this.params.speed = Math.sqrt(movedX * movedX + movedY * movedY) / (this.positions[this.positionCount].time - this.positions[this.positionCount - 1].time);
-        if (this.params.speed > 1.1) {
+        if (this.params.speed > 3) {
           this.params.dragDirection = "flick:" + getDragDirection(this);
         } else {
           this.params.dragDirection = getDragDirection(this);
@@ -472,14 +472,14 @@ Object.merge = function(destination, source) {
     deltaY = finger.params.y - finger.positions[finger.positionCount - 1].y;
     return getDirection(deltaX, deltaY);
   };
-}).call(this);
-lyser = (function() {
+  Analyser = (function() {
     function Analyser(totalNbFingers, targetElement) {
       this.totalNbFingers = totalNbFingers;
       this.targetElement = targetElement;
       this.fingersArray = {};
       this.fingers = [];
       this.firstAnalysis = true;
+      this.stopAnalyze = false;
     }
     Analyser.prototype.notify = function(fingerID, gestureName, eventObj) {
       this.eventObj = eventObj;
@@ -489,7 +489,7 @@ lyser = (function() {
         this.fingersArray[fingerID] = new FingerGesture(fingerID, gestureName, this.eventObj);
         this.fingers.push(this.fingersArray[fingerID]);
       }
-      if (_.size(this.fingersArray) === this.totalNbFingers) {
+      if (_.size(this.fingersArray) === this.totalNbFingers && !this.stopAnalyze) {
         return this.analyse(this.totalNbFingers);
       }
     };
@@ -539,6 +539,7 @@ lyser = (function() {
         case "drag":
           this.informations.global.type = finger.params.dragDirection;
           if (finger.params.dragDirection.contains("flick")) {
+            this.stopAnalyze = true;
             this.targetElement.trigger("flick", this.informations);
           }
           break;
@@ -787,7 +788,7 @@ lyser = (function() {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind('all', function(name, event) {
+    return $("blue").bind("flick", function(event) {
       return $('debug').innerHTML = event.global.type + "<br />" + $('debug').innerHTML;
     });
   };
