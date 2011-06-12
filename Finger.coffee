@@ -21,7 +21,7 @@ class FingerGesture
 		@params.panY = 0
 		@updatePosition(eventObj)
 		@params.speed = 0
-		@params.dragDirection = "none"
+		@params.dragDirection = "unknownDirection"
 
 	update: (@gestureName, eventObj) ->
 		@positionCount++
@@ -37,7 +37,7 @@ class FingerGesture
 			movedY = @params.y - @positions[@positionCount - 1].y
 			@params.speed = Math.sqrt(movedX * movedX  + movedY  * movedY) / (@positions[@positionCount].time - @positions[@positionCount - 1].time) 
 			
-			if @params.speed > 3
+			if @params.speed > 2
 				@params.dragDirection = "flick:" + getDragDirection(this)
 			else
 				@params.dragDirection = getDragDirection(this)

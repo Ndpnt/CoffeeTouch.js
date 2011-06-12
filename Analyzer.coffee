@@ -47,12 +47,12 @@ class Analyser
 			when "fixed" then @informations.global.type = "fixed"
 			when "fixedend" then @informations.global.type = "press"
 			when "drag"
-				@informations.global.type = finger.params.dragDirection ## getDragDirection(finger)
+				@informations.global.type = finger.params.dragDirection
+				## Also trigger flick instead of flick:direction
 				if finger.params.dragDirection.contains("flick")
 					@stopAnalyze = true
 					@targetElement.trigger("flick", @informations)
-				else
-					@targetElement.trigger("drag", @informations)
+				@targetElement.trigger("drag", @informations)
 			when "dragend" then @informations.global.type = "dragend"
 			else 
 				@informations.global.type = finger.gestureName
@@ -73,7 +73,7 @@ class Analyser
 					@firstFinger = @fingersArray[key] if i == 1
 					@secondFinger = @fingersArray[key] if i == 2
 			## Detection of finger order. First one will be the first from the left
-			if (Math.abs(@secondFinger.params.startX - @firstFinger.params.startX) < 20)
+			if (Math.abs(@secondFinger.params.startX - @firstFinger.params.startX) < 5)
 				if @firstFinger.params.startY > @secondFinger.params.startY
 					Object.swap @firstFinger, @secondFinger
 			else if @firstFinger.params.startX > @secondFinger.params.startX
@@ -106,10 +106,12 @@ class Analyser
 				@informations.global.distance = distanceBetweenTwoPoints @firstFinger.params.x, @firstFinger.params.y, @secondFinger.params.x, @secondFinger.params.y
 				if @firstFinger.gestureName == "fixed"
 					@informations.global.type = "fixed,#{@secondFinger.params.dragDirection}"
-					## @informations.global.type = "fixed,#{getDragDirection(@secondFinger)}"
-				else 
+					@targetElement.trigger("fixed,flick", @informations) if @secondFinger.params.dragDirection.contains("flick")
+				else
 					@informations.global.type = "#{@firstFinger.params.dragDirection},fixed"
-					## @informations.global.type = "#{getDragDirection(@firstFinger.)},fixed"
+					@targetElement.trigger("flick,fixed", @informations) if @firstFinger.params.dragDirection.contains("flick")
+				if @firstFinger.params.dragDirection.contains("flick") or @secondFinger.params.dragDirection.contains("flick")
+					@stopAnalyze = true
 			
 			when "doubletap,doubletap"
 				@informations.global.type = "doubletap,doubletap"
@@ -123,32 +125,28 @@ class Analyser
 			when "drag,drag"
 				@informations.global.distance = distanceBetweenTwoPoints @firstFinger.params.x, @firstFinger.params.y, @secondFinger.params.x, @secondFinger.params.y
 				@informations.global.scale =  (@informations.global.distance / @informations.global.initialDistance) ##/
-				
+				@informations.global.type = "#{@firstFinger.params.dragDirection},#{@secondFinger.params.dragDirection}"
 				a1 = (@firstFinger.params.startY - @firstFinger.params.y) / (@firstFinger.params.startX - @firstFinger.params.x);
 				a2 = (@secondFinger.params.y - @secondFinger.params.startY) / (@secondFinger.params.x - @secondFinger.params.startX);
 				
 				b1 = @firstFinger.params.y - (a1 * @firstFinger.params.x);
 				b2 = @secondFinger.params.y - (a2 * @secondFinger.params.x);
-				##$("debug").innerHTML = " b1: " + Math.round(b1) + " b2 :" + Math.round(b2) + "<br />" + $("debug").innerHTML
-##				$("debug").innerHTML = " angle1: " + Math.round(Math.atan2(@firstFinger.params.x,@firstFinger.params.y) * 100)/100 + " angle2 :" + Math.round(Math.atan2(@secondFinger.params.x, @secondFinger.params.y) * 100)/100 + "<br />" + $("debug").innerHTML
 
 				if @informations.global.scale < 0.8
-					@informations.global.type = "pinch"
+					@targetElement.trigger "pinch", @informations
 				else if @informations.global.scale > 1.2
-					@informations.global.type = "spread"
-				else
-					type = "#{getDragDirection(@firstFinger)},#{getDragDirection(@secondFinger)}"
-					switch type
-						when "right,left"
-							@informations.global.type = "rotate:cw"
-						when "left,right"
-							@informations.global.type = "rotate:ccw"
-						when "up,down"
-							@informations.global.type = "rotate:cw"
-						when "down,up"
-							@informations.global.type = "rotate:ccw"
-						else
-							@informations.global.type = type
+					@targetElement.trigger "spread", @informations
+				
+				switch @informations.global.type
+					when "left,right", "up,down" then @targetElement.trigger "rotate:cw", @informations
+					when "right,left", "down,up" then @targetElement.trigger "rotate:ccw", @informations
+
+				## Also trigger flick instead of flick:direction
+				@targetElement.trigger("flick,#{@firstFinger.params.dragDirection}", @informations) if @firstFinger.params.dragDirection.contains("flick")
+				@targetElement.trigger("#{@firstFinger.params.dragDirection},flick", @informations) if @secondFinger.params.dragDirection.contains("flick")
+				if @firstFinger.params.dragDirection.contains("flick") or @secondFinger.params.dragDirection.contains("flick")
+					@stopAnalyze = true
+				@targetElement.trigger("drag,drag", @informations)
 			else
 				@informations.global.type = gestureName
 		@targetElement.trigger @informations.global.type, @informations
@@ -205,35 +203,50 @@ class Analyser
 
 			when "fixed,fixed,drag", "fixed,drag,fixed", "drag,fixed,fixed"
 				type = ""
-				i = 0
+				i = dragIndex = 0
 				for finger in @fingers
 					if finger.gestureName == "drag"
 						type += finger.params.dragDirection
+						dragIndex = i
 					else 
 						type += finger.gestureName
 					i++
 					type += "," if i < @fingers.length
 				@informations.global.type = type
+				if fingers[0].params.dragDirection.contains("flick") or fingers[1].params.dragDirection.contains("flick") or fingers[2].params.dragDirection.contains("flick")
+					@stopAnalyze = true
+					switch dragIndex
+						when 0 then @targetElement.trigger "flick,fixed,fixed", @informations
+						when 1 then @targetElement.trigger "fixed,flick,fixed", @informations
+						when 2 then @targetElement.trigger "fixed,fixed,flick", @informations
+				switch dragIndex
+					when 0 then @targetElement.trigger "drag,fixed,fixed", @informations
+					when 1 then @targetElement.trigger "fixed,drag,fixed", @informations
+					when 2 then @targetElement.trigger "fixed,fixed,drag", @informations
 				@targetElement.trigger "two:fixed,drag", @informations
 				@targetElement.trigger "drag,two:fixed", @informations
-				@targetElement.trigger "two:fixed,#{finger.params.dragDirection}", @informations
-				@targetElement.trigger "#{finger.params.dragDirection},two:fixed", @informations
+				@targetElement.trigger "two:fixed,#{fingers[dragIndex].params.dragDirection}", @informations
+				@targetElement.trigger "#{fingers[dragIndex].params.dragDirection},two:fixed", @informations
 
 			when "fixed,drag,drag", "drag,fixed,drag", "drag,drag,fixed"
 				type = ""
-				i = 0
+				i = fixedIndex = 0
 				for finger in @fingers
 					if finger.gestureName == "drag"
 						type += finger.params.dragDirection
 					else 
 						type += finger.gestureName
+						fixedIndex = i
 					i++
 					type += "," if i < @fingers.length
 				@informations.global.type = type
+				
+				switch fixedIndex
+					when 0 then @targetElement.trigger "fixed,drag,drag", @informations
+					when 1 then @targetElement.trigger "drag,fixed,drag", @informations
+					when 2 then @targetElement.trigger "drag,drag,fixed", @informations
 				@targetElement.trigger "two:drag,fixed", @informations
 				@targetElement.trigger "fixed,two:drag", @informations
-				@targetElement.trigger "two:#{finger.params.dragDirection},fixed", @informations
-				@targetElement.trigger "fixed,two:#{finger.params.dragDirection}", @informations
 			when "drag,drag,drag"
 				type = ""
 				i = 0
@@ -242,14 +255,14 @@ class Analyser
 					type += finger.params.dragDirection
 					type += "," if i < @fingers.length
 				@informations.global.type = type
+				@targetElement.trigger "drag,drag,drag", @informations
 				@targetElement.trigger "three:drag", @informations
 				@targetElement.trigger "three:#{finger.params.dragDirection}", @informations
-
 		@targetElement.trigger @informations.global.type, @informations
 
 window.onload = ->
-	$("blue").bind "flick", (event) ->
-#		$('debug').innerHTML = event.global.type + "<br />" + $('debug').innerHTML
+	$("blue").bind "all", (name, event) ->
+		$('debug').innerHTML = name + "<br />" + $('debug').innerHTML
 ###
 		if name.contains "flick"
 			$('debug').innerHTML = event.global.type + "<br />"

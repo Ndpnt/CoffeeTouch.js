@@ -61,7 +61,7 @@ class EventGrouper
 	receive: (name, eventObj, fingerCount, element) ->
 		if name == "tap"
 			if @savedTap[eventObj.identifier]? && ((new Date().getTime()) - @savedTap[eventObj.identifier].time) < 400
-				@send "doubleTap", eventObj
+				@send "doubletap", eventObj
 	
 			else
 				@savedTap[eventObj.identifier] =  {}
