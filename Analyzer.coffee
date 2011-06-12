@@ -142,8 +142,9 @@ class Analyser
 					when "right,left", "down,up" then @targetElement.trigger "rotate:ccw", @informations
 
 				## Also trigger flick instead of flick:direction
-				@targetElement.trigger("flick,#{@firstFinger.params.dragDirection}", @informations) if @firstFinger.params.dragDirection.contains("flick")
-				@targetElement.trigger("#{@firstFinger.params.dragDirection},flick", @informations) if @secondFinger.params.dragDirection.contains("flick")
+				@targetElement.trigger("flick,flick", @informations) if @firstFinger.params.dragDirection.contains("flick") and @secondtFinger.params.dragDirection.contains("flick")
+				@targetElement.trigger("flick,#{@firstFinger.params.dragDirection}", @informations) if @firstFinger.params.dragDirection.contains("flick") and !@secondFinger.params.dragDirection.contains("flick")
+				@targetElement.trigger("#{@firstFinger.params.dragDirection},flick", @informations) if @secondFinger.params.dragDirection.contains("flick") and !@firstFinger.params.dragDirection.contains("flick")
 				if @firstFinger.params.dragDirection.contains("flick") or @secondFinger.params.dragDirection.contains("flick")
 					@stopAnalyze = true
 				@targetElement.trigger("drag,drag", @informations)
@@ -261,8 +262,8 @@ class Analyser
 		@targetElement.trigger @informations.global.type, @informations
 
 window.onload = ->
-	$("blue").bind "all", (name, event) ->
-		$('debug').innerHTML = name + "<br />" + $('debug').innerHTML
+	$("blue").bind "pinch", (event) ->
+		$('debug').innerHTML = event.global.scale + "<br />" + $('debug').innerHTML
 ###
 		if name.contains "flick"
 			$('debug').innerHTML = event.global.type + "<br />"
