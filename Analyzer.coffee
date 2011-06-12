@@ -247,7 +247,7 @@ class Analyser
 
 window.onload = ->
 	$("blue").bind "flick", (event) ->
-		$('debug').innerHTML = event.global.type + "<br />" + $('debug').innerHTML
+#		$('debug').innerHTML = event.global.type + "<br />" + $('debug').innerHTML
 ###
 		if name.contains "flick"
 			$('debug').innerHTML = event.global.type + "<br />"

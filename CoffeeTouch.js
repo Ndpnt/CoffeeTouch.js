@@ -788,9 +788,7 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind("flick", function(event) {
-      return $('debug').innerHTML = event.global.type + "<br />" + $('debug').innerHTML;
-    });
+    return $("blue").bind("flick", function(event) {});
   };
   /*
   		if name.contains "flick"
