@@ -287,7 +287,7 @@ class Analyser
 			@informations =
 				global: 
 					nbFingers: @fingers.length
-			for i in @fingers.length
+			for i in [0..@fingers.length - 1]
 				switch i
 					when 0 then @informations.first = @fingers[0].params
 					when 1 then @informations.second = @fingers[1].params
@@ -338,15 +338,15 @@ class Analyser
 		for finger in @fingers
 			sumAverageDistance += distanceBetweenTwoPoints finger.params.x, finger.params.y, centroidX, centroidY
 		averageDistance = sumAverageDistance / @fingers.length
-		scale = averageDistance / @informations.global.initialAverageDistanceToCentroid ##/
 		@informations.global.centroid =
 			x: centroidX
 			y: centroidY
+		scale = averageDistance / @informations.global.initialAverageDistanceToCentroid ##/
 
 	
 window.onload = ->
-	$("blue").bind "all", (name, event) ->
-		$('debug').innerHTML = name + "<br />" + $('debug').innerHTML
+	$("blue").bind "spread", (event) ->
+		$('debug').innerHTML = event.global.scale + "<br />" + $('debug').innerHTML
 ###
 		if name.contains "flick"
 			$('debug').innerHTML = event.global.type + "<br />"

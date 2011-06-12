@@ -169,10 +169,10 @@ Object.merge = function(destination, source) {
     return GenericState;
   })();
   NoTouch = (function() {
-    __extends(NoTouch, GenericState);
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(NoTouch, GenericState);
     NoTouch.prototype.description = function() {
       return "NoTouch state";
     };
@@ -182,10 +182,10 @@ Object.merge = function(destination, source) {
     return NoTouch;
   })();
   FirstTouch = (function() {
-    __extends(FirstTouch, GenericState);
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(FirstTouch, GenericState);
     FirstTouch.prototype.description = function() {
       return "FirstTouch state";
     };
@@ -211,10 +211,10 @@ Object.merge = function(destination, source) {
     return FirstTouch;
   })();
   Fixed = (function() {
-    __extends(Fixed, GenericState);
     function Fixed() {
       Fixed.__super__.constructor.apply(this, arguments);
     }
+    __extends(Fixed, GenericState);
     Fixed.prototype.description = function() {
       return "Fixed state";
     };
@@ -227,10 +227,10 @@ Object.merge = function(destination, source) {
     return Fixed;
   })();
   Drag = (function() {
-    __extends(Drag, GenericState);
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
+    __extends(Drag, GenericState);
     Drag.prototype.description = function() {
       return "Drag state";
     };
@@ -852,7 +852,7 @@ Object.merge = function(destination, source) {
       return this.targetElement.trigger(this.informations.global.type, this.informations);
     };
     Analyser.prototype.initInformations = function() {
-      var i, _i, _len, _ref;
+      var i, _ref;
       if (this.firstAnalysis) {
         this.fingers = this.fingers.sort(function(a, b) {
           if (Math.abs(a.params.startX - b.params.startX) < 5) {
@@ -865,9 +865,7 @@ Object.merge = function(destination, source) {
             nbFingers: this.fingers.length
           }
         };
-        _ref = this.fingers.length;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          i = _ref[_i];
+        for (i = 0, _ref = this.fingers.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
           switch (i) {
             case 0:
               this.informations.first = this.fingers[0].params;
@@ -949,17 +947,17 @@ Object.merge = function(destination, source) {
         sumAverageDistance += distanceBetweenTwoPoints(finger.params.x, finger.params.y, centroidX, centroidY);
       }
       averageDistance = sumAverageDistance / this.fingers.length;
-      scale = averageDistance / this.informations.global.initialAverageDistanceToCentroid;
-      return this.informations.global.centroid = {
+      this.informations.global.centroid = {
         x: centroidX,
         y: centroidY
       };
+      return scale = averageDistance / this.informations.global.initialAverageDistanceToCentroid;
     };
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind("all", function(name, event) {
-      return $('debug').innerHTML = name + "<br />" + $('debug').innerHTML;
+    return $("blue").bind("spread", function(event) {
+      return $('debug').innerHTML = event.global.scale + "<br />" + $('debug').innerHTML;
     });
   };
   /*
