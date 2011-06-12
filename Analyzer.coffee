@@ -51,6 +51,8 @@ class Analyser
 				if finger.params.dragDirection.contains("flick")
 					@stopAnalyze = true
 					@targetElement.trigger("flick", @informations)
+				else
+					@targetElement.trigger("drag", @informations)
 			when "dragend" then @informations.global.type = "dragend"
 			else 
 				@informations.global.type = finger.gestureName

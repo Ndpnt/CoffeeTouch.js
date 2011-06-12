@@ -4,28 +4,28 @@
 		<meta name="description" content="Use up, down, left and right keys to navigate the 3D cube, built using -webkit-perspective, -webkit-transform and -webkit-transition.">
 		<meta name="keywords" content="css, css3, 3d, cube, webkit, css cube, transform, webkit-transform, webkit-transition, webkit-perspective">
 		<meta name="author" content="Paul Hayes">
+		<meta name="viewport" content="user-scalable=no, width=device-width" />
 		<style type="text/css">
 		#experiment {
-		  -webkit-perspective: 800; 
-		  -webkit-perspective-origin: 50% 200px;
+		  -webkit-perspective: 600; 
+		  -webkit-perspective-origin: 50% 100px;
 		}
 		#body {
 			overflow: auto;
 		}
 		#cube {
 		  position: relative;
-		  margin: 100px auto 0;
-		  height: 400px;
-		  width: 400px;
-		  -webkit-transition: -webkit-transform 2s linear;
+		  margin: 50px auto 0;
+		  height: 200px;
+		  width: 200px;
+		  -webkit-transition: -webkit-transform 1s ease-out;
 		  -webkit-transform-style: preserve-3d;
 		}
 		
 		.face {
 		  position: absolute;
-		  height: 360px;
-		  width: 360px;
-		  padding: 20px;
+		  height: 200px;
+		  width: 200px;
 		  background-color: rgba(50, 50, 50, 0.7);
 		  font-size: 27px;
 		  line-height: 1em;
@@ -36,27 +36,27 @@
 		
 		#cube .one  {
 			background-color: "#FF0000";
-		  -webkit-transform: rotateX(90deg) translateZ(200px);
+			-webkit-transform: rotateX(90deg) translateZ(100px);
 		}
 		
 		#cube .two {
-		  -webkit-transform: translateZ(200px);
+			-webkit-transform: translateZ(100px);
 		}
 		
 		#cube .three {
-		  -webkit-transform: rotateY(90deg) translateZ(200px);
+		  -webkit-transform: rotateY(90deg) translateZ(100px);
 		}
 		
 		#cube .four {
-		  -webkit-transform: rotateY(180deg) translateZ(200px);
+		  -webkit-transform: rotateY(180deg) translateZ(100px);
 		}
 		
 		#cube .five {
-		  -webkit-transform: rotateY(-90deg) translateZ(200px);
+			-webkit-transform: rotateY(-90deg) translateZ(100px);
 		}
 		
 		#cube .six {
-		  -webkit-transform: rotateX(-90deg) rotate(180deg) translateZ(200px) ;
+		  -webkit-transform: rotateX(-90deg) rotate(180deg) translateZ(100px) ;
 		}
 		  
 		#debug {
@@ -69,17 +69,17 @@
 	</head>
 	<body class="experiment" id="body">
 		<div id="wrapper">
-			<h1 id="debug"></h1>
 			<div id="experiment">	
 				<div id="cube">
 			        <div class="face one">
 						One face
 			        </div>
 			        <div class="face two">
+						Flick :
 						Up, down, left, right
 			        </div>
 			        <div class="face three">
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod.
 			        </div>
 			        <div class="face four">
 						New forms of navigation are fun.
@@ -88,10 +88,11 @@
 						Rotating 3D cube
 			        </div>
 			        <div class="face six">
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.
+						Ut enim ad minim veniam, quis nostrud exercitation.
 			        </div>
-			    </div>	
+			    </div>
 			</div>
 		</div>
+		<div id="debug"></div>
 	</body>
 </html>

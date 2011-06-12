@@ -541,6 +541,8 @@ Object.merge = function(destination, source) {
           if (finger.params.dragDirection.contains("flick")) {
             this.stopAnalyze = true;
             this.targetElement.trigger("flick", this.informations);
+          } else {
+            this.targetElement.trigger("drag", this.informations);
           }
           break;
         case "dragend":
