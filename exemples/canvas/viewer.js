@@ -32,7 +32,7 @@ window.Viewer = (function (){
 	Viewer.prototype.displayLine = function (x1,y1, x2,y2, color) {
 		var context = this.canvas.getContext('2d');		
 		context.lineWidth = 2;
-		context.strokeStyle = color || "rgba(0,0,0,1)";;
+		context.strokeStyle = color || "rgba(0,0,0,1)";
 		context.beginPath();
 		context.moveTo(x1, y1);
 		context.lineTo(x2, y2);
