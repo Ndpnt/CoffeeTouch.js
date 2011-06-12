@@ -46,3 +46,8 @@ getDragDirection = (finger) ->
 	deltaX = finger.params.x - finger.positions[finger.positionCount - 1].x
 	deltaY = finger.params.y - finger.positions[finger.positionCount - 1].y
 	getDirection deltaX, deltaY	
+
+digit_name = (->
+	names = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'height', 'nine', 'ten']
+	(n) -> 
+		names[n])()
