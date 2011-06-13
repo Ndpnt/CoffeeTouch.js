@@ -68,14 +68,14 @@ class Fixed extends GenericState
 
 
 class Drag extends GenericState
-	description: ->"Drag state"
+	description: -> "Drag state"
 	init: ->
 		@isTap = true
 		@initialX = @eventObj.clientX
 		@initialY = @eventObj.clientY	
 		@delta = 25
 		that = this		
-		setTimeout (->that.isTap = false), 150
+		setTimeout (->that.isTap = false), 75
 	touchmove: ->
 		@notify "drag"
 	touchend: ->

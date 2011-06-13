@@ -4,7 +4,6 @@ class Analyser
 		@fingersArray = {} 		## Hash with fingerId: fingerGestureObject
 		@fingers = [] 			## Array with all fingers
 		@firstAnalysis = true 	## To know if we have to init the informations which will be returned
-		@stopAnalyze = false 	## The analysis will stop if a flick is detected
 		@informations = {}
 		@informations.global = {}
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
@@ -18,7 +17,7 @@ class Analyser
 			@fingersArray[fingerID] =  new FingerGesture(fingerID, gestureName, @eventObj)
 			@fingers.push @fingersArray[fingerID]
 
-		if _.size(@fingersArray) is @totalNbFingers and !@stopAnalyze
+		if _.size(@fingersArray) is @totalNbFingers
 			@analyse @totalNbFingers
 	
 	## Redirect to the correct analysis method depending the number of finger	
@@ -41,13 +40,12 @@ class Analyser
 		@generateGrouppedFingerName()
 		switch gestureName
 			when "fixedend" then @informations.global.type = "press"
+			when "dragend"
+				if @fingers[0].isFlick
+					toTrigger.push "flick"
+					toTrigger.push "flick:#{@fingers[0].params.dragDirection}"
 			when "drag"
 				@informations.global.type = @fingers[0].params.dragDirection
-				## Also trigger flick instead of flick:direction
-				if @fingers[0].params.dragDirection.contains("flick")
-					@stopAnalyze = true
-					toTrigger.push "flick"
-					toTrigger.push @fingers[0].params.dragDirection
 			
 		@targetElement.trigger gestureName, @informations
 		@targetElement.trigger eventName, @informations	for eventName in toTrigger
@@ -72,27 +70,24 @@ class Analyser
 
 			when "fixed,drag"
 				toTrigger.push "fixed,#{@fingers[1].params.dragDirection}"
-				toTrigger.push ("fixed,flick") if @fingers[1].params.dragDirection.contains("flick") 
-				@stopAnalyze = true if @fingers[1].params.dragDirection.contains("flick")
 			when "drag,fixed"
 				toTrigger.push "#{@fingers[0].params.dragDirection},fixed"
-				toTrigger.push("flick,fixed") if @fingers[0].params.dragDirection.contains("flick")
-				@stopAnalyze = true if @fingers[0].params.dragDirection.contains("flick")					
-					
-			when "drag,drag"
 
-				#$("debug").innerHTML = @informations.global.rotation + "<br />" + $("debug").innerHTML
-			
+			## Flick case
+			when "dragend,dragend"
+				toTrigger.push("flick,flick") if @fingers[0].isFlick and @fingers[1].isFlick
+			when "dragend,drag", "drag,dragend"	
+				if @fingers[0].isFlick
+					toTrigger.push "flick,#{@fingers[1].params.dragDirection}"
+					toTrigger.push "flick:#{@fingers[0].params.dragDirection},#{@fingers[1].params.dragDirection}"
+				else if @fingers[1].isFlick
+					toTrigger.push "#{@fingers[0].params.dragDirection},flick"
+					toTrigger.push "#{@fingers[0].params.dragDirection},flick:#{@fingers[1].params.dragDirection}"
+			## Flick end
+													
+			when "drag,drag"
 				@triggerPinchOrSpread()
 				@triggerRotation()
-				## Also trigger flick instead of flick:direction
-				toTrigger.push("flick,flick") if @fingers[0].params.dragDirection.contains("flick") and @fingers[1].params.dragDirection.contains("flick")
-				if @fingers[0].params.dragDirection.contains("flick") and !@fingers[1].params.dragDirection.contains("flick")
-					toTrigger.push "flick,#{@fingers[0].params.dragDirection}"
-				if @fingers[1].params.dragDirection.contains("flick") and !@fingers[0].params.dragDirection.contains("flick")
-					toTrigger.push "#{@fingers[0].params.dragDirection},flick"
-				if @fingers[0].params.dragDirection.contains("flick") or @fingers[1].params.dragDirection.contains("flick")
-					@stopAnalyze = true
 
 		@targetElement.trigger gestureName, @informations
 		@targetElement.trigger eventName, @informations	for eventName in toTrigger
@@ -327,6 +322,8 @@ class Analyser
 						when "right" then gestures.dragDirection.right++
 		for gesture of gestures
 			if gestures[gesture] > 0
+				if gesture == "dragend"
+					gestureName.push "#{digit_name(gestures[gesture])}:flick"
 				gestureName.push "#{digit_name(gestures[gesture])}:#{gesture}"
 				gestureNameDrag.push "#{digit_name(gestures[gesture])}:#{gesture}" if gesture != "drag"
 			if gesture == "dragDirection"
@@ -385,5 +382,5 @@ class Analyser
 		[].concat permutations...
 	
 window.onload = ->
-	$("blue").bind "spread", (event) ->
-		$('debug').innerHTML = event.global.scale + "<br />" + $('debug').innerHTML
+	$("blue").bind "flick", (event) ->
+		$('debug').innerHTML = event.first.speed + "<br />" + $('debug').innerHTML

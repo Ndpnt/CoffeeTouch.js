@@ -22,6 +22,7 @@ class FingerGesture
 		@updatePosition(eventObj)
 		@params.speed = 0
 		@params.dragDirection = "unknownDirection"
+		@isFlick = false
 
 	update: (@gestureName, eventObj) ->
 		@positionCount++
@@ -35,13 +36,11 @@ class FingerGesture
 		if @gestureName == "drag"
 			movedX = @params.x - @positions[@positionCount - 1].x
 			movedY = @params.y - @positions[@positionCount - 1].y
-			@params.speed = Math.sqrt(movedX * movedX  + movedY  * movedY) / (@positions[@positionCount].time - @positions[@positionCount - 1].time) 
-			
-			if @params.speed > 2
-				@params.dragDirection = "flick:" + getDragDirection(this)
-			else
-				@params.dragDirection = getDragDirection(this)
-			@params.direction = Math.atan2(@params.panY, @params.panX)
+			@params.speed = Math.sqrt(movedX * movedX  + movedY  * movedY) / (@positions[@positionCount].time - @positions[@positionCount - 1].time) #/
+			@params.dragDirection = getDragDirection(this)
+		if @gestureName == "dragend"
+			if @params.speed > 0.5 or @params.timeElasped < 100
+				@isFlick = true
 
 	updatePosition: (eventObj) ->
 		@params.x = eventObj.clientX

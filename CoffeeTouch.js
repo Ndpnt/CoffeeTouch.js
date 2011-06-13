@@ -245,7 +245,7 @@ Object.merge = function(destination, source) {
       that = this;
       return setTimeout((function() {
         return that.isTap = false;
-      }), 150);
+      }), 75);
     };
     Drag.prototype.touchmove = function() {
       return this.notify("drag");
@@ -300,12 +300,12 @@ Object.merge = function(destination, source) {
         movedX = this.params.x - this.positions[this.positionCount - 1].x;
         movedY = this.params.y - this.positions[this.positionCount - 1].y;
         this.params.speed = Math.sqrt(movedX * movedX + movedY * movedY) / (this.positions[this.positionCount].time - this.positions[this.positionCount - 1].time);
-        if (this.params.speed > 2) {
-          this.params.dragDirection = "flick:" + getDragDirection(this);
-        } else {
-          this.params.dragDirection = getDragDirection(this);
+        this.params.dragDirection = getDragDirection(this);
+      }
+      if (this.gestureName === "dragend") {
+        if (this.params.speed > 0.5 || this.params.timeElasped < 100) {
+          return this.params.dragDirection = "flick";
         }
-        return this.params.direction = Math.atan2(this.params.panY, this.params.panX);
       }
     };
     FingerGesture.prototype.updatePosition = function(eventObj) {
@@ -544,6 +544,11 @@ Object.merge = function(destination, source) {
       switch (gestureName) {
         case "fixedend":
           this.informations.global.type = "press";
+          break;
+        case "dragend":
+          if (this.fingers[0].params.dragDirection.contains("flick")) {
+            toTrigger.push("flick");
+          }
           break;
         case "drag":
           this.informations.global.type = this.fingers[0].params.dragDirection;
@@ -1048,8 +1053,8 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind("spread", function(event) {
-      return $('debug').innerHTML = event.global.scale + "<br />" + $('debug').innerHTML;
+    return $("blue").bind("flick", function(event) {
+      return $('debug').innerHTML = event.first.speed + "<br />" + $('debug').innerHTML;
     });
   };
 }).call(this);
