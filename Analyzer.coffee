@@ -5,8 +5,8 @@ class Analyser
 		@fingers = [] 			## Array with all fingers
 		@firstAnalysis = true 	## To know if we have to init the informations which will be returned
 		@stopAnalyze = false 	## The analysis will stop if a flick is detected
-		@informations = 
-			global: {}
+		@informations = {}
+		@informations.global = {}
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
 	notify: (fingerID, gestureName, @eventObj) ->
 		@informations.global.rotation = @eventObj.global.rotation 

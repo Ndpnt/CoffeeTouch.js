@@ -490,14 +490,11 @@ Object.merge = function(destination, source) {
       this.fingers = [];
       this.firstAnalysis = true;
       this.stopAnalyze = false;
-      this.informations = {
-        global: {}
-      };
+      this.informations = {};
+      this.informations.global = {};
     }
     Analyser.prototype.notify = function(fingerID, gestureName, eventObj) {
       this.eventObj = eventObj;
-      this.informations.global.rotation = this.eventObj.global.rotation;
-      this.informations.global.scale = this.eventObj.global.scale;
       if (this.fingersArray[fingerID] != null) {
         this.fingersArray[fingerID].update(gestureName, this.eventObj);
       } else {
@@ -835,10 +832,7 @@ Object.merge = function(destination, source) {
         }
         return a.params.startX - b.params.startX;
       });
-      this.informations.global = {
-        nbFingers: this.fingers.length,
-        rotation: 0
-      };
+      this.informations.global.nbFingers = this.fingers.length;
       for (i = 0, _ref = this.fingers.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
         switch (i) {
           case 0:
@@ -876,10 +870,10 @@ Object.merge = function(destination, source) {
       return this.lastRotation = this.informations.global.rotation;
     };
     Analyser.prototype.triggerPinchOrSpread = function() {
-      if (this.informations.global.scale < 0.9) {
+      if (this.informations.global.scale < 1) {
         this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":pinch", this.informations);
         return this.targetElement.trigger("pinch", this.informations);
-      } else if (this.informations.global.scale > 1.1) {
+      } else if (this.informations.global.scale > 1) {
         this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":spread", this.informations);
         return this.targetElement.trigger("spread", this.informations);
       }
@@ -1045,8 +1039,8 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind("rotation:cw", function(event) {
-      return $('debug').innerHTML = "rotate cw" + "<br />" + $('debug').innerHTML;
+    return $("blue").bind("tap", function(event) {
+      return $('debug').innerHTML = "tap" + "<br />" + $('debug').innerHTML;
     });
   };
   /*
