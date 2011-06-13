@@ -45,7 +45,7 @@ class Analyser
 					toTrigger.push "flick"
 					toTrigger.push "flick:#{@fingers[0].params.dragDirection}"
 			when "drag"
-				@informations.global.type = @fingers[0].params.dragDirection
+				toTrigger.push @fingers[0].params.dragDirection
 			
 		@targetElement.trigger gestureName, @informations
 		@targetElement.trigger eventName, @informations	for eventName in toTrigger
@@ -308,32 +308,58 @@ class Analyser
 		
 		for finger in @fingers
 			switch finger.gestureName
-				when "tap" then gestures.tap++
-				when "doubletap" then gestures.doubletap++
-				when "fixed" then gestures.fixed++
-				when "fixedend" then gestures.fixedend++
-				when "dragend" then gestures.dragend++
+				when "tap" 
+					gestures.tap.n++
+					gestures.tap.fingers.push finger
+				when "doubletap"
+					gestures.doubletap.n++
+					gestures.doubletap.fingers.push finger
+				when "fixed" 
+					gestures.fixed.n++
+					gestures.fixed.fingers.push finger
+				when "fixedend"
+					gestures.fixedend.n++
+					gestures.fixedend.fingers.push finger
+				when "dragend" 
+					gestures.dragend.n++
+					gestures.dragend.fingers.push finger
 				when "drag"
-					gestures.drag++
+					gestures.drag.n++
+					gestures.drag.fingers.push finger
 					switch finger.params.dragDirection
-						when "up" then gestures.dragDirection.up++
-						when "down" then gestures.dragDirection.down++
-						when "left" then gestures.dragDirection.left++
-						when "right" then gestures.dragDirection.right++
+						when "up" 
+							gestures.dragDirection.up.n++
+							gestures.dragDirection.up.fingers.push finger
+						when "down" 
+							gestures.dragDirection.down.n++
+							gestures.dragDirection.down.fingers.push finger
+						when "righ" 
+							gestures.dragDirection.right.n++
+							gestures.dragDirection.right.fingers.push finger
+						when "left" 
+							gestures.dragDirection.left.n++
+							gestures.dragDirection.left.fingers.push finger
 		for gesture of gestures
-			if gestures[gesture] > 0
+			if gestures[gesture].n > 0
+				## For the flick, I consider that if two drag end has been done at the same time and one of them is
+				## a flick, both of them where flick
 				if gesture == "dragend"
-					gestureName.push "#{digit_name(gestures[gesture])}:flick"
-				gestureName.push "#{digit_name(gestures[gesture])}:#{gesture}"
-				gestureNameDrag.push "#{digit_name(gestures[gesture])}:#{gesture}" if gesture != "drag"
+					for finger in gestures[gesture].fingers
+						if finger.isFlick
+							gestureName.push if gestures[gesture].n > 1 then "#{digit_name(gestures[gesture].n)}:flick" else "flick"
+							gestureNameDrag.push if gestures[gesture].n > 1 then "#{digit_name(gestures[gesture].n)}:flick:#{finger.params.dragDirection}" else "flick:#{finger.params.dragDirection}"
+							break
+				## End Flick
+				else if gesture == "fixedend"
+					gestureName.push if gestures[gesture].n > 1 then "#{digit_name(gestures[gesture].n)}:press" else "press"
+				else
+					gestureName.push if gestures[gesture].n > 1 then "#{digit_name(gestures[gesture].n)}:#{gesture}" else "#{gesture}"
 			if gesture == "dragDirection"
 				for gestureDirection of gestures[gesture]
-					if gestures[gesture][gestureDirection] > 0
-						gestureNameDrag.push "#{digit_name(gestures[gesture][gestureDirection])}:#{gestureDirection}"
-#		gestureNameDrag = gestureNameDrag.slice(0, gestureNameDrag.length - 1); ## Removing last coma
-#		gestureName = gestureName.slice(0, gestureName.length - 1); ## Removing last coma
-
-		return gestureNameDrag
+					if gestures[gesture][gestureDirection].n > 0
+						gestureNameDrag.push if gestures[gesture][gestureDirection].n > 1 then "#{digit_name(gestures[gesture][gestureDirection].n)}:#{gestureDirection}" else "#{gestureDirection}"
+		@targetElement.trigger gestureName, @informations
+		@targetElement.trigger gestureNameDrag, @informations
 	
 	getCentroid: ->
 		sumX = sumY = 0
@@ -359,28 +385,10 @@ class Analyser
 		sumAverageDistance = 0
 		for finger in @fingers
 			sumAverageDistance += distanceBetweenTwoPoints finger.params.x, finger.params.y, centroid.x, centroid.y
-		averageDistance = sumAverageDistance / @fingers.length
+		averageDistance = sumAverageDistance / @fingers.length #/
 		@informations.global.centroid = centroid
 		scale = averageDistance / @informations.global.initialAverageDistanceToCentroid ##/
-	
-	
-	# Returns a copy of an array with the element at a specific position
-	# removed from it.
-	arrayExcept: (arr, idx) ->
-		res = arr[0..]
-		res.splice idx, 1
-		res
- 
-	# The actual function which returns the permutations of an array-like
-	# object (or a proper array).
-	permute: (arr) ->
-		arr = Array::slice.call arr, 0
-		return [[]] if arr.length == 0
-		permutations = (for value,idx in arr
-  			[value].concat perm for perm in @permute @arrayExcept arr, idx)
-		# Flatten the array before returning it.
-		[].concat permutations...
-	
+		
 window.onload = ->
-	$("blue").bind "flick", (event) ->
+	$("blue").bind "drag", (event) ->
 		$('debug').innerHTML = event.first.speed + "<br />" + $('debug').innerHTML
