@@ -293,18 +293,18 @@ class Analyser
 		i = 0
 		nbFingers = @fingers.length
 		gestures = 
-			tap: 0
-			doubletap: 0
-			fixed: 0
-			fixedend: 0
-			drag: 0
-			dragend: 0
+			tap: {n: 0, fingers: []}
+			doubletap: {n: 0, fingers: []}
+			fixed: {n: 0, fingers: []}
+			fixedend: {n: 0, fingers: []}
+			drag: {n: 0, fingers: []}
+			dragend: {n: 0, fingers: []}
 			dragDirection:
-				up: 0
-				down: 0
-				left: 0
-				right: 0
-				drag: 0
+				up: {n: 0, fingers: []}
+				down: {n: 0, fingers: []}
+				left: {n: 0, fingers: []}
+				right: {n: 0, fingers: []}
+				drag: {n: 0, fingers: []}
 		
 		for finger in @fingers
 			switch finger.gestureName
