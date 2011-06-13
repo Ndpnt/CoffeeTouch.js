@@ -371,27 +371,27 @@ Object.merge = function(destination, source) {
     };
     EventRouter.prototype.touchmove = function(event) {
       var i, iMachine, _i, _len, _ref, _results;
-      $("debug").innerHTML = event.translateSpeedX + "<br />" + $("debug").innerHTML;
       event.preventDefault();
       _ref = event.changedTouches;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
         if (!(this.machines[i.identifier] != null)) {
-          this.addGlobal(event, {});
           iMachine = new StateMachine(i.identifier, this);
           iMachine.apply("touchstart", i);
           this.machines[i.identifier] = iMachine;
         }
+        this.addGlobal(event, i);
         _results.push(this.machines[i.identifier].apply("touchmove", i));
       }
       return _results;
     };
     EventRouter.prototype.addGlobal = function(event, target) {
       target.global = {};
-      target.global.scale = event.scale;
-      target.global.rotation = event.rotation;
-      return target;
+      return target.global = {
+        scale: event.scale,
+        rotation: event.rotation
+      };
     };
     EventRouter.prototype.broadcast = function(name, eventObj) {
       return this.grouper.receive(name, eventObj, this.fingerCount, this.element);
@@ -502,6 +502,8 @@ Object.merge = function(destination, source) {
     }
     Analyser.prototype.notify = function(fingerID, gestureName, eventObj) {
       this.eventObj = eventObj;
+      this.informations.global.rotation = this.eventObj.global.rotation;
+      this.informations.global.scale = this.eventObj.global.scale;
       if (this.fingersArray[fingerID] != null) {
         this.fingersArray[fingerID].update(gestureName, this.eventObj);
       } else {
@@ -1046,13 +1048,8 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind("tap", function(event) {
-      return $('debug').innerHTML = "tap" + "<br />" + $('debug').innerHTML;
+    return $("blue").bind("spread", function(event) {
+      return $('debug').innerHTML = event.global.scale + "<br />" + $('debug').innerHTML;
     });
   };
-  /*
-  		if name.contains "flick"
-  			$('debug').innerHTML = event.global.type + "<br />"
-  			$('debug').innerHTML += name
-  */
 }).call(this);

@@ -385,10 +385,5 @@ class Analyser
 		[].concat permutations...
 	
 window.onload = ->
-	$("blue").bind "tap", (event) ->
-		$('debug').innerHTML = "tap" + "<br />" + $('debug').innerHTML
-###
-		if name.contains "flick"
-			$('debug').innerHTML = event.global.type + "<br />"
-			$('debug').innerHTML += name
-###
+	$("blue").bind "spread", (event) ->
+		$('debug').innerHTML = event.global.scale + "<br />" + $('debug').innerHTML

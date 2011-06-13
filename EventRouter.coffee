@@ -37,21 +37,20 @@ class EventRouter
 		@grouper.refreshFingerCount @fingerCount, @element			
 
 	touchmove: (event) ->
-		$("debug").innerHTML = event.translateSpeedX + "<br />" + $("debug").innerHTML
 		event.preventDefault()
 		for i in event.changedTouches
-			if !@machines[i.identifier]? 
-				@addGlobal(event, {})
+			if !@machines[i.identifier]?
 				iMachine = new StateMachine i.identifier, this
 				iMachine.apply "touchstart", i
 				@machines[i.identifier] = iMachine
+			@addGlobal event, i
 			@machines[i.identifier].apply("touchmove", i)		
 			
 	addGlobal: (event, target) ->
 		target.global = {}
-		target.global.scale = event.scale
-		target.global.rotation = event.rotation
-		target
+		target.global =
+			scale: event.scale
+			rotation: event.rotation
 		
 
 
