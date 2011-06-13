@@ -7,6 +7,8 @@ window.onload = ->
 	ctx.lineCap = "round"
 	ctx.lineJoin = "round"
 	firsttime = true
+	$('canvas').bind "tap", (params) ->
+		SelectPoint(params.first.x, params.first.y)
 	$('canvas').bind "tap,tap", (params) ->
 		p1 = {
 			x: params.first.x,
@@ -25,9 +27,9 @@ window.onload = ->
 		else
 			Dragging(params)
 		
-	$('canvas').bind "doubleTap", (params) ->
+	$('canvas').bind "doubletap", (params) ->
 		Add(params.first.x, params.first.y)
-		$('debug').innerHTML = params.global.type + "<br/>" + $('debug').innerHTML
+		
 	$('canvas').bind "tap,tap,tap", (params) ->
 		Validate()
 	
@@ -42,6 +44,8 @@ window.onload = ->
 	allPoint = []
 	point = {}
 	allValidatePoint = []
+	dPoint = {}
+	drag = null	
 	style =
 		curve:
 			width: 4
@@ -50,12 +54,13 @@ window.onload = ->
 			width: 1
 			color: "#C00"
 		point:
-			radius: 35 
+			radius: 15 
 			width: 2
 			color: "#900"
 			fill: "rgba(200,200,200,0.5)"
 			arc1: 0
 			arc2: 2 * Math.PI
+
 	init = (a,b) ->
 		point1 =
 			p:
@@ -65,7 +70,7 @@ window.onload = ->
 				x: (a.x + 50)
 				y: (a.y + 50)
 			validate: false
-			
+			selected: false
 		point2 =
 			p:
 				x: b.x
@@ -74,130 +79,16 @@ window.onload = ->
 				x: (b.x + 50)
 				y: (b.y + 50)
 			validate: false
-		
+			selected: false
 		allPoint.push point1
 		allPoint.push point2
 		##default styles
 		DrawCanvas()
-		
-	drag = null
-	`
-    function DrawCanvas() {
-		ctx.clearRect(0, 0, canvas.width, canvas.height)
-		
-		for (var value in allPoint) {
-			if (allPoint[value].validate === false) {
-				if(allPoint[value].p) {
-					ctx.lineWidth = style.cpline.width;
-					ctx.strokeStyle = style.cpline.color;
-					ctx.beginPath();
-					ctx.moveTo(allPoint[value].p.x, allPoint[value].p.y);
-					ctx.lineTo(allPoint[value].cp.x, allPoint[value].cp.y);
-					ctx.stroke();
-					ctx.closePath();
-				}
-			}
-		}
-		
-		var i = 0
-		for (i = 0; i < allPoint.length - 1; i += 1){
-			if (allPoint[i].validate === false) {
-				ctx.lineWidth = style.curve.width;
-				ctx.strokeStyle = style.curve.color;
-				ctx.beginPath();
-				ctx.moveTo(allPoint[i].p.x, allPoint[i].p.y);
-				ctx.bezierCurveTo(allPoint[i].cp.x, allPoint[i].cp.y, allPoint[i + 1].cp.x, allPoint[i + 1].cp.y, allPoint[i + 1].p.x, allPoint[i + 1].p.y);
-				ctx.stroke();
-				ctx.closePath();
-			}
-		}
-			
-		
-		for (var value in allPoint) {
-			if (allPoint[value].validate === false) {
-				if(allPoint[value].p) {
-					ctx.lineWidth = style.point.width;
-					ctx.strokeStyle = style.point.color;
-					ctx.fillStyle = style.point.fill;
-					ctx.beginPath();
-					ctx.arc(allPoint[value].p.x, allPoint[value].p.y, style.point.radius, style.point.arc1, style.point.arc2, true);
-					ctx.fill();
-					ctx.stroke();
-					ctx.beginPath();
-					ctx.arc(allPoint[value].cp.x, allPoint[value].cp.y, style.point.radius, style.point.arc1, style.point.arc2, true);
-					ctx.fill();
-					ctx.stroke();
-					ctx.closePath();
-				}
-			}
-		}
-		DrawValidatePoints();
-	}
-	
-	
-	function DrawValidatePoints() {
-		var i = 0
-		for (i = 0; i < allPoint.length - 1; i += 1) {
-			if (allPoint[i].validate === true && allPoint[i + 1].validate === true) {
-				ctx.lineWidth = style.curve.width;
-				ctx.strokeStyle = style.curve.color;
-				ctx.beginPath();
-				ctx.moveTo(allPoint[i].p.x, allPoint[i].p.y);
-				ctx.bezierCurveTo(allPoint[i].cp.x, allPoint[i].cp.y, allPoint[i + 1].cp.x, allPoint[i + 1].cp.y, allPoint[i + 1].p.x, allPoint[i + 1].p.y);
-				ctx.stroke();
-				ctx.closePath();
-			}
-		}
-	}
-	
-	var dPoint;
-	function DragStart(event) {
-		e = {
-			x: event.first.x,
-			y: event.first.y
-		}
-		var dx, dy;
-		for (var value in allPoint) {
-			if (allPoint[value].validate === false) {
-				if(allPoint[value].p) {
-					dx = allPoint[value].p.x - e.x;
-					dy = allPoint[value].p.y - e.y;
-					dcx = allPoint[value].cp.x - e.x;
-					dcy = allPoint[value].cp.y - e.y;
-					if ((dx * dx) + (dy * dy) < style.point.radius * style.point.radius) {
-						drag = allPoint[value].p;
-						dPoint = e;
-						return;
-					}
-					if ((dcx * dcx) + (dcy * dcy) < style.point.radius * style.point.radius) {
-						drag = allPoint[value].cp;
-						dPoint = e;
-						return;
-					}
-				}
-			}
-		}
-	}
-	
-	
-	// dragging
-	function Dragging(event) {
-		if (drag) {
-			e = {
-				x: event.first.x,
-				y: event.first.y
-			}
-			drag.x += e.x - dPoint.x;
-			drag.y += e.y - dPoint.y;
-			dPoint = e;
-			DrawCanvas();
-		}
-	}
-	`
+
 	DragEnd = (e) ->
 		drag = null
 		DrawCanvas()
-			
+		
 	Add = (x,y) ->
 		point =
 			p:
@@ -207,12 +98,122 @@ window.onload = ->
 				x: (x + 50)
 				y: (y + 50)
 			validate: false
+			selected: false
 		allPoint.push(point)
 		DrawCanvas()
 	
+	j = 0
 	Validate = ->
 		ctx.clearRect(0, 0, canvas.width, canvas.height)
-		for i in [0.._.size(allPoint) - 1]
+		for i in [0..allPoint.length - 1]
 			allPoint[i].validate = true
+			if !allPoint[i].group?
+				allPoint[i].group = j
+		j++
 		DrawValidatePoints()
+		
+	DrawCanvas = ->
+		ctx.clearRect(0, 0, canvas.width, canvas.height)
+		for value of allPoint
+			if allPoint[value].validate == false
+				if allPoint[value].p
+					ctx.lineWidth = style.cpline.width
+					ctx.strokeStyle = style.cpline.color
+					ctx.beginPath()
+					ctx.moveTo(allPoint[value].p.x, allPoint[value].p.y)
+					ctx.lineTo(allPoint[value].cp.x, allPoint[value].cp.y)
+					ctx.stroke()
+					ctx.closePath()
+		
+		for i in [0..allPoint.length - 1]
+			if allPoint[i].validate == false and allPoint[i + 1]
+				ctx.lineWidth = style.curve.width
+				ctx.strokeStyle = style.curve.color
+				ctx.beginPath()
+				ctx.moveTo(allPoint[i].p.x, allPoint[i].p.y)
+				ctx.bezierCurveTo(allPoint[i].cp.x, allPoint[i].cp.y, allPoint[i + 1].cp.x, allPoint[i + 1].cp.y, allPoint[i + 1].p.x, allPoint[i + 1].p.y)
+				ctx.stroke()
+				ctx.closePath()
+			
+		
+		for value of allPoint
+			if allPoint[value].validate == false
+				if allPoint[value].p
+					ctx.lineWidth = style.point.width
+					ctx.strokeStyle = style.point.color
+					ctx.fillStyle = style.point.fill
+					ctx.beginPath()
+					radius = if(allPoint[value].selected == true) then 40 else style.point.radius
+					ctx.arc(allPoint[value].p.x, allPoint[value].p.y, radius, style.point.arc1, style.point.arc2, true)
+					ctx.fill()
+					ctx.stroke()
+					ctx.beginPath()
+					ctx.arc(allPoint[value].cp.x, allPoint[value].cp.y, style.point.radius, style.point.arc1, style.point.arc2, true)
+					ctx.fill()
+					ctx.stroke()
+					ctx.closePath()
+		DrawValidatePoints()
+	
+	
+	DrawValidatePoints = ->
+		for i in [0..allPoint.length - 1]
+			if allPoint[i].validate == true and allPoint[i + 1] and allPoint[i].group == allPoint[i + 1].group
+				ctx.lineWidth = style.curve.width
+				ctx.strokeStyle = style.curve.color
+				ctx.beginPath()
+				ctx.moveTo(allPoint[i].p.x, allPoint[i].p.y)
+				ctx.bezierCurveTo(allPoint[i].cp.x, allPoint[i].cp.y, allPoint[i + 1].cp.x, allPoint[i + 1].cp.y, allPoint[i + 1].p.x, allPoint[i + 1].p.y)
+				ctx.stroke()
+				ctx.closePath()
+		
+
+	DragStart = (event) ->
+		e =
+			x: event.first.x
+			y: event.first.y
+		dx = dy = 0
+		for value of allPoint
+			if allPoint[value].validate == false
+				if allPoint[value].p
+					dx = allPoint[value].p.x - e.x
+					dy = allPoint[value].p.y - e.y
+					dcx = allPoint[value].cp.x - e.x
+					dcy = allPoint[value].cp.y - e.y
+					if ((dx * dx) + (dy * dy) < style.point.radius * style.point.radius and allPoint[value].selected == true)
+						drag = allPoint[value].p
+						dPoint = e
+						return
+					if ((dcx * dcx) + (dcy * dcy) < style.point.radius * style.point.radius and allPoint[value].selected == true)
+						drag = allPoint[value].cp
+						dPoint = e
+						return
+	
+	Dragging = (event) ->
+		if drag?
+			e =
+				x: event.first.x
+				y: event.first.y
+			drag.x += e.x - dPoint.x
+			drag.y += e.y - dPoint.y
+			dPoint = e
+			DrawCanvas()
+	
+	SelectPoint = (x,y) ->
+		e =
+			x: x
+			y: y
+		dx = dy = 0
+		for value of allPoint
+			allPoint[value].selected = false
+			if allPoint[value].validate == false
+				if allPoint[value].p
+					dx = allPoint[value].p.x - e.x
+					dy = allPoint[value].p.y - e.y
+					dcx = allPoint[value].cp.x - e.x
+					dcy = allPoint[value].cp.y - e.y
+					if ((dx * dx) + (dy * dy) < style.point.radius * style.point.radius)
+						allPoint[value].selected = true
+					else if ((dcx * dcx) + (dcy * dcy) < style.point.radius * style.point.radius)
+						allPoint[value].selected = true
+			DrawCanvas()
 
