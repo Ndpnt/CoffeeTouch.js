@@ -169,10 +169,10 @@ Object.merge = function(destination, source) {
     return GenericState;
   })();
   NoTouch = (function() {
+    __extends(NoTouch, GenericState);
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
-    __extends(NoTouch, GenericState);
     NoTouch.prototype.description = function() {
       return "NoTouch state";
     };
@@ -182,10 +182,10 @@ Object.merge = function(destination, source) {
     return NoTouch;
   })();
   FirstTouch = (function() {
+    __extends(FirstTouch, GenericState);
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
-    __extends(FirstTouch, GenericState);
     FirstTouch.prototype.description = function() {
       return "FirstTouch state";
     };
@@ -211,10 +211,10 @@ Object.merge = function(destination, source) {
     return FirstTouch;
   })();
   Fixed = (function() {
+    __extends(Fixed, GenericState);
     function Fixed() {
       Fixed.__super__.constructor.apply(this, arguments);
     }
-    __extends(Fixed, GenericState);
     Fixed.prototype.description = function() {
       return "Fixed state";
     };
@@ -227,10 +227,10 @@ Object.merge = function(destination, source) {
     return Fixed;
   })();
   Drag = (function() {
+    __extends(Drag, GenericState);
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
-    __extends(Drag, GenericState);
     Drag.prototype.description = function() {
       return "Drag state";
     };
@@ -340,7 +340,7 @@ Object.merge = function(destination, source) {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
-        _results.push(!(this.machines[i.identifier] != null) ? (iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine) : void 0);
+        _results.push(!(this.machines[i.identifier] != null) ? (this.addGlobal(event, i), iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine) : void 0);
       }
       return _results;
     };
@@ -360,7 +360,7 @@ Object.merge = function(destination, source) {
           }
         }
         if (!exists) {
-          this.machines[iMKey].apply("touchend", {});
+          this.machines[iMKey].apply("touchend", this.addGlobal(event, {}));
           delete this.machines[iMKey];
         }
       }
@@ -375,6 +375,7 @@ Object.merge = function(destination, source) {
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
         if (!(this.machines[i.identifier] != null)) {
+          this.addGlobal(event, {});
           iMachine = new StateMachine(i.identifier, this);
           iMachine.apply("touchstart", i);
           this.machines[i.identifier] = iMachine;
@@ -382,6 +383,12 @@ Object.merge = function(destination, source) {
         _results.push(this.machines[i.identifier].apply("touchmove", i));
       }
       return _results;
+    };
+    EventRouter.prototype.addGlobal = function(event, target) {
+      target.global = {};
+      target.global.scale = event.scale;
+      target.global.rotation = event.rotation;
+      return target;
     };
     EventRouter.prototype.broadcast = function(name, eventObj) {
       return this.grouper.receive(name, eventObj, this.fingerCount, this.element);
