@@ -276,10 +276,10 @@ class Analyser
 		# The scale is already sent in the event Object
 		# @informations.global.scale = @calculateScale()
 		## Spread and Pinch detection
-		if @informations.global.scale < 0.9
+		if @informations.global.scale < 1
 			@targetElement.trigger "#{digit_name(@fingers.length)}:pinch", @informations
 			@targetElement.trigger "pinch", @informations
-		else if @informations.global.scale > 1.1
+		else if @informations.global.scale > 1
 			@targetElement.trigger "#{digit_name(@fingers.length)}:spread", @informations
 			@targetElement.trigger "spread", @informations
 
