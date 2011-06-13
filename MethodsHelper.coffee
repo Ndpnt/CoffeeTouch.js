@@ -90,15 +90,17 @@ function print_r(obj) {
   win_print_r.document.write("</ul>")
  }
 
-Object.prototype.keys = function ()
+
+Object.keys = function (object)
 {
   var keys = [];
-  for(var i in this) if (this.hasOwnProperty(i))
+  for(var i in object) if (object.hasOwnProperty(i))
   {
     keys.push(i);
   }
   return keys;
 }
+
 
 Object.merge = function(destination, source) {
     for (var property in source) {
