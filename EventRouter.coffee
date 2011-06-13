@@ -23,7 +23,7 @@ class EventRouter
 
 	touchend: (event) ->
 		event.preventDefault()
-		for iMKey in @machines.keys()
+		for iMKey in Object.keys(@machines)
 			iMKey = parseInt(iMKey)
 			exists = false			
 			for iTouch in event.touches
@@ -37,6 +37,7 @@ class EventRouter
 		@grouper.refreshFingerCount @fingerCount, @element			
 
 	touchmove: (event) ->
+		$("debug").innerHTML = event.translateSpeedX + "<br />" + $("debug").innerHTML
 		event.preventDefault()
 		for i in event.changedTouches
 			if !@machines[i.identifier]? 
