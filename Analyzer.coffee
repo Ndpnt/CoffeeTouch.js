@@ -6,11 +6,15 @@ class Analyser
 		@firstAnalysis = true 	## To know if we have to init the informations which will be returned
 		@informations = {}
 		@informations.global = {}
+		date = new Date()
+		@informations.global.timeStart = date.getTime()
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
 	notify: (fingerID, gestureName, @eventObj) ->
 		@informations.global.rotation = @eventObj.global.rotation 
 		@informations.global.scale = @eventObj.global.scale
-
+		date = new Date()
+		@informations.global.timeElasped = date.getTime() - @informations.global.timeStart
+		
 		if @fingersArray[fingerID]?
 			@fingersArray[fingerID].update gestureName, @eventObj
 		else
