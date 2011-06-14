@@ -5,15 +5,15 @@ window.onload = ->
 	yAngle = 0
 	zAngle = 0;
 
-	$('body').bind "flick:up", (params) ->
+	$('body').onGesture "flick:up", (params) ->
 		xAngle += 360
 		$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
 	
-	$('body').bind "flick:down", (params) ->
+	$('body').onGesture "flick:down", (params) ->
 		xAngle -= 360
 		$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
 	
-	$('body').bind "flick:left", (params) ->
+	$('body').onGesture "flick:left", (params) ->
 		if (xAngle % 360) == 0
 			yAngle -= 90
 			$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
@@ -27,7 +27,7 @@ window.onload = ->
 			zAngle += 90
 			$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
 
-	$('body').bind "flick:right", (params) ->
+	$('body').onGesture "flick:right", (params) ->
 		if (xAngle % 360) == 0
 			yAngle += 90
 			$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
@@ -41,10 +41,10 @@ window.onload = ->
 			zAngle -= 90
 			$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateZ(" + zAngle + "deg)"
 	
-	$('body').bind "right", (params) ->
+	$('body').onGesture "right", (params) ->
 		yAngle += params.first.x * 9 / window.innerWidth
 		$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
 
-	$('body').bind "left", (params) ->
+	$('body').onGesture "left", (params) ->
 		yAngle -= params.first.x * 9 / window.innerWidth
 		$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"

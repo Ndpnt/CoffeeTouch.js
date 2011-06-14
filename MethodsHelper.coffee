@@ -1,9 +1,9 @@
 ###
- The bind, unbind and trigger function have been taken from Backbone Framework.
- The bind function has been changed
+ The unbind and trigger function have been taken from Backbone Framework. 
+ The onGesture function is inspired by the bind functon of Backbone Framework. 
 ###
 
-Element::bind = (eventName, callback) ->
+Element::onGesture = (eventName, callback) ->
 	if !this.router?
 		this.router = new EventRouter this
 	calls = @_callbacks or @_callbacks = {}
@@ -11,7 +11,7 @@ Element::bind = (eventName, callback) ->
 	list.push callback
 	return this
 
-Element::unbind = (ev, callback) ->
+Element::unbindGesture = (ev, callback) ->
 	if !ev
 		@_callbacks = {}
 	else if calls = @_callbacks
@@ -27,40 +27,40 @@ Element::unbind = (ev, callback) ->
 					break
 	return this
 
-`
-Element.prototype.trigger =  function(ev) {
-	  var list, calls, i, l;
-	  if (!(calls = this._callbacks)) return this;
-	  if (list = calls[ev]) {
-	    for (i = 0, l = list.length; i < l; i++) {
-	      list[i].apply(this, Array.prototype.slice.call(arguments, 1));
-	    }
-	  }
-	  if (list = calls['all']) {
-	    for (i = 0, l = list.length; i < l; i++) {
-	      list[i].apply(this, arguments);
-	    }
-	  }
-	  return this;
-	};
-`
+Element::trigger = (ev) ->
+	if !(calls = @._callbacks) then return this
+	if list = calls[ev]
+		for i in list
+			i.apply(this, Array.prototype.slice.call(arguments, 1));
+
+	if list = calls['all']
+		for i in list
+			i.apply(this, arguments)
+	return this
 
 $ = (element) ->
 	document.getElementById element
 
 String::contains = (it) ->
 	this.indexOf(it) != -1;
+Array::contains = (element) ->
+	for el in this
+		if (el == element) then return true
+	return false
 
 ####################### Misc          ####################### 
 `
-function dump(arr,level) {
+function dump(arr) {
 		var dumped_text = "["
 		for(var item in arr) {
 			var value = arr[item];
-			if(typeof(value)=='function') continue;
-			dumped_text += item + "=" + value + " ";
+			if(typeof(value)=='function')
+				continue;
+			else if(typeof(value)=='object')
+				dumped_text += dump(value);
+			else
+				dumped_text += item + "=" + value + " ";
 		}
-
 	return dumped_text + "]";
 }
 function print_r(obj) {

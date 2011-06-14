@@ -8,14 +8,16 @@ window.onload = ->
 	ctx.lineJoin = "round"
 	firsttime = true
 	$('canvas').bind "tap", (params) ->
+		
+
+	$('canvas').onGesture "tap", (params) ->
 		selectPoint(params.first.x, params.first.y)
 		ctx.fillStyle = "rgba(0,0,0,1)";
 		ctx.beginPath();
 		ctx.arc(params.first.x, params.first.y, 3, 0, Math.PI * 2,true);
 		ctx.closePath();
 		ctx.fill();
-		
-	$('canvas').bind "tap,tap", (params) ->
+	$('canvas').onGesture "tap,tap", (params) ->
 		p1 = {
 			x: params.first.x,
 			y: params.first.y
@@ -26,27 +28,27 @@ window.onload = ->
 		}
 		init(p1,p2)
 	
-	$('canvas').bind "drag", (params) ->
+	$('canvas').onGesture "drag", (params) ->
 		if firsttime
 			dragStart(params)
 			firsttime = false
 		else
 			dragging(params)
 		
-	$('canvas').bind "doubletap", (params) ->
+	$('canvas').onGesture "doubletap", (params) ->
 		add(params.first.x, params.first.y)
 		
-	$('canvas').bind "tap,tap,tap", (params) ->
+	$('canvas').onGesture "tap,tap,tap", (params) ->
 		validate()
 	
-	$('canvas').bind "dragend", (params) ->
+	$('canvas').onGesture "dragend", (params) ->
 		firsttime = true
 		dragEnd(params)
 
 	$('canvas').bind "three:down", (params) ->
 		clear()
 	
-	$('canvas').bind "all", (a, params) ->
+	$('canvas').onGesture "all", (a, params) ->
 		$('debug').innerHTML = a + "<br/>" + $('debug').innerHTML
 	
 	style = {}
