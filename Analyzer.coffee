@@ -45,10 +45,10 @@ class Analyser
 					toTrigger.push "flick"
 					toTrigger.push "flick:#{@fingers[0].params.dragDirection}"
 			when "drag"
-				toTrigger.push @fingers[0].params.dragDirection
+				@triggerDragDirections()
 			
 		@targetElement.trigger gestureName, @informations
-		@targetElement.trigger eventName, @informations	for eventName in toTrigger
+		@targetElement.trigger eventName, @informations	for eventName in toTrigger if toTrigger.length > 0 
 
 
 	###----------------------------------------------------------------------------------------------------------------
@@ -60,14 +60,10 @@ class Analyser
 		@generateGrouppedFingerName()
 		@informations.global.distance = distanceBetweenTwoPoints @fingers[0].params.x, @fingers[0].params.y, @fingers[1].params.x, @fingers[1].params.y
 		switch gestureName
-		
-			when "tap,tap", "doubletap,doubletap", "fixed,fixed"
-				toTrigger.push "two:#{@fingers[0].gestureName}"
-				
+						
 			when "fixedend,fixedend"
 				toTrigger.push "press,press"
-				toTrigger.push "two:press"
-
+				
 			when "fixed,drag"
 				toTrigger.push "fixed,#{@fingers[1].params.dragDirection}"
 			when "drag,fixed"
@@ -88,10 +84,10 @@ class Analyser
 			when "drag,drag"
 				@triggerPinchOrSpread()
 				@triggerRotation()
+				@triggerDragDirections()
 
 		@targetElement.trigger gestureName, @informations
-		@targetElement.trigger eventName, @informations	for eventName in toTrigger
-
+		@targetElement.trigger eventName, @informations	for eventName in toTrigger if toTrigger.length > 0
 	###----------------------------------------------------------------------------------------------------------------
 	## Three Finger Gesture
 	###
@@ -100,28 +96,9 @@ class Analyser
 		toTrigger = []
 		@generateGrouppedFingerName()
 		switch gestureName
-			when "tap,tap,tap", "doubletap,doubletap,doubletap", "fixed,fixed,fixed"
-				toTrigger.push "three:#{@fingers[0].gestureName}"
 
 			when "fixedend,fixedend,fixedend"
 				toTrigger.push "press,press,press"
-				toTrigger.push "three:press"
-
-			when "fixed,fixed,tap", "fixed,tap,fixed", "tap,fixed,fixed"
-				toTrigger.push "two:fixed,tap"
-				toTrigger.push "tap,two:fixed"
-
-			when "fixed,tap,tap", "tap,tap,fixed", "tap,fixed,tap"
-				toTrigger.push "two:tap,fixed"
-				toTrigger.push "fixed,two:tap"
-
-			when "fixed,fixed,doubletap", "fixed,doubletap,fixed", "doubletap,fixed,fixed"
-				toTrigger.push "two:fixed,doubletap"
-				toTrigger.push "doubletap,two:fixed"
-
-			when "fixed,doubletap,doubletap", "doubletap,doubletap,fixed", "doubletap,fixed,doubletap"
-				toTrigger.push "two:doubletap,fixed"
-				toTrigger.push "fixed,two:doubletap"
 
 			when "fixed,fixed,drag", "fixed,drag,fixed", "drag,fixed,fixed"
 				type = ""
@@ -135,22 +112,10 @@ class Analyser
 					i++
 					type += "," if i < @fingers.length
 				toTrigger.push type
-				if fingers[0].params.dragDirection.contains("flick") or fingers[1].params.dragDirection.contains("flick") or fingers[2].params.dragDirection.contains("flick")
-					@stopAnalyze = true
-					switch dragIndex
-						when 0 
-							toTrigger.push "flick,fixed,fixed"
-							toTrigger.push "two:fixed,flick"
-						when 1 then toTrigger.push "fixed,flick,fixed"
-						when 2 then toTrigger.push "fixed,fixed,flick"
 				switch dragIndex
 					when 0 then toTrigger.push "drag,fixed,fixed"
 					when 1 then toTrigger.push "fixed,drag,fixed"
 					when 2 then toTrigger.push "fixed,fixed,drag"
-				toTrigger.push "two:fixed,drag"
-				toTrigger.push "drag,two:fixed"
-				toTrigger.push "two:fixed,#{fingers[dragIndex].params.dragDirection}"
-				toTrigger.push "#{fingers[dragIndex].params.dragDirection},two:fixed"
 
 			when "fixed,drag,drag", "drag,fixed,drag", "drag,drag,fixed"
 				type = ""
@@ -172,17 +137,12 @@ class Analyser
 				toTrigger.push "two:drag,fixed"
 				toTrigger.push "fixed,two:drag"
 			when "drag,drag,drag"
-				toTrigger.push @getDragDirection()
 				@triggerPinchOrSpread()
 				@triggerRotation()
-				toTrigger.push "drag,drag,drag"
-				toTrigger.push "three:drag"
-				if @fingers[0].params.dragDirection == @fingers[1].params.dragDirection == @fingers[2].params.dragDirection
-					toTrigger.push "three:#{@fingers[0].params.dragDirection}"
+				@triggerDragDirections()
 
 		@targetElement.trigger gestureName, @informations
-		@targetElement.trigger eventName, @informations	for eventName in toTrigger
-
+		@targetElement.trigger eventName, @informations	for eventName in toTrigger if toTrigger.length > 0
 	###----------------------------------------------------------------------------------------------------------------
 	## Four Finger Gesture
 	###
@@ -191,24 +151,16 @@ class Analyser
 		toTrigger = []
 		gestureName = "#{@fingers[0].gestureName},#{@fingers[1].gestureName},#{@fingers[2].gestureName},#{@fingers[3].gestureName}"
 		switch gestureName
-			when "tap,tap,tap,tap", "doubletap,doubletap,doubletap,doubletap", "fixed,fixed,fixed,fixed"
-				toTrigger.push "four:#{@fingers[0].gestureName}"
-
 			when "fixedend,fixedend,fixedend,fixedend"
 				toTrigger.push "press,press,press,press"
-				toTrigger.push "four:press"
 			
 			when "drag,drag,drag,drag"
-				toTrigger.push @getDragDirection()
 				@triggerPinchOrSpread()
 				@triggerRotation()
-				toTrigger.push "drag,drag,drag,drag"
-				toTrigger.push "four:drag"
-				if @fingers[0].params.dragDirection == @fingers[1].params.dragDirection == @fingers[2].params.dragDirection == @fingers[3].params.dragDirection
-					toTrigger.push "three:#{@fingers[0].params.dragDirection}"
-		
+				@triggerDragDirections()
+				
 		@targetElement.trigger gestureName, @informations
-		@targetElement.trigger eventName, @informations	for eventName in toTrigger
+		@targetElement.trigger eventName, @informations	for eventName in toTrigger if toTrigger.length > 0
 	###----------------------------------------------------------------------------------------------------------------
 	## Five Finger Gesture
 	###
@@ -217,31 +169,21 @@ class Analyser
 		toTrigger = []
 		gestureName = "#{@fingers[0].gestureName},#{@fingers[1].gestureName},#{@fingers[2].gestureName},#{@fingers[3].gestureName},#{@fingers[4].gestureName}"
 		switch gestureName
-			when "tap,tap,tap,tap,tap", "doubletap,doubletap,doubletap,doubletap,doubletap", "fixed,fixed,fixed,fixed,fixed"
-				toTrigger.push "five:{@fingers[0].gestureName}"
-
 			when "fixedend,fixedend,fixedend,fixedend,fixedend"
 				toTrigger.push "press,press,press,press,press"
-				toTrigger.push "five:press"
 				
 			when "drag,drag,drag,drag,drag"
-				toTrigger.push @getDragDirection()
 				@triggerPinchOrSpread()
 				@triggerRotation()
-				toTrigger.push "drag,drag,drag,drag,drag"
-				toTrigger.push "five:drag"
-
-				if @fingers[0].params.dragDirection == @fingers[1].params.dragDirection == @fingers[2].params.dragDirection == @fingers[3].params.dragDirection == @fingers[4].params.dragDirection
-					toTrigger.push "three:#{@fingers[0].params.dragDirection}"
+				@triggerDragDirections()
 
 		@targetElement.trigger gestureName, @informations
-		@targetElement.trigger eventName, @informations	for eventName in toTrigger
-
-
+		@targetElement.trigger eventName, @informations	for eventName in toTrigger if toTrigger.length > 0
+		
 	init: ->
 		## Sort fingers. Left to Right and Top to Bottom
 		@fingers = @fingers.sort (a,b) ->
-			if Math.abs(a.params.startX - b.params.startX) < 5
+			if Math.abs(a.params.startX - b.params.startX) < 15
 				return a.params.startY - b.params.startY
 			return a.params.startX - b.params.startX
 		@informations.global.nbFingers = @fingers.length
@@ -253,22 +195,39 @@ class Analyser
 				when 3 then @informations.fourth = @fingers[3].params
 				when 4 then @informations.fifth = @fingers[4].params
 		@firstAnalysis = false
-	
+		
+	triggerFlick: ->
+		finished = true
+		for finger in @fingers
+			if finger.gestureName == "dragend" then finished = false
+		if !finished
+			gestureName1 = []
+			gestureName2 = []
+			for finger in @fingers
+				if finger.isFlick
+					gestureName1 += "flick:#{finger.params.dragDirection}"
+					gestureName2 += "flick"
+				else
+					gestureName1 += finger.params.dragDirection
+					gestureName2 += finger.params.dragDirection
+			@targetElement.trigger gestureName1, @informations
+			@targetElement.trigger gestureName2, @informations
+
+	triggerDragDirections: ->
+		gestureName = []
+		for finger in @fingers
+			gestureName.push finger.params.dragDirection
+		if !gestureName.contains "unknown"
+			@targetElement.trigger gestureName, @informations
+		
 	triggerRotation: -> 
-		###
-		if !@initialRotation?
-			@initialRotation = Math.atan2(@fingers[1].params.y - @fingers[0].params.y, @fingers[1].params.x - @fingers[0].params.x)
-		@informations.global.rotation = @informations.global.rotation + Math.atan2(@fingers[1].params.y - @fingers[0].params.y, @fingers[1].params.x - @fingers[0].params.x) - @initialRotation
-		###
 		if !@lastRotation?
 			@lastRotation = @informations.global.rotation
-		if @informations.global.rotation > @lastRotation
-			@targetElement.trigger "rotation:cw", @informations
-		else
-			@targetElement.trigger "rotation:ccw", @informations
-		@targetElement.trigger "rotation", @informations
-
+		rotationDirection = ""
+		if @informations.global.rotation > @lastRotation then rotationDirection = "rotation:cw" else rotationDirection = "rotation:ccw"	
 		@lastRotation = @informations.global.rotation
+		@targetElement.trigger rotationDirection, @informations
+		@targetElement.trigger "rotation", @informations
 
 	triggerPinchOrSpread: ->
 		# The scale is already sent in the event Object
@@ -280,15 +239,6 @@ class Analyser
 		else if @informations.global.scale > 1
 			@targetElement.trigger "#{digit_name(@fingers.length)}:spread", @informations
 			@targetElement.trigger "spread", @informations
-
-	getDragDirection: ->
-		type = ""
-		i = 0
-		for finger in @fingers
-			i++
-			type += finger.params.dragDirection
-			type += "," if i < @fingers.length
-		return type
 
 	generateGrouppedFingerName: -> 
 		gestureName = [] 
@@ -336,7 +286,7 @@ class Analyser
 						when "down" 
 							gestures.dragDirection.down.n++
 							gestures.dragDirection.down.fingers.push finger
-						when "righ" 
+						when "right" 
 							gestures.dragDirection.right.n++
 							gestures.dragDirection.right.fingers.push finger
 						when "left" 
@@ -361,37 +311,10 @@ class Analyser
 				for gestureDirection of gestures[gesture]
 					if gestures[gesture][gestureDirection].n > 0
 						gestureNameDrag.push "#{digit_name(gestures[gesture][gestureDirection].n)}:#{gestureDirection}"
-		@targetElement.trigger gestureName, @informations
+#		$('debug').innerHTML = "--#{gestureName}<br />" + $('debug').innerHTML
+		@targetElement.trigger gestureName, @informations if gestureNameDrag.length > 0
 		@targetElement.trigger gestureNameDrag, @informations if gestureNameDrag.length > 0
-	
-	getCentroid: ->
-		sumX = sumY = 0
-		for finger in @fingers
-			sumX += finger.params.startX
-			sumY += finger.params.startY
-		centroid =
-			x: sumX / @fingers.length #/
-			y: sumY / @fingers.length #/
-		
-	
-	## Calculate the scale using centroid
-	calculateScale: ->
-		if !@informations.global.initialAverageDistanceToCentroid?
-			## Initial calculation
-			centroid = @getCentroid()
-			sumAverageDistance = 0
-			
-			for finger in @fingers
-				sumAverageDistance += distanceBetweenTwoPoints finger.params.startX, finger.params.startY, centroid.x, centroid.y
-			@informations.global.initialAverageDistanceToCentroid = sumAverageDistance / @fingers.length ##/
-		centroid = @getCentroid()
-		sumAverageDistance = 0
-		for finger in @fingers
-			sumAverageDistance += distanceBetweenTwoPoints finger.params.x, finger.params.y, centroid.x, centroid.y
-		averageDistance = sumAverageDistance / @fingers.length #/
-		@informations.global.centroid = centroid
-		scale = averageDistance / @informations.global.initialAverageDistanceToCentroid ##/
-		
+				
 window.onload = ->
 	$("blue").bind "all", (name, event) ->
-		$('debug').innerHTML = name + "<br />" + $('debug').innerHTML
+		$('debug').innerHTML = "#{name}<br />" + $('debug').innerHTML

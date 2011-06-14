@@ -50,6 +50,10 @@ $ = (element) ->
 
 String::contains = (it) ->
 	this.indexOf(it) != -1;
+Array::contains = (element) ->
+	for el in this
+		if (el == element) then return true
+	return false
 
 ####################### Misc          ####################### 
 `
@@ -64,7 +68,6 @@ function dump(arr) {
 			else
 				dumped_text += item + "=" + value + " ";
 		}
-
 	return dumped_text + "]";
 }
 function print_r(obj) {
