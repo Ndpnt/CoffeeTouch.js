@@ -1,7 +1,7 @@
 (function() {
   /*
-   The bind, unbind and trigger function have been taken from Backbone Framework.
-   The bind function has been changed
+   The unbind and trigger function have been taken from Backbone Framework. 
+   The onGesture function is inspired by the bind functon of Backbone Framework. 
   */  var $, Analyser, Drag, EventGrouper, EventRouter, FingerGesture, FirstTouch, Fixed, GenericState, NoTouch, StateMachine, digit_name, distanceBetweenTwoPoints, getDirection, getDragDirection;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -11,7 +11,7 @@
     child.__super__ = parent.prototype;
     return child;
   };
-  Element.prototype.bind = function(eventName, callback) {
+  Element.prototype.onGesture = function(eventName, callback) {
     var calls, list;
     if (!(this.router != null)) {
       this.router = new EventRouter(this);
@@ -21,7 +21,7 @@
     list.push(callback);
     return this;
   };
-  Element.prototype.unbind = function(ev, callback) {
+  Element.prototype.unbindGesture = function(ev, callback) {
     var calls, i, list, _i, _len;
     if (!ev) {
       this._callbacks = {};
@@ -44,23 +44,25 @@
     }
     return this;
   };
-  
-Element.prototype.trigger =  function(ev) {
-	  var list, calls, i, l;
-	  if (!(calls = this._callbacks)) return this;
-	  if (list = calls[ev]) {
-	    for (i = 0, l = list.length; i < l; i++) {
-	      list[i].apply(this, Array.prototype.slice.call(arguments, 1));
-	    }
-	  }
-	  if (list = calls['all']) {
-	    for (i = 0, l = list.length; i < l; i++) {
-	      list[i].apply(this, arguments);
-	    }
-	  }
-	  return this;
-	};
-;
+  Element.prototype.trigger = function(ev) {
+    var calls, i, list, _i, _j, _len, _len2;
+    if (!(calls = this._callbacks)) {
+      return this;
+    }
+    if (list = calls[ev]) {
+      for (_i = 0, _len = list.length; _i < _len; _i++) {
+        i = list[_i];
+        i.apply(this, Array.prototype.slice.call(arguments, 1));
+      }
+    }
+    if (list = calls['all']) {
+      for (_j = 0, _len2 = list.length; _j < _len2; _j++) {
+        i = list[_j];
+        i.apply(this, arguments);
+      }
+    }
+    return this;
+  };
   $ = function(element) {
     return document.getElementById(element);
   };
@@ -426,7 +428,6 @@ Object.merge = function(destination, source) {
       if (this.fingerCount < newCount) {
         this.fingerCount = newCount;
         this.analyser = new Analyser(this.fingerCount, element);
-        $("debug").innerHTML = ("new   " + this.fingerCount + "<br/>\n") + $("debug").innerHTML;
         _ref = Object.keys(this.fixedSave);
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -461,7 +462,6 @@ Object.merge = function(destination, source) {
           }
         }
       }
-      $("debug").innerHTML = ("Grouper.send   " + name + " " + eventObj.identifier + "<br/>\n") + $("debug").innerHTML;
       return this.analyser.notify(eventObj.identifier, name, eventObj);
     };
     return EventGrouper;
@@ -1027,7 +1027,7 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind("all", function(name, event) {
+    return $("blue").onGesture("all", function(name, event) {
       return $('debug').innerHTML = ("" + name + "<br />") + $('debug').innerHTML;
     });
   };

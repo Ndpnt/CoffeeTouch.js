@@ -11,7 +11,7 @@ Element::onGesture = (eventName, callback) ->
 	list.push callback
 	return this
 
-Element::unbind = (ev, callback) ->
+Element::unbindGesture = (ev, callback) ->
 	if !ev
 		@_callbacks = {}
 	else if calls = @_callbacks
@@ -27,23 +27,16 @@ Element::unbind = (ev, callback) ->
 					break
 	return this
 
-`
-Element.prototype.trigger =  function(ev) {
-	  var list, calls, i, l;
-	  if (!(calls = this._callbacks)) return this;
-	  if (list = calls[ev]) {
-	    for (i = 0, l = list.length; i < l; i++) {
-	      list[i].apply(this, Array.prototype.slice.call(arguments, 1));
-	    }
-	  }
-	  if (list = calls['all']) {
-	    for (i = 0, l = list.length; i < l; i++) {
-	      list[i].apply(this, arguments);
-	    }
-	  }
-	  return this;
-	};
-`
+Element::trigger = (ev) ->
+	if !(calls = @._callbacks) then return this
+	if list = calls[ev]
+		for i in list
+			i.apply(this, Array.prototype.slice.call(arguments, 1));
+
+	if list = calls['all']
+		for i in list
+			i.apply(this, arguments)
+	return this
 
 $ = (element) ->
 	document.getElementById element

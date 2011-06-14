@@ -311,7 +311,6 @@ class Analyser
 				for gestureDirection of gestures[gesture]
 					if gestures[gesture][gestureDirection].n > 0
 						gestureNameDrag.push "#{digit_name(gestures[gesture][gestureDirection].n)}:#{gestureDirection}"
-#		$('debug').innerHTML = "--#{gestureName}<br />" + $('debug').innerHTML
 		@targetElement.trigger gestureName, @informations if gestureNameDrag.length > 0
 		@targetElement.trigger gestureNameDrag, @informations if gestureNameDrag.length > 0
 				

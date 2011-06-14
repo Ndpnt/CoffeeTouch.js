@@ -70,7 +70,6 @@ class EventGrouper
 		if @fingerCount < newCount
 			@fingerCount = newCount
 			@analyser = new Analyser @fingerCount, element
-			$("debug").innerHTML = "new   #{@fingerCount}<br/>\n" + $("debug").innerHTML
 			@analyser.notify(@fixedSave[i].identifier, "fixed", @fixedSave[i]) for i in Object.keys(@fixedSave)	
 			
 
@@ -91,7 +90,5 @@ class EventGrouper
 		else if name =="fixedend"
 			for i in Object.keys(@fixedSave)
 				delete @fixedSave[i] if eventObj.identifier == parseInt(i)
-					
-		$("debug").innerHTML = "Grouper.send   #{name} #{eventObj.identifier}<br/>\n" + $("debug").innerHTML
 		@analyser.notify(eventObj.identifier, name, eventObj)
 	
