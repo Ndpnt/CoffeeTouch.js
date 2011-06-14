@@ -316,5 +316,5 @@ class Analyser
 		@targetElement.trigger gestureNameDrag, @informations if gestureNameDrag.length > 0
 				
 window.onload = ->
-	$("blue").bind "all", (name, event) ->
+	$("blue").onGesture "all", (name, event) ->
 		$('debug').innerHTML = "#{name}<br />" + $('debug').innerHTML

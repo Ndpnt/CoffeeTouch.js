@@ -5,7 +5,7 @@ window.onload = ->
 	yAngle = 0
 	zAngle = 0;
 
-	$('body').bind "flick:up", (params) ->
+	$('body').onGesture "flick:up", (params) ->
 		if (yAngle % 360) == 0
 			xAngle += 90
 			$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
@@ -21,7 +21,7 @@ window.onload = ->
 		
 		##$('debug').innerHTML = "Xangle: " + xAngle + "Yangle: " + yAngle + "Zangle: " + zAngle + "<br/>" + $('debug').innerHTML
 	
-	$('body').bind "flick:down", (params) ->
+	$('body').onGesture "flick:down", (params) ->
 		if (yAngle % 360) == 0
 			xAngle -= 90
 			$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
@@ -36,7 +36,7 @@ window.onload = ->
 			$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
 		##$('debug').innerHTML = "Xangle: " + xAngle + "Yangle: " + yAngle + "Zangle: " + zAngle + "<br/>" + $('debug').innerHTML
 	
-	$('body').bind "flick:left", (params) ->
+	$('body').onGesture "flick:left", (params) ->
 		if (xAngle % 360) == 0
 			yAngle -= 90
 			$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
@@ -51,7 +51,7 @@ window.onload = ->
 			$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
 		##$('debug').innerHTML = "Xangle: " + xAngle + "Yangle: " + yAngle + "Zangle: " + zAngle + "<br/>" + $('debug').innerHTML
 
-	$('body').bind "flick:right", (params) ->
+	$('body').onGesture "flick:right", (params) ->
 		if (xAngle % 360) == 0
 			yAngle += 90
 			$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
@@ -66,7 +66,7 @@ window.onload = ->
 			$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateZ(" + zAngle + "deg)"
 		##$('debug').innerHTML = "Xangle: " + xAngle + "Yangle: " + yAngle + "Zangle: " + zAngle + "<br/>" + $('debug').innerHTML
 	
-	$('body').bind "right", (params) ->
+	$('body').onGesture "right", (params) ->
 		if (xAngle % 360) == 0
 			yAngle += params.first.panX * 90 / window.innerWidth
 			$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
@@ -82,6 +82,6 @@ window.onload = ->
 		$('debug').innerHTML += params.first.x * 90 / window.innerWidth + " inner : " + window.innerWidth
 
 	###
-$('body').bind "all", (a, params) ->
+$('body').onGesture "all", (a, params) ->
 		$('debug').innerHTML = params.global.type
 ###

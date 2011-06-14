@@ -1,9 +1,9 @@
 ###
- The bind, unbind and trigger function have been taken from Backbone Framework.
- The bind function has been changed
+ The unbind and trigger function have been taken from Backbone Framework. 
+ The onGesture function is inspired by the bind functon of Backbone Framework. 
 ###
 
-Element::bind = (eventName, callback) ->
+Element::onGesture = (eventName, callback) ->
 	if !this.router?
 		this.router = new EventRouter this
 	calls = @_callbacks or @_callbacks = {}

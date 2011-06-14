@@ -7,9 +7,9 @@ window.onload = ->
 	ctx.lineCap = "round"
 	ctx.lineJoin = "round"
 	firsttime = true
-	$('canvas').bind "tap", (params) ->
+	$('canvas').onGesture "tap", (params) ->
 		SelectPoint(params.first.x, params.first.y)
-	$('canvas').bind "tap,tap", (params) ->
+	$('canvas').onGesture "tap,tap", (params) ->
 		p1 = {
 			x: params.first.x,
 			y: params.first.y
@@ -20,24 +20,24 @@ window.onload = ->
 		}
 		init(p1,p2)
 	
-	$('canvas').bind "drag", (params) ->
+	$('canvas').onGesture "drag", (params) ->
 		if firsttime
 			DragStart(params)
 			firsttime = false
 		else
 			Dragging(params)
 		
-	$('canvas').bind "doubletap", (params) ->
+	$('canvas').onGesture "doubletap", (params) ->
 		Add(params.first.x, params.first.y)
 		
-	$('canvas').bind "tap,tap,tap", (params) ->
+	$('canvas').onGesture "tap,tap,tap", (params) ->
 		Validate()
 	
-	$('canvas').bind "dragend", (params) ->
+	$('canvas').onGesture "dragend", (params) ->
 		firsttime = true
 		DragEnd(params)
 	
-	$('canvas').bind "all", (a, params) ->
+	$('canvas').onGesture "all", (a, params) ->
 		$('debug').innerHTML = a + "<br/>" + $('debug').innerHTML
 	
 	style = {}

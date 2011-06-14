@@ -2,14 +2,14 @@ window.onload = ->
 	$ = (element) ->
 		document.getElementById element
 	canvas = new window.Viewer($('canvas'));
-	$('canvas').bind "tap", (params) ->
+	$('canvas').onGesture "tap", (params) ->
 		canvas.displayPoint(params.first.x, params.first.y, "FF0000")
 		
-	$('canvas').bind "tap,tap", (params) ->
+	$('canvas').onGesture "tap,tap", (params) ->
 		
 		canvas.displayLine(params.first.x, params.first.y, params.second.x, params.second.y, "#0000AA")
 		
-	$('canvas').bind "tap,tap,tap", (params) ->
+	$('canvas').onGesture "tap,tap,tap", (params) ->
 		canvas.displayPoint(params.first.x, params.first.y, "#FF0000")
 		canvas.displayPoint(params.second.x, params.second.y, "#FF0000")
 		canvas.displayPoint(params.third.x, params.third.y, "#FF0000")
@@ -19,16 +19,16 @@ window.onload = ->
 
 
 	
-	$('canvas').bind "right", (params) ->
+	$('canvas').onGesture "right", (params) ->
 		draw(params)
 		
-	$('canvas').bind "left", (params) ->
+	$('canvas').onGesture "left", (params) ->
 		draw(params)
 		
-	$('canvas').bind "up", (params) ->
+	$('canvas').onGesture "up", (params) ->
 		draw(params)
 					
-	$('canvas').bind "down", (params) ->
+	$('canvas').onGesture "down", (params) ->
 		draw(params)
 
 	started = false
@@ -52,10 +52,10 @@ window.onload = ->
 			previousX = params.first.x
 			previousY = params.first.y
 	
-	$('canvas').bind "dragend", (params) ->
+	$('canvas').onGesture "dragend", (params) ->
 		started = false;		
 		context.closePath();
 
 
-	$('canvas').bind "all", (a, params) ->
+	$('canvas').onGesture "all", (a, params) ->
 		$('debug').innerHTML += a + "<br>"
