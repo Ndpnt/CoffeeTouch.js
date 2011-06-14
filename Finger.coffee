@@ -21,7 +21,7 @@ class FingerGesture
 		@params.panY = 0
 		@updatePosition(eventObj)
 		@params.speed = 0
-		@params.dragDirection = "unknownDirection"
+		@params.dragDirection = "unknown"
 		@isFlick = false
 
 	update: (@gestureName, eventObj) ->
