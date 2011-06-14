@@ -59,8 +59,8 @@ class Analyser
 		toTrigger = []
 		@generateGrouppedFingerName()
 		@informations.global.distance = distanceBetweenTwoPoints @fingers[0].params.x, @fingers[0].params.y, @fingers[1].params.x, @fingers[1].params.y
+		@triggerFixed()
 		switch gestureName
-						
 			when "fixedend,fixedend"
 				toTrigger.push "press,press"
 				
@@ -95,6 +95,7 @@ class Analyser
 		gestureName = "#{@fingers[0].gestureName},#{@fingers[1].gestureName},#{@fingers[2].gestureName}"
 		toTrigger = []
 		@generateGrouppedFingerName()
+		@triggerFixed()
 		switch gestureName
 
 			when "fixedend,fixedend,fixedend"
@@ -148,6 +149,7 @@ class Analyser
 	###
 	fourFingersGesture: ->
 		@generateGrouppedFingerName()
+		@triggerFixed()
 		toTrigger = []
 		gestureName = "#{@fingers[0].gestureName},#{@fingers[1].gestureName},#{@fingers[2].gestureName},#{@fingers[3].gestureName}"
 		switch gestureName
@@ -166,6 +168,7 @@ class Analyser
 	###
 	fiveFingersGesture: ->
 		@generateGrouppedFingerName()
+		@triggerFixed()
 		toTrigger = []
 		gestureName = "#{@fingers[0].gestureName},#{@fingers[1].gestureName},#{@fingers[2].gestureName},#{@fingers[3].gestureName},#{@fingers[4].gestureName}"
 		switch gestureName
@@ -196,6 +199,23 @@ class Analyser
 				when 4 then @informations.fifth = @fingers[4].params
 		@firstAnalysis = false
 		
+	triggerFixed: ->
+		finished = true
+		for finger in @fingers
+			if finger.gestureName == "fixed" then finished = false
+		if !finished
+			dontTrigger = false
+			gestureName = []
+			for finger in @fingers
+				if finger.params.dragDirection != "unknown"
+					dontTrigger = true
+				if finger.gestureName == "drag"
+					gestureName.push "#{finger.params.dragDirection}"
+				else
+					gestureName.push finger.params.dragDirection
+			if !dontTrigger
+				@targetElement.trigger gestureName, @informations
+			
 	triggerFlick: ->
 		finished = true
 		for finger in @fingers
@@ -203,15 +223,19 @@ class Analyser
 		if !finished
 			gestureName1 = []
 			gestureName2 = []
+			dontTrigger = false
 			for finger in @fingers
+				if finger.params.dragDirection != "unknown"
+					dontTrigger = true
 				if finger.isFlick
-					gestureName1 += "flick:#{finger.params.dragDirection}"
-					gestureName2 += "flick"
+					gestureName1.push "flick:#{finger.params.dragDirection}"
+					gestureName2.push "flick"
 				else
-					gestureName1 += finger.params.dragDirection
-					gestureName2 += finger.params.dragDirection
-			@targetElement.trigger gestureName1, @informations
-			@targetElement.trigger gestureName2, @informations
+					gestureName1.push finger.params.dragDirection
+					gestureName2.push finger.params.dragDirection
+			if !dontTrigger
+				@targetElement.trigger gestureName1, @informations
+				@targetElement.trigger gestureName2, @informations
 
 	triggerDragDirections: ->
 		gestureName = []
@@ -267,7 +291,7 @@ class Analyser
 				when "doubletap"
 					gestures.doubletap.n++
 					gestures.doubletap.fingers.push finger
-				when "fixed" 
+				when "fixed"
 					gestures.fixed.n++
 					gestures.fixed.fingers.push finger
 				when "fixedend"
@@ -315,5 +339,5 @@ class Analyser
 		@targetElement.trigger gestureNameDrag, @informations if gestureNameDrag.length > 0
 				
 window.onload = ->
-	$("blue").onGesture "drag", (event) ->
-		$('debug').innerHTML = "#{event.first.panX}<br />" + $('debug').innerHTML
+	$("blue").onGesture "all", (name, event) ->
+		$('debug').innerHTML = "#{name}<br />" + $('debug').innerHTML

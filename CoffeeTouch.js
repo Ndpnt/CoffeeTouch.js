@@ -613,6 +613,7 @@ Object.merge = function(destination, source) {
       toTrigger = [];
       this.generateGrouppedFingerName();
       this.informations.global.distance = distanceBetweenTwoPoints(this.fingers[0].params.x, this.fingers[0].params.y, this.fingers[1].params.x, this.fingers[1].params.y);
+      this.triggerFixed();
       switch (gestureName) {
         case "fixedend,fixedend":
           toTrigger.push("press,press");
@@ -661,6 +662,7 @@ Object.merge = function(destination, source) {
       gestureName = "" + this.fingers[0].gestureName + "," + this.fingers[1].gestureName + "," + this.fingers[2].gestureName;
       toTrigger = [];
       this.generateGrouppedFingerName();
+      this.triggerFixed();
       switch (gestureName) {
         case "fixedend,fixedend,fixedend":
           toTrigger.push("press,press,press");
@@ -750,6 +752,7 @@ Object.merge = function(destination, source) {
     Analyser.prototype.fourFingersGesture = function() {
       var eventName, gestureName, toTrigger, _i, _len, _results;
       this.generateGrouppedFingerName();
+      this.triggerFixed();
       toTrigger = [];
       gestureName = "" + this.fingers[0].gestureName + "," + this.fingers[1].gestureName + "," + this.fingers[2].gestureName + "," + this.fingers[3].gestureName;
       switch (gestureName) {
@@ -777,6 +780,7 @@ Object.merge = function(destination, source) {
     Analyser.prototype.fiveFingersGesture = function() {
       var eventName, gestureName, toTrigger, _i, _len, _results;
       this.generateGrouppedFingerName();
+      this.triggerFixed();
       toTrigger = [];
       gestureName = "" + this.fingers[0].gestureName + "," + this.fingers[1].gestureName + "," + this.fingers[2].gestureName + "," + this.fingers[3].gestureName + "," + this.fingers[4].gestureName;
       switch (gestureName) {
@@ -827,8 +831,38 @@ Object.merge = function(destination, source) {
       }
       return this.firstAnalysis = false;
     };
+    Analyser.prototype.triggerFixed = function() {
+      var dontTrigger, finger, finished, gestureName, _i, _j, _len, _len2, _ref, _ref2;
+      finished = true;
+      _ref = this.fingers;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        finger = _ref[_i];
+        if (finger.gestureName === "fixed") {
+          finished = false;
+        }
+      }
+      if (!finished) {
+        dontTrigger = false;
+        gestureName = [];
+        _ref2 = this.fingers;
+        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+          finger = _ref2[_j];
+          if (finger.params.dragDirection !== "unknown") {
+            dontTrigger = true;
+          }
+          if (finger.gestureName === "drag") {
+            gestureName.push("" + finger.params.dragDirection);
+          } else {
+            gestureName.push(finger.params.dragDirection);
+          }
+        }
+        if (!dontTrigger) {
+          return this.targetElement.trigger(gestureName, this.informations);
+        }
+      }
+    };
     Analyser.prototype.triggerFlick = function() {
-      var finger, finished, gestureName1, gestureName2, _i, _j, _len, _len2, _ref, _ref2;
+      var dontTrigger, finger, finished, gestureName1, gestureName2, _i, _j, _len, _len2, _ref, _ref2;
       finished = true;
       _ref = this.fingers;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -840,19 +874,25 @@ Object.merge = function(destination, source) {
       if (!finished) {
         gestureName1 = [];
         gestureName2 = [];
+        dontTrigger = false;
         _ref2 = this.fingers;
         for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
           finger = _ref2[_j];
+          if (finger.params.dragDirection !== "unknown") {
+            dontTrigger = true;
+          }
           if (finger.isFlick) {
-            gestureName1 += "flick:" + finger.params.dragDirection;
-            gestureName2 += "flick";
+            gestureName1.push("flick:" + finger.params.dragDirection);
+            gestureName2.push("flick");
           } else {
-            gestureName1 += finger.params.dragDirection;
-            gestureName2 += finger.params.dragDirection;
+            gestureName1.push(finger.params.dragDirection);
+            gestureName2.push(finger.params.dragDirection);
           }
         }
-        this.targetElement.trigger(gestureName1, this.informations);
-        return this.targetElement.trigger(gestureName2, this.informations);
+        if (!dontTrigger) {
+          this.targetElement.trigger(gestureName1, this.informations);
+          return this.targetElement.trigger(gestureName2, this.informations);
+        }
       }
     };
     Analyser.prototype.triggerDragDirections = function() {
@@ -1027,8 +1067,8 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").onGesture("drag", function(event) {
-      return $('debug').innerHTML = ("" + event.first.panX + "<br />") + $('debug').innerHTML;
+    return $("blue").onGesture("all", function(name, event) {
+      return $('debug').innerHTML = ("" + name + "<br />") + $('debug').innerHTML;
     });
   };
 }).call(this);
