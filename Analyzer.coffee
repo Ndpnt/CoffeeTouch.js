@@ -174,6 +174,7 @@ class Analyser
 			when "drag,drag,drag"
 				toTrigger.push @getDragDirection()
 				@triggerPinchOrSpread()
+				@triggerRotation()
 				toTrigger.push "drag,drag,drag"
 				toTrigger.push "three:drag"
 				if @fingers[0].params.dragDirection == @fingers[1].params.dragDirection == @fingers[2].params.dragDirection
@@ -200,6 +201,7 @@ class Analyser
 			when "drag,drag,drag,drag"
 				toTrigger.push @getDragDirection()
 				@triggerPinchOrSpread()
+				@triggerRotation()
 				toTrigger.push "drag,drag,drag,drag"
 				toTrigger.push "four:drag"
 				if @fingers[0].params.dragDirection == @fingers[1].params.dragDirection == @fingers[2].params.dragDirection == @fingers[3].params.dragDirection
@@ -225,6 +227,7 @@ class Analyser
 			when "drag,drag,drag,drag,drag"
 				toTrigger.push @getDragDirection()
 				@triggerPinchOrSpread()
+				@triggerRotation()
 				toTrigger.push "drag,drag,drag,drag,drag"
 				toTrigger.push "five:drag"
 
@@ -346,18 +349,18 @@ class Analyser
 				if gesture == "dragend"
 					for finger in gestures[gesture].fingers
 						if finger.isFlick
-							gestureName.push if gestures[gesture].n > 1 then "#{digit_name(gestures[gesture].n)}:flick" else "flick"
-							gestureNameDrag.push if gestures[gesture].n > 1 then "#{digit_name(gestures[gesture].n)}:flick:#{finger.params.dragDirection}" else "flick:#{finger.params.dragDirection}"
+							gestureName.push "#{digit_name(gestures[gesture].n)}:flick" 
+							gestureNameDrag.push "#{digit_name(gestures[gesture].n)}:flick:#{finger.params.dragDirection}"
 							break
 				## End Flick
 				else if gesture == "fixedend"
-					gestureName.push if gestures[gesture].n > 0 then "#{digit_name(gestures[gesture].n)}:press" else "press"
+					gestureName.push "#{digit_name(gestures[gesture].n)}:press"
 				else
-					gestureName.push if gestures[gesture].n > 0 then "#{digit_name(gestures[gesture].n)}:#{gesture}" else "#{gesture}"
+					gestureName.push "#{digit_name(gestures[gesture].n)}:#{gesture}"
 			if gesture == "dragDirection"
 				for gestureDirection of gestures[gesture]
 					if gestures[gesture][gestureDirection].n > 0
-						gestureNameDrag.push if gestures[gesture][gestureDirection].n > 1 then "#{digit_name(gestures[gesture][gestureDirection].n)}:#{gestureDirection}" else "#{gestureDirection}"
+						gestureNameDrag.push "#{digit_name(gestures[gesture][gestureDirection].n)}:#{gestureDirection}"
 		@targetElement.trigger gestureName, @informations
 		@targetElement.trigger gestureNameDrag, @informations if gestureNameDrag.length > 0
 	
@@ -367,8 +370,8 @@ class Analyser
 			sumX += finger.params.startX
 			sumY += finger.params.startY
 		centroid =
-			x: sumX / @fingers.length
-			y: sumY / @fingers.length
+			x: sumX / @fingers.length #/
+			y: sumY / @fingers.length #/
 		
 	
 	## Calculate the scale using centroid
@@ -390,5 +393,5 @@ class Analyser
 		scale = averageDistance / @informations.global.initialAverageDistanceToCentroid ##/
 		
 window.onload = ->
-	$("blue").bind "five:spread", (event) ->
-		$('debug').innerHTML = event.global.scale + "<br />" + $('debug').innerHTML
+	$("blue").bind "all", (name, event) ->
+		$('debug').innerHTML = name + "<br />" + $('debug').innerHTML

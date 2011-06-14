@@ -741,6 +741,7 @@ Object.merge = function(destination, source) {
         case "drag,drag,drag":
           toTrigger.push(this.getDragDirection());
           this.triggerPinchOrSpread();
+          this.triggerRotation();
           toTrigger.push("drag,drag,drag");
           toTrigger.push("three:drag");
           if ((this.fingers[0].params.dragDirection === (_ref3 = this.fingers[1].params.dragDirection) && _ref3 === this.fingers[2].params.dragDirection)) {
@@ -776,6 +777,7 @@ Object.merge = function(destination, source) {
         case "drag,drag,drag,drag":
           toTrigger.push(this.getDragDirection());
           this.triggerPinchOrSpread();
+          this.triggerRotation();
           toTrigger.push("drag,drag,drag,drag");
           toTrigger.push("four:drag");
           if (((this.fingers[0].params.dragDirection === (_ref2 = this.fingers[1].params.dragDirection) && _ref2 === (_ref = this.fingers[2].params.dragDirection)) && _ref === this.fingers[3].params.dragDirection)) {
@@ -811,6 +813,7 @@ Object.merge = function(destination, source) {
         case "drag,drag,drag,drag,drag":
           toTrigger.push(this.getDragDirection());
           this.triggerPinchOrSpread();
+          this.triggerRotation();
           toTrigger.push("drag,drag,drag,drag,drag");
           toTrigger.push("five:drag");
           if ((((this.fingers[0].params.dragDirection === (_ref3 = this.fingers[1].params.dragDirection) && _ref3 === (_ref2 = this.fingers[2].params.dragDirection)) && _ref2 === (_ref = this.fingers[3].params.dragDirection)) && _ref === this.fingers[4].params.dragDirection)) {
@@ -1001,21 +1004,21 @@ Object.merge = function(destination, source) {
             for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
               finger = _ref2[_j];
               if (finger.isFlick) {
-                gestureName.push(gestures[gesture].n > 1 ? "" + (digit_name(gestures[gesture].n)) + ":flick" : "flick");
-                gestureNameDrag.push(gestures[gesture].n > 1 ? "" + (digit_name(gestures[gesture].n)) + ":flick:" + finger.params.dragDirection : "flick:" + finger.params.dragDirection);
+                gestureName.push("" + (digit_name(gestures[gesture].n)) + ":flick");
+                gestureNameDrag.push("" + (digit_name(gestures[gesture].n)) + ":flick:" + finger.params.dragDirection);
                 break;
               }
             }
           } else if (gesture === "fixedend") {
-            gestureName.push(gestures[gesture].n > 0 ? "" + (digit_name(gestures[gesture].n)) + ":press" : "press");
+            gestureName.push("" + (digit_name(gestures[gesture].n)) + ":press");
           } else {
-            gestureName.push(gestures[gesture].n > 0 ? "" + (digit_name(gestures[gesture].n)) + ":" + gesture : "" + gesture);
+            gestureName.push("" + (digit_name(gestures[gesture].n)) + ":" + gesture);
           }
         }
         if (gesture === "dragDirection") {
           for (gestureDirection in gestures[gesture]) {
             if (gestures[gesture][gestureDirection].n > 0) {
-              gestureNameDrag.push(gestures[gesture][gestureDirection].n > 1 ? "" + (digit_name(gestures[gesture][gestureDirection].n)) + ":" + gestureDirection : "" + gestureDirection);
+              gestureNameDrag.push("" + (digit_name(gestures[gesture][gestureDirection].n)) + ":" + gestureDirection);
             }
           }
         }
@@ -1065,8 +1068,8 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind("five:spread", function(event) {
-      return $('debug').innerHTML = event.global.scale + "<br />" + $('debug').innerHTML;
+    return $("blue").bind("all", function(name, event) {
+      return $('debug').innerHTML = name + "<br />" + $('debug').innerHTML;
     });
   };
 }).call(this);
