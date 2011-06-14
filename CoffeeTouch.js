@@ -68,12 +68,16 @@ Element.prototype.trigger =  function(ev) {
     return this.indexOf(it) !== -1;
   };
   
-function dump(arr,level) {
+function dump(arr) {
 		var dumped_text = "["
 		for(var item in arr) {
 			var value = arr[item];
-			if(typeof(value)=='function') continue;
-			dumped_text += item + "=" + value + " ";
+			if(typeof(value)=='function')
+				continue;
+			else if(typeof(value)=='object')
+				dumped_text += dump(value);
+			else
+				dumped_text += item + "=" + value + " ";
 		}
 
 	return dumped_text + "]";
@@ -402,11 +406,25 @@ Object.merge = function(destination, source) {
   EventGrouper = (function() {
     function EventGrouper() {
       this.savedTap = {};
+      this.fixedSave = {};
+      this.fingerCount = 0;
     }
     EventGrouper.prototype.refreshFingerCount = function(newCount, element) {
-      if (this.fingerCount !== newCount) {
+      var i, _i, _len, _ref, _results;
+      if (newCount === 0) {
+        this.fingerCount = -1;
+      }
+      if (this.fingerCount < newCount) {
         this.fingerCount = newCount;
-        return this.analyser = new Analyser(this.fingerCount, element);
+        this.analyser = new Analyser(this.fingerCount, element);
+        $("debug").innerHTML = ("new   " + this.fingerCount + "<br/>\n") + $("debug").innerHTML;
+        _ref = Object.keys(this.fixedSave);
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          i = _ref[_i];
+          _results.push(this.analyser.notify(this.fixedSave[i].identifier, "fixed", this.fixedSave[i]));
+        }
+        return _results;
       }
     };
     EventGrouper.prototype.receive = function(name, eventObj, fingerCount, element) {
@@ -422,6 +440,19 @@ Object.merge = function(destination, source) {
       return this.send(name, eventObj);
     };
     EventGrouper.prototype.send = function(name, eventObj) {
+      var i, _i, _len, _ref;
+      if (name === "fixed") {
+        this.fixedSave[eventObj.identifier] = eventObj;
+      } else if (name === "fixedend") {
+        _ref = Object.keys(this.fixedSave);
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          i = _ref[_i];
+          if (eventObj.identifier === parseInt(i)) {
+            delete this.fixedSave[i];
+          }
+        }
+      }
+      $("debug").innerHTML = ("Grouper.send   " + name + " " + eventObj.identifier + "<br/>\n") + $("debug").innerHTML;
       return this.analyser.notify(eventObj.identifier, name, eventObj);
     };
     return EventGrouper;

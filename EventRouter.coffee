@@ -61,11 +61,18 @@ class EventRouter
 class EventGrouper
 	constructor: ->
 		@savedTap = {}
-	
-	refreshFingerCount: (newCount, element) ->
-		if @fingerCount != newCount
+		@fixedSave = {}
+		@fingerCount = 0
+		
+	refreshFingerCount: (newCount, element) -> #Initialize a new Analyzer, only if the number of fingers increase or is reset
+		@fingerCount = -1 if newCount == 0
+
+		if @fingerCount < newCount
 			@fingerCount = newCount
 			@analyser = new Analyser @fingerCount, element
+			$("debug").innerHTML = "new   #{@fingerCount}<br/>\n" + $("debug").innerHTML
+			@analyser.notify(@fixedSave[i].identifier, "fixed", @fixedSave[i]) for i in Object.keys(@fixedSave)	
+			
 
 	receive: (name, eventObj, fingerCount, element) ->
 		if name == "tap"
@@ -80,6 +87,11 @@ class EventGrouper
 		@send name, eventObj
 
 	send: (name, eventObj) ->
-		#$("debug").innerHTML = "Grouper.Send  #{name} #{@fingerCount} <br/>" + $("debug").innerHTML
+		if name == "fixed" then @fixedSave[eventObj.identifier] = eventObj
+		else if name =="fixedend"
+			for i in Object.keys(@fixedSave)
+				delete @fixedSave[i] if eventObj.identifier == parseInt(i)
+					
+		$("debug").innerHTML = "Grouper.send   #{name} #{eventObj.identifier}<br/>\n" + $("debug").innerHTML
 		@analyser.notify(eventObj.identifier, name, eventObj)
 	

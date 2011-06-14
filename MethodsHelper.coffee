@@ -53,12 +53,16 @@ String::contains = (it) ->
 
 ####################### Misc          ####################### 
 `
-function dump(arr,level) {
+function dump(arr) {
 		var dumped_text = "["
 		for(var item in arr) {
 			var value = arr[item];
-			if(typeof(value)=='function') continue;
-			dumped_text += item + "=" + value + " ";
+			if(typeof(value)=='function')
+				continue;
+			else if(typeof(value)=='object')
+				dumped_text += dump(value);
+			else
+				dumped_text += item + "=" + value + " ";
 		}
 
 	return dumped_text + "]";
