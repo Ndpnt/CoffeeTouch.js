@@ -222,7 +222,7 @@ class Analyser
 				toTrigger.push "press,press,press,press,press"
 				toTrigger.push "five:press"
 				
-			when "drag,drag,drag,drag,drag,drag"
+			when "drag,drag,drag,drag,drag"
 				toTrigger.push @getDragDirection()
 				@triggerPinchOrSpread()
 				toTrigger.push "drag,drag,drag,drag,drag"
@@ -351,15 +351,15 @@ class Analyser
 							break
 				## End Flick
 				else if gesture == "fixedend"
-					gestureName.push if gestures[gesture].n > 1 then "#{digit_name(gestures[gesture].n)}:press" else "press"
+					gestureName.push if gestures[gesture].n > 0 then "#{digit_name(gestures[gesture].n)}:press" else "press"
 				else
-					gestureName.push if gestures[gesture].n > 1 then "#{digit_name(gestures[gesture].n)}:#{gesture}" else "#{gesture}"
+					gestureName.push if gestures[gesture].n > 0 then "#{digit_name(gestures[gesture].n)}:#{gesture}" else "#{gesture}"
 			if gesture == "dragDirection"
 				for gestureDirection of gestures[gesture]
 					if gestures[gesture][gestureDirection].n > 0
 						gestureNameDrag.push if gestures[gesture][gestureDirection].n > 1 then "#{digit_name(gestures[gesture][gestureDirection].n)}:#{gestureDirection}" else "#{gestureDirection}"
 		@targetElement.trigger gestureName, @informations
-		@targetElement.trigger gestureNameDrag, @informations
+		@targetElement.trigger gestureNameDrag, @informations if gestureNameDrag.length > 0
 	
 	getCentroid: ->
 		sumX = sumY = 0
@@ -390,5 +390,5 @@ class Analyser
 		scale = averageDistance / @informations.global.initialAverageDistanceToCentroid ##/
 		
 window.onload = ->
-	$("blue").bind "drag", (event) ->
-		$('debug').innerHTML = event.first.speed + "<br />" + $('debug').innerHTML
+	$("blue").bind "five:spread", (event) ->
+		$('debug').innerHTML = event.global.scale + "<br />" + $('debug').innerHTML

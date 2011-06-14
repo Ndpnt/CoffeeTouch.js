@@ -196,7 +196,7 @@ Object.merge = function(destination, source) {
       _machine = this.machine;
       this.fixedtimer = setTimeout((function() {
         return _machine.setState(new Fixed(_machine));
-      }), 500);
+      }), 300);
       this.eventObj.initX = this.eventObj.clientX;
       return this.eventObj.initY = this.eventObj.clientY;
     };
@@ -808,7 +808,7 @@ Object.merge = function(destination, source) {
           toTrigger.push("press,press,press,press,press");
           toTrigger.push("five:press");
           break;
-        case "drag,drag,drag,drag,drag,drag":
+        case "drag,drag,drag,drag,drag":
           toTrigger.push(this.getDragDirection());
           this.triggerPinchOrSpread();
           toTrigger.push("drag,drag,drag,drag,drag");
@@ -1007,9 +1007,9 @@ Object.merge = function(destination, source) {
               }
             }
           } else if (gesture === "fixedend") {
-            gestureName.push(gestures[gesture].n > 1 ? "" + (digit_name(gestures[gesture].n)) + ":press" : "press");
+            gestureName.push(gestures[gesture].n > 0 ? "" + (digit_name(gestures[gesture].n)) + ":press" : "press");
           } else {
-            gestureName.push(gestures[gesture].n > 1 ? "" + (digit_name(gestures[gesture].n)) + ":" + gesture : "" + gesture);
+            gestureName.push(gestures[gesture].n > 0 ? "" + (digit_name(gestures[gesture].n)) + ":" + gesture : "" + gesture);
           }
         }
         if (gesture === "dragDirection") {
@@ -1021,7 +1021,9 @@ Object.merge = function(destination, source) {
         }
       }
       this.targetElement.trigger(gestureName, this.informations);
-      return this.targetElement.trigger(gestureNameDrag, this.informations);
+      if (gestureNameDrag.length > 0) {
+        return this.targetElement.trigger(gestureNameDrag, this.informations);
+      }
     };
     Analyser.prototype.getCentroid = function() {
       var centroid, finger, sumX, sumY, _i, _len, _ref;
@@ -1063,8 +1065,8 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").bind("drag", function(event) {
-      return $('debug').innerHTML = event.first.speed + "<br />" + $('debug').innerHTML;
+    return $("blue").bind("five:spread", function(event) {
+      return $('debug').innerHTML = event.global.scale + "<br />" + $('debug').innerHTML;
     });
   };
 }).call(this);

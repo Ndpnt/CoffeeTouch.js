@@ -43,7 +43,7 @@ class FirstTouch extends GenericState
 	description: -> "FirstTouch state"
 	init: ->
 		_machine = @machine
-		@fixedtimer = setTimeout (->(_machine.setState new Fixed _machine)), 500
+		@fixedtimer = setTimeout (->(_machine.setState new Fixed _machine)), 300
 		@eventObj.initX = @eventObj.clientX
 		@eventObj.initY = @eventObj.clientY
 		
