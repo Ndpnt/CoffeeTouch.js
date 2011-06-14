@@ -13,7 +13,11 @@ class EventRouter
 		event.preventDefault()
 		@fingerCount = event.touches.length
 		@grouper.refreshFingerCount @fingerCount, @element
-		for i in event.changedTouches
+
+		a = (z.identifier + " " for z in event.touches)
+		$('debug').innerHTML = a + $('debug').innerHTML + "<br/>\n" 
+
+		for i in event.changedTouches			
 			if !@machines[i.identifier]?
 				@addGlobal(event, i)
 				iMachine = new StateMachine i.identifier, this
@@ -74,6 +78,8 @@ class EventGrouper
 			
 
 	receive: (name, eventObj, fingerCount, element) ->
+		@send name, eventObj
+
 		if name == "tap"
 			if @savedTap[eventObj.identifier]? && ((new Date().getTime()) - @savedTap[eventObj.identifier].time) < 400
 				@send "doubletap", eventObj
@@ -83,7 +89,7 @@ class EventGrouper
 				@savedTap[eventObj.identifier].event = eventObj
 				@savedTap[eventObj.identifier].time = new Date().getTime()
 	
-		@send name, eventObj
+
 
 	send: (name, eventObj) ->
 		if name == "fixed" then @fixedSave[eventObj.identifier] = eventObj
