@@ -160,17 +160,10 @@ Object.merge = function(destination, source) {
     return StateMachine;
   })();
   GenericState = (function() {
-    GenericState.prototype.description = function() {
-      return "Generic state";
-    };
     GenericState.prototype.init = function() {};
     function GenericState(machine) {
       this.machine = machine;
-      if (this.machine.currentState != null) {
-        this.eventObj = this.machine.currentState.eventObj;
-      } else {
-        this.eventObj = {};
-      }
+      this.eventObj = this.machine.currentState != null ? this.machine.currentState.eventObj : {};
       this.init();
     }
     GenericState.prototype.apply = function(eventName, arg) {
@@ -190,9 +183,6 @@ Object.merge = function(destination, source) {
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
-    NoTouch.prototype.description = function() {
-      return "NoTouch state";
-    };
     NoTouch.prototype.touchstart = function() {
       return this.machine.setState(new FirstTouch(this.machine));
     };
@@ -203,9 +193,6 @@ Object.merge = function(destination, source) {
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
-    FirstTouch.prototype.description = function() {
-      return "FirstTouch state";
-    };
     FirstTouch.prototype.init = function() {
       var _machine;
       _machine = this.machine;
@@ -232,14 +219,12 @@ Object.merge = function(destination, source) {
     function Fixed() {
       Fixed.__super__.constructor.apply(this, arguments);
     }
-    Fixed.prototype.description = function() {
-      return "Fixed state";
-    };
     Fixed.prototype.init = function() {
       return this.notify("fixed");
     };
     Fixed.prototype.touchend = function() {
-      return this.notify("fixedend");
+      this.notify("fixedend");
+      return this.machine.setState(new NoTouch(this.machine));
     };
     return Fixed;
   })();
@@ -248,9 +233,6 @@ Object.merge = function(destination, source) {
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
-    Drag.prototype.description = function() {
-      return "Drag state";
-    };
     Drag.prototype.init = function() {
       var that;
       this.isTap = true;
@@ -350,10 +332,21 @@ Object.merge = function(destination, source) {
       });
     }
     EventRouter.prototype.touchstart = function(event) {
-      var i, iMachine, _i, _len, _ref, _results;
+      var a, i, iMachine, z, _i, _len, _ref, _results;
       event.preventDefault();
       this.fingerCount = event.touches.length;
       this.grouper.refreshFingerCount(this.fingerCount, this.element);
+      a = (function() {
+        var _i, _len, _ref, _results;
+        _ref = event.touches;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          z = _ref[_i];
+          _results.push(z.identifier + " ");
+        }
+        return _results;
+      })();
+      $('debug').innerHTML = a + $('debug').innerHTML + "<br/>\n";
       _ref = event.changedTouches;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -428,6 +421,7 @@ Object.merge = function(destination, source) {
       if (this.fingerCount < newCount) {
         this.fingerCount = newCount;
         this.analyser = new Analyser(this.fingerCount, element);
+        $('debug').innerHTML = ("/new " + this.fingerCount + "/\n") + $('debug').innerHTML;
         _ref = Object.keys(this.fixedSave);
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -438,16 +432,17 @@ Object.merge = function(destination, source) {
       }
     };
     EventGrouper.prototype.receive = function(name, eventObj, fingerCount, element) {
+      this.send(name, eventObj);
       if (name === "tap") {
         if ((this.savedTap[eventObj.identifier] != null) && ((new Date().getTime()) - this.savedTap[eventObj.identifier].time) < 400) {
-          this.send("doubletap", eventObj);
+          $('debug').innerHTML = "/doubletap/\n" + $('debug').innerHTML;
+          return this.send("doubletap", eventObj);
         } else {
           this.savedTap[eventObj.identifier] = {};
           this.savedTap[eventObj.identifier].event = eventObj;
-          this.savedTap[eventObj.identifier].time = new Date().getTime();
+          return this.savedTap[eventObj.identifier].time = new Date().getTime();
         }
       }
-      return this.send(name, eventObj);
     };
     EventGrouper.prototype.send = function(name, eventObj) {
       var i, _i, _len, _ref;
@@ -542,11 +537,13 @@ Object.merge = function(destination, source) {
     }
     Analyser.prototype.notify = function(fingerID, gestureName, eventObj) {
       this.eventObj = eventObj;
+      $('debug').innerHTML = ("/notify " + gestureName + "/\n") + $('debug').innerHTML;
       this.informations.global.rotation = this.eventObj.global.rotation;
       this.informations.global.scale = this.eventObj.global.scale;
       if (this.fingersArray[fingerID] != null) {
         this.fingersArray[fingerID].update(gestureName, this.eventObj);
       } else {
+        $('debug').innerHTML = "/newgesture/\n" + $('debug').innerHTML;
         this.fingersArray[fingerID] = new FingerGesture(fingerID, gestureName, this.eventObj);
         this.fingers.push(this.fingersArray[fingerID]);
       }

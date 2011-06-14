@@ -10,14 +10,12 @@ class StateMachine
 	
 
 class GenericState
-	description: -> "Generic state"
 	init: -> # Defined par les sous classes
+
 	constructor: (@machine) ->
-		if @machine.currentState?
-			@eventObj = @machine.currentState.eventObj
-		else
-			@eventObj = {}
+		@eventObj = if @machine.currentState? then @machine.currentState.eventObj else {}
 		this.init()
+
 	apply: (eventName, arg) ->
 		Object.merge(@eventObj, arg)
 		this[eventName]()	
@@ -27,20 +25,15 @@ class GenericState
 	touchend: -> #throw "undefined"
 
 	notify: (name) ->
-		@machine.router.broadcast(name, @eventObj)
-	
-
+		@machine.router.broadcast(name, @eventObj)	
 
 
 class NoTouch extends GenericState
-	description: -> "NoTouch state"
 	touchstart: ->
 		@machine.setState(new FirstTouch @machine)
-		
 
 
 class FirstTouch extends GenericState
-	description: -> "FirstTouch state"
 	init: ->
 		_machine = @machine
 		@fixedtimer = setTimeout (->(_machine.setState new Fixed _machine)), 300
@@ -59,16 +52,15 @@ class FirstTouch extends GenericState
 
 		
 class Fixed extends GenericState
-	description: -> "Fixed state"
 	init: ->
 		@notify "fixed"
 
 	touchend: ->
 		@notify "fixedend"
+		@machine.setState new NoTouch @machine
 
 
 class Drag extends GenericState
-	description: -> "Drag state"
 	init: ->
 		@isTap = true
 		@initialX = @eventObj.clientX
@@ -76,11 +68,14 @@ class Drag extends GenericState
 		@delta = 25
 		that = this		
 		setTimeout (->that.isTap = false), 75
+
 	touchmove: ->
 		@notify "drag"
+
 	touchend: ->
 		if @isTap && (Math.abs(@eventObj.clientX - @initialX) < @delta) && (Math.abs(@eventObj.clientY - @initialY) < @delta)
 			@notify "tap"
 		else
 			@notify "dragend"
+
 		@machine.setState(new NoTouch @machine)
