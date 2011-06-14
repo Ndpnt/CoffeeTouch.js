@@ -327,8 +327,8 @@ Object.merge = function(destination, source) {
     FingerGesture.prototype.updatePosition = function(eventObj) {
       this.params.x = eventObj.clientX;
       this.params.y = eventObj.clientY;
-      this.params.panX = Math.abs(this.params.startX - this.params.x);
-      return this.params.panY = Math.abs(this.params.startY - this.params.y);
+      this.params.panX = this.params.x - this.params.startX;
+      return this.params.panY = this.params.y - this.params.startY;
     };
     return FingerGesture;
   })();
@@ -874,13 +874,13 @@ Object.merge = function(destination, source) {
       }
       rotationDirection = "";
       if (this.informations.global.rotation > this.lastRotation) {
-        rotationDirection = "rotation:cw";
+        rotationDirection = "rotate:cw";
       } else {
-        rotationDirection = "rotation:ccw";
+        rotationDirection = "rotate:ccw";
       }
       this.lastRotation = this.informations.global.rotation;
       this.targetElement.trigger(rotationDirection, this.informations);
-      return this.targetElement.trigger("rotation", this.informations);
+      return this.targetElement.trigger("rotate", this.informations);
     };
     Analyser.prototype.triggerPinchOrSpread = function() {
       if (this.informations.global.scale < 1) {
@@ -1027,8 +1027,8 @@ Object.merge = function(destination, source) {
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").onGesture("all", function(name, event) {
-      return $('debug').innerHTML = ("" + name + "<br />") + $('debug').innerHTML;
+    return $("blue").onGesture("drag", function(event) {
+      return $('debug').innerHTML = ("" + event.first.panX + "<br />") + $('debug').innerHTML;
     });
   };
 }).call(this);

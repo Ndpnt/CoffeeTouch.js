@@ -224,10 +224,10 @@ class Analyser
 		if !@lastRotation?
 			@lastRotation = @informations.global.rotation
 		rotationDirection = ""
-		if @informations.global.rotation > @lastRotation then rotationDirection = "rotation:cw" else rotationDirection = "rotation:ccw"	
+		if @informations.global.rotation > @lastRotation then rotationDirection = "rotate:cw" else rotationDirection = "rotate:ccw"	
 		@lastRotation = @informations.global.rotation
 		@targetElement.trigger rotationDirection, @informations
-		@targetElement.trigger "rotation", @informations
+		@targetElement.trigger "rotate", @informations
 
 	triggerPinchOrSpread: ->
 		# The scale is already sent in the event Object
@@ -315,5 +315,5 @@ class Analyser
 		@targetElement.trigger gestureNameDrag, @informations if gestureNameDrag.length > 0
 				
 window.onload = ->
-	$("blue").onGesture "all", (name, event) ->
-		$('debug').innerHTML = "#{name}<br />" + $('debug').innerHTML
+	$("blue").onGesture "drag", (event) ->
+		$('debug').innerHTML = "#{event.first.panX}<br />" + $('debug').innerHTML
