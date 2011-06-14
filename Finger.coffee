@@ -45,5 +45,5 @@ class FingerGesture
 	updatePosition: (eventObj) ->
 		@params.x = eventObj.clientX
 		@params.y = eventObj.clientY
-		@params.panX = Math.abs(@params.startX - @params.x)
-		@params.panY = Math.abs(@params.startY - @params.y)
+		@params.panX = @params.x - @params.startX
+		@params.panY = @params.y - @params.startY
