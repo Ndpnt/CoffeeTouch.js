@@ -43,7 +43,7 @@
     $('canvas').bind("tap,tap,tap", function(params) {
       return validate();
     });
-    $('canvas').bind("dragEnd", function(params) {
+    $('canvas').bind("dragend", function(params) {
       firsttime = true;
       return dragEnd(params);
     });
@@ -135,7 +135,9 @@
       var i, _ref;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (i = 0, _ref = allPoint.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
-        allPoint[i].validate = true;
+        if (allPoint[i]) {
+          allPoint[i].validate = true;
+        }
         if (!(allPoint[i].group != null)) {
           allPoint[i].group = j;
         }
@@ -252,8 +254,10 @@
       dx = dy = 0;
       _results = [];
       for (value in allPoint) {
-        allPoint[value].p.selected = false;
-        allPoint[value].cp.selected = false;
+        if (allPoint[value].p) {
+          allPoint[value].p.selected = false;
+          allPoint[value].cp.selected = false;
+        }
         if (allPoint[value].validate === false) {
           if (allPoint[value].p) {
             dx = allPoint[value].p.x - e.x;

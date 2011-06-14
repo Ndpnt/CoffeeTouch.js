@@ -39,7 +39,7 @@ window.onload = ->
 	$('canvas').bind "tap,tap,tap", (params) ->
 		validate()
 	
-	$('canvas').bind "dragEnd", (params) ->
+	$('canvas').bind "dragend", (params) ->
 		firsttime = true
 		dragEnd(params)
 
@@ -118,7 +118,7 @@ window.onload = ->
 	validate = ->
 		ctx.clearRect(0, 0, canvas.width, canvas.height)
 		for i in [0..allPoint.length - 1]
-			allPoint[i].validate = true
+			allPoint[i].validate = true if allPoint[i]
 			if !allPoint[i].group?
 				allPoint[i].group = j
 		j++
@@ -217,9 +217,9 @@ window.onload = ->
 			y: y
 		dx = dy = 0
 		for value of allPoint
-			##if allPoint[value].p
-			allPoint[value].p.selected = false
-			allPoint[value].cp.selected = false
+			if allPoint[value].p
+				allPoint[value].p.selected = false
+				allPoint[value].cp.selected = false
 			if allPoint[value].validate == false
 				if allPoint[value].p
 					dx = allPoint[value].p.x - e.x
