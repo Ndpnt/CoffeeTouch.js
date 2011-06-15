@@ -18,7 +18,7 @@ class GenericState
 
 	apply: (eventName, arg) ->
 		Object.merge(@eventObj, arg)
-		this[eventName]()	
+		this[eventName]()
 
 	touchstart: -> #throw "undefined"
 	touchmove: -> #throw "undefined"
@@ -37,9 +37,7 @@ class FirstTouch extends GenericState
 	init: ->
 		_machine = @machine
 		@fixedtimer = setTimeout (->(_machine.setState new Fixed _machine)), 300
-		@eventObj.initX = @eventObj.clientX
-		@eventObj.initY = @eventObj.clientY
-		
+
 	touchend: ->
 		clearTimeout @fixedtimer
 		@notify "tap"

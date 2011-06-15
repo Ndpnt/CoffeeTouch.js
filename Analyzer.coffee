@@ -8,19 +8,19 @@ class Analyser
 		@informations.global = {} ## Informations corresponding to all fingers
 		date = new Date()
 		@informations.global.timeStart = date.getTime()
+
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
 	notify: (fingerID, gestureName, @eventObj) ->
 		@informations.global.rotation = @eventObj.global.rotation 
 		@informations.global.scale = @eventObj.global.scale
 		date = new Date()
-		@informations.global.timeElasped = date.getTime() - @informations.global.timeStart
-		
+		@informations.global.timeElasped = date.getTime() - @informations.global.timeStart		
+
 		if @fingersArray[fingerID]?
 			@fingersArray[fingerID].update gestureName, @eventObj
 		else
 			@fingersArray[fingerID] =  new FingerGesture(fingerID, gestureName, @eventObj)
 			@fingers.push @fingersArray[fingerID]
-		
 		## Analyse event only when it receives the information from each fingers of the gesture.
 		@analyse @totalNbFingers if _.size(@fingersArray) is @totalNbFingers
 	
@@ -97,8 +97,11 @@ class Analyser
 		rotationDirection = ""
 		if @informations.global.rotation > @lastRotation then rotationDirection = "rotate:cw" else rotationDirection = "rotate:ccw"	
 		@lastRotation = @informations.global.rotation
+		
 		@targetElement.trigger rotationDirection, @informations
 		@targetElement.trigger "rotate", @informations
+		@targetElement.trigger "#{digit_name(@fingers.length)}:#{rotationDirection}", @informations
+		@targetElement.trigger "#{digit_name(@fingers.length)}:rotate", @informations
 
 	triggerPinchOrSpread: ->
 		# The scale is already sent in the event Object

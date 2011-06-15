@@ -25,8 +25,7 @@ class EventRouter
 
 	touchend: (event) ->
 		event.preventDefault()
-		for iMKey in Object.keys(@machines)
-			iMKey = parseInt(iMKey)
+		for iMKey of @machines
 			exists = false			
 			for iTouch in event.touches
 				if iTouch.identifier == iMKey

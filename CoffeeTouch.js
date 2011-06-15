@@ -79,68 +79,15 @@
     }
     return false;
   };
-  
-function dump(arr) {
-		var dumped_text = "["
-		for(var item in arr) {
-			var value = arr[item];
-			if(typeof(value)=='function')
-				continue;
-			else if(typeof(value)=='object')
-				dumped_text += dump(value);
-			else
-				dumped_text += item + "=" + value + " ";
-		}
-	return dumped_text + "]";
-}
-function print_r(obj) {
-  win_print_r = window.open('about:blank', 'win_print_r');
-  win_print_r.document.write('<html><body>');
-  r_print_r(obj, win_print_r);
-  win_print_r.document.write('</body></html>');
- }
-
- function r_print_r(theObj, win_print_r) {
-  if(theObj.constructor == Array ||
-   theObj.constructor == Object){
-   if (win_print_r == null)
-    win_print_r = window.open('about:blank', 'win_print_r');
-   }
-   for(var p in theObj){
-    if(theObj[p].constructor == Array||
-     theObj[p].constructor == Object){
-     win_print_r.document.write("<li>["+p+"] =>"+typeof(theObj)+"</li>");
-     win_print_r.document.write("<ul>")
-     r_print_r(theObj[p], win_print_r);
-     win_print_r.document.write("</ul>")
-    } else {
-     win_print_r.document.write("<li>["+p+"] =>"+theObj[p]+"</li>");
-    }
-   }
-  win_print_r.document.write("</ul>")
- }
-
-
-Object.keys = function (object)
-{
-  var keys = [];
-  for(var i in object) if (object.hasOwnProperty(i))
-  {
-    keys.push(i);
-  }
-  return keys;
-}
-
-
-Object.merge = function(destination, source) {
-    for (var property in source) {
-        if (source.hasOwnProperty(property)) {
-            destination[property] = source[property];
-        }
+  Object.merge = function(destination, source) {
+    var property;
+    for (property in source) {
+      if (source.hasOwnProperty(property)) {
+        destination[property] = source[property];
+      }
     }
     return destination;
-}
-;
+  };
   StateMachine = (function() {
     function StateMachine(identifier, router) {
       this.identifier = identifier;
@@ -196,11 +143,9 @@ Object.merge = function(destination, source) {
     FirstTouch.prototype.init = function() {
       var _machine;
       _machine = this.machine;
-      this.fixedtimer = setTimeout((function() {
+      return this.fixedtimer = setTimeout((function() {
         return _machine.setState(new Fixed(_machine));
       }), 300);
-      this.eventObj.initX = this.eventObj.clientX;
-      return this.eventObj.initY = this.eventObj.clientY;
     };
     FirstTouch.prototype.touchend = function() {
       clearTimeout(this.fixedtimer);
@@ -355,16 +300,13 @@ Object.merge = function(destination, source) {
       return _results;
     };
     EventRouter.prototype.touchend = function(event) {
-      var exists, iMKey, iTouch, _i, _j, _len, _len2, _ref, _ref2;
+      var exists, iMKey, iTouch, _i, _len, _ref;
       event.preventDefault();
-      _ref = Object.keys(this.machines);
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        iMKey = _ref[_i];
-        iMKey = parseInt(iMKey);
+      for (iMKey in this.machines) {
         exists = false;
-        _ref2 = event.touches;
-        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-          iTouch = _ref2[_j];
+        _ref = event.touches;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          iTouch = _ref[_i];
           if (iTouch.identifier === iMKey) {
             exists = true;
           }
@@ -657,7 +599,9 @@ Object.merge = function(destination, source) {
       }
       this.lastRotation = this.informations.global.rotation;
       this.targetElement.trigger(rotationDirection, this.informations);
-      return this.targetElement.trigger("rotate", this.informations);
+      this.targetElement.trigger("rotate", this.informations);
+      this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":" + rotationDirection, this.informations);
+      return this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":rotate", this.informations);
     };
     Analyser.prototype.triggerPinchOrSpread = function() {
       if (this.informations.global.scale < 1.1) {
