@@ -5,17 +5,19 @@ class Analyser
 		@fingers = [] ## Array with all fingers		
 		@firstAnalysis = true ## To know if we have to init the informations which will be returned
 		@informations = {} ## All informations which will be send with the event gesture
-		@informations.global = {} ## Informations corresponding to all fingers
+		@informations = {} ## Informations corresponding to all fingers
+		@informations.fingers = []
+		@informations.firstTrigger = true
 		date = new Date()
 		@fingerArraySize = 0
-		@informations.global.timeStart = date.getTime()
+		@informations.timeStart = date.getTime()
 
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
 	notify: (fingerID, gestureName, @eventObj) ->
-		@informations.global.rotation = @eventObj.global.rotation 
-		@informations.global.scale = @eventObj.global.scale
+		@informations.rotation = @eventObj.global.rotation 
+		@informations.scale = @eventObj.global.scale
 		date = new Date()
-		@informations.global.timeElasped = date.getTime() - @informations.global.timeStart		
+		@informations.timeElasped = date.getTime() - @informations.timeStart		
 
 		if @fingersArray[fingerID]?
 			@fingersArray[fingerID].update gestureName, @eventObj
@@ -35,21 +37,17 @@ class Analyser
 		@generateGrouppedFingerName()
 		@triggerFixed()
 		@triggerFlick()
+		@informations.firstTrigger = false if @informations.firstTrigger
 		
 	init: ->
 		## Sort fingers. Left to Right and Top to Bottom
 		@fingers = @fingers.sort (a,b) ->
 			return a.params.startY - b.params.startY if Math.abs(a.params.startX - b.params.startX) < 15
 			return a.params.startX - b.params.startX
-		@informations.global.nbFingers = @fingers.length
+		@informations.nbFingers = @fingers.length
 		## For each finger, assigns to the information's event the information corresponding to this one.
 		for i in [0..@fingers.length - 1]
-			switch i
-				when 0 then @informations.first = @fingers[0].params
-				when 1 then @informations.second = @fingers[1].params
-				when 2 then @informations.third = @fingers[2].params
-				when 3 then @informations.fourth = @fingers[3].params
-				when 4 then @informations.fifth = @fingers[4].params
+			@informations.fingers[i] = @fingers[i].params
 		@firstAnalysis = false
 	
 	triggerDrag: -> 
@@ -95,10 +93,10 @@ class Analyser
 		
 	triggerRotation: -> 
 		if !@lastRotation?
-			@lastRotation = @informations.global.rotation
+			@lastRotation = @informations.rotation
 		rotationDirection = ""
-		if @informations.global.rotation > @lastRotation then rotationDirection = "rotate:cw" else rotationDirection = "rotate:ccw"	
-		@lastRotation = @informations.global.rotation
+		if @informations.rotation > @lastRotation then rotationDirection = "rotate:cw" else rotationDirection = "rotate:ccw"	
+		@lastRotation = @informations.rotation
 		
 		@targetElement.trigger rotationDirection, @informations
 		@targetElement.trigger "rotate", @informations
@@ -107,12 +105,12 @@ class Analyser
 
 	triggerPinchOrSpread: ->
 		# The scale is already sent in the event Object
-		# @informations.global.scale = @calculateScale()
+		# @informations.scale = @calculateScale()
 		## Spread and Pinch detection
-		if @informations.global.scale < 1.1
+		if @informations.scale < 1.1
 			@targetElement.trigger "#{digit_name(@fingers.length)}:pinch", @informations
 			@targetElement.trigger "pinch", @informations
-		else if @informations.global.scale > 1.1
+		else if @informations.scale > 1.1
 			@targetElement.trigger "#{digit_name(@fingers.length)}:spread", @informations
 			@targetElement.trigger "spread", @informations
 

@@ -449,18 +449,20 @@
       this.fingers = [];
       this.firstAnalysis = true;
       this.informations = {};
-      this.informations.global = {};
+      this.informations = {};
+      this.informations.fingers = [];
+      this.informations.firstTrigger = true;
       date = new Date();
       this.fingerArraySize = 0;
-      this.informations.global.timeStart = date.getTime();
+      this.informations.timeStart = date.getTime();
     }
     Analyser.prototype.notify = function(fingerID, gestureName, eventObj) {
       var date;
       this.eventObj = eventObj;
-      this.informations.global.rotation = this.eventObj.global.rotation;
-      this.informations.global.scale = this.eventObj.global.scale;
+      this.informations.rotation = this.eventObj.global.rotation;
+      this.informations.scale = this.eventObj.global.scale;
       date = new Date();
-      this.informations.global.timeElasped = date.getTime() - this.informations.global.timeStart;
+      this.informations.timeElasped = date.getTime() - this.informations.timeStart;
       if (this.fingersArray[fingerID] != null) {
         this.fingersArray[fingerID].update(gestureName, this.eventObj);
       } else {
@@ -487,7 +489,10 @@
       this.targetElement.trigger(this.gestureName, this.informations);
       this.generateGrouppedFingerName();
       this.triggerFixed();
-      return this.triggerFlick();
+      this.triggerFlick();
+      if (this.informations.firstTrigger) {
+        return this.informations.firstTrigger = false;
+      }
     };
     Analyser.prototype.init = function() {
       var i, _ref;
@@ -497,24 +502,9 @@
         }
         return a.params.startX - b.params.startX;
       });
-      this.informations.global.nbFingers = this.fingers.length;
+      this.informations.nbFingers = this.fingers.length;
       for (i = 0, _ref = this.fingers.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
-        switch (i) {
-          case 0:
-            this.informations.first = this.fingers[0].params;
-            break;
-          case 1:
-            this.informations.second = this.fingers[1].params;
-            break;
-          case 2:
-            this.informations.third = this.fingers[2].params;
-            break;
-          case 3:
-            this.informations.fourth = this.fingers[3].params;
-            break;
-          case 4:
-            this.informations.fifth = this.fingers[4].params;
-        }
+        this.informations.fingers[i] = this.fingers[i].params;
       }
       return this.firstAnalysis = false;
     };
@@ -591,25 +581,25 @@
     Analyser.prototype.triggerRotation = function() {
       var rotationDirection;
       if (!(this.lastRotation != null)) {
-        this.lastRotation = this.informations.global.rotation;
+        this.lastRotation = this.informations.rotation;
       }
       rotationDirection = "";
-      if (this.informations.global.rotation > this.lastRotation) {
+      if (this.informations.rotation > this.lastRotation) {
         rotationDirection = "rotate:cw";
       } else {
         rotationDirection = "rotate:ccw";
       }
-      this.lastRotation = this.informations.global.rotation;
+      this.lastRotation = this.informations.rotation;
       this.targetElement.trigger(rotationDirection, this.informations);
       this.targetElement.trigger("rotate", this.informations);
       this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":" + rotationDirection, this.informations);
       return this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":rotate", this.informations);
     };
     Analyser.prototype.triggerPinchOrSpread = function() {
-      if (this.informations.global.scale < 1.1) {
+      if (this.informations.scale < 1.1) {
         this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":pinch", this.informations);
         return this.targetElement.trigger("pinch", this.informations);
-      } else if (this.informations.global.scale > 1.1) {
+      } else if (this.informations.scale > 1.1) {
         this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":spread", this.informations);
         return this.targetElement.trigger("spread", this.informations);
       }
