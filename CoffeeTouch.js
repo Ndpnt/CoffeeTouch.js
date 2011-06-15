@@ -485,9 +485,9 @@
         finger = _ref[_i];
         this.gestureName.push(finger.gestureName);
       }
-      this.triggerDrag();
       this.targetElement.trigger(this.gestureName, this.informations);
       this.generateGrouppedFingerName();
+      this.triggerDrag();
       this.triggerFixed();
       this.triggerFlick();
       if (this.informations.firstTrigger) {
@@ -525,7 +525,7 @@
         _ref = this.fingers;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           finger = _ref[_i];
-          if (finger.gestureName === "drag" && finger.params.dragDirection === "unknown") {
+          if (finger.gestureName === "drag" && finger.params.dragDirection === "triggerDrag") {
             dontTrigger = true;
             break;
           }
@@ -700,8 +700,8 @@
     return Analyser;
   })();
   window.onload = function() {
-    return $("blue").onGesture("all", function(name, event) {
-      return $('debug').innerHTML = ("" + name + "<br />") + $('debug').innerHTML;
+    return $('blue').onGesture("three:flick:down", function(params) {
+      return alert("?");
     });
   };
 }).call(this);

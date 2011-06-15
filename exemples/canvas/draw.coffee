@@ -7,24 +7,24 @@ window.onload = ->
 	ctx.lineCap = "round"
 	ctx.lineJoin = "round"
 	firsttime = true
-	$('canvas').bind "tap", (params) ->
+	$('canvas').onGesture "tap", (params) ->
 		
 
 	$('canvas').onGesture "tap", (params) ->
-		selectPoint(params.first.x, params.first.y)
+		selectPoint(params.fingers[0].x, params.fingers[0].y)
 		ctx.fillStyle = "rgba(0,0,0,1)";
 		ctx.beginPath();
-		ctx.arc(params.first.x, params.first.y, 3, 0, Math.PI * 2,true);
+		ctx.arc(params.fingers[0].x, params.fingers[0].y, 3, 0, Math.PI * 2,true);
 		ctx.closePath();
 		ctx.fill();
 	$('canvas').onGesture "tap,tap", (params) ->
 		p1 = {
-			x: params.first.x,
-			y: params.first.y
+			x: params.fingers[0].x,
+			y: params.fingers[0].y
 		}
 		p2 = {
-			x: params.second.x,
-			y: params.second.y
+			x: params.fingers[1].x,
+			y: params.fingers[1].y
 		}
 		init(p1,p2)
 	
@@ -36,20 +36,19 @@ window.onload = ->
 			dragging(params)
 		
 	$('canvas').onGesture "doubletap", (params) ->
-		add(params.first.x, params.first.y)
+		add(params.fingers[0].x, params.fingers[0].y)
 		
 	$('canvas').onGesture "tap,tap,tap", (params) ->
 		validate()
 	
-	$('canvas').onGesture "dragend", (params) ->
-		firsttime = true
+	$('canvas').onGesture "tap", (params) ->
 		dragEnd(params)
 
-	$('canvas').bind "three:down", (params) ->
+	$('canvas').onGesture "three:flick:down", (params) ->
 		clear()
 	
-	$('canvas').onGesture "all", (a, params) ->
-		$('debug').innerHTML = a + "<br/>" + $('debug').innerHTML
+#	$('canvas').onGesture "all", (a, params) ->
+#		$('debug').innerHTML = a + "<br/>" + $('debug').innerHTML
 	
 	style = {}
 	allPoint = []
@@ -184,8 +183,8 @@ window.onload = ->
 
 	dragStart = (event) ->
 		e =
-			x: event.first.x
-			y: event.first.y
+			x: event.fingers[0].x
+			y: event.fingers[0].y
 		dx = dy = 0
 		for value of allPoint
 			if allPoint[value].validate == false
@@ -206,8 +205,8 @@ window.onload = ->
 	dragging = (event) ->
 		if drag?
 			e =
-				x: event.first.x
-				y: event.first.y
+				x: event.fingers[0].x
+				y: event.fingers[0].y
 			drag.x += e.x - dPoint.x
 			drag.y += e.y - dPoint.y
 			dPoint = e

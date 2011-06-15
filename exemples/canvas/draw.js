@@ -9,27 +9,28 @@
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     firsttime = true;
-    $('canvas').bind("tap", function(params) {
-      selectPoint(params.first.x, params.first.y);
+    $('canvas').onGesture("tap", function(params) {});
+    $('canvas').onGesture("tap", function(params) {
+      selectPoint(params.fingers[0].x, params.fingers[0].y);
       ctx.fillStyle = "rgba(0,0,0,1)";
       ctx.beginPath();
-      ctx.arc(params.first.x, params.first.y, 3, 0, Math.PI * 2, true);
+      ctx.arc(params.fingers[0].x, params.fingers[0].y, 3, 0, Math.PI * 2, true);
       ctx.closePath();
       return ctx.fill();
     });
-    $('canvas').bind("tap,tap", function(params) {
+    $('canvas').onGesture("tap,tap", function(params) {
       var p1, p2;
       p1 = {
-        x: params.first.x,
-        y: params.first.y
+        x: params.fingers[0].x,
+        y: params.fingers[0].y
       };
       p2 = {
-        x: params.second.x,
-        y: params.second.y
+        x: params.fingers[1].x,
+        y: params.fingers[1].y
       };
       return init(p1, p2);
     });
-    $('canvas').bind("drag", function(params) {
+    $('canvas').onGesture("drag", function(params) {
       if (firsttime) {
         dragStart(params);
         return firsttime = false;
@@ -37,21 +38,17 @@
         return dragging(params);
       }
     });
-    $('canvas').bind("doubletap", function(params) {
-      return add(params.first.x, params.first.y);
+    $('canvas').onGesture("doubletap", function(params) {
+      return add(params.fingers[0].x, params.fingers[0].y);
     });
-    $('canvas').bind("tap,tap,tap", function(params) {
+    $('canvas').onGesture("tap,tap,tap", function(params) {
       return validate();
     });
-    $('canvas').bind("dragend", function(params) {
-      firsttime = true;
+    $('canvas').onGesture("tap", function(params) {
       return dragEnd(params);
     });
-    $('canvas').bind("three:down", function(params) {
+    $('canvas').onGesture("three:flick:down", function(params) {
       return clear();
-    });
-    $('canvas').bind("all", function(a, params) {
-      return $('debug').innerHTML = a + "<br/>" + $('debug').innerHTML;
     });
     style = {};
     allPoint = [];
@@ -205,8 +202,8 @@
     dragStart = function(event) {
       var dcx, dcy, dx, dy, e, value, _results;
       e = {
-        x: event.first.x,
-        y: event.first.y
+        x: event.fingers[0].x,
+        y: event.fingers[0].y
       };
       dx = dy = 0;
       _results = [];
@@ -236,8 +233,8 @@
       var e;
       if (drag != null) {
         e = {
-          x: event.first.x,
-          y: event.first.y
+          x: event.fingers[0].x,
+          y: event.fingers[0].y
         };
         drag.x += e.x - dPoint.x;
         drag.y += e.y - dPoint.y;
