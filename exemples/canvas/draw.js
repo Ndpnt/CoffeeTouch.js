@@ -1,6 +1,6 @@
 (function() {
   window.onload = function() {
-    var $, add, allPoint, allvalidatePoint, canvas, clear, ctx, dPoint, drag, dragEnd, dragStart, dragging, drawCanvas, drawvalidatePoints, firsttime, init, j, point, selectPoint, style, validate;
+    var $, add, allPoint, allvalidatePoint, canvas, changeBlueColor, changeGreenColor, changeRadius, changeRadiusSelection, changeRedColor, clear, ctx, dPoint, drag, dragEnd, dragStart, dragging, drawCanvas, drawvalidatePoints, firsttime, init, j, point, selectPoint, style, validate;
     $ = function(element) {
       return document.getElementById(element);
     };
@@ -9,7 +9,6 @@
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     firsttime = true;
-    $('canvas').onGesture("tap", function(params) {});
     $('canvas').onGesture("tap", function(params) {
       selectPoint(params.fingers[0].x, params.fingers[0].y);
       ctx.fillStyle = "rgba(0,0,0,1)";
@@ -50,16 +49,39 @@
     $('canvas').onGesture("three:flick:down", function(params) {
       return clear();
     });
+    $('canvas').onGesture("two:spread", function(params) {
+      return changeRadiusSelection(params.global.scale);
+    });
+    $('canvas').onGesture("two:pinch", function(params) {
+      return changeRadiusSelection(params.global.scale);
+    });
+    $('canvas').onGesture("three:spread", function(params) {
+      return changeRadius(params.global.scale);
+    });
+    $('canvas').onGesture("three:pinch", function(params) {
+      return changeRadius(params.global.scale);
+    });
+    $('canvas').onGesture("three:drag", function(params) {
+      changeRedColor(params.first.panY);
+      changeGreenColor(params.second.panY);
+      changeBlueColor(params.third.panY);
+      return changeRedColor;
+    });
     style = {};
     allPoint = [];
     point = {};
     allvalidatePoint = [];
     dPoint = {};
     drag = null;
+    ({
+      red: 250,
+      green: 33,
+      blue: 33
+    });
     style = {
       curve: {
         width: 4,
-        color: "#333"
+        color: "rgb(" + this.red + "," + this.green + "," + this.blue + ")"
       },
       cpline: {
         width: 1,
@@ -125,6 +147,26 @@
         validate: false
       };
       allPoint.push(point);
+      return drawCanvas();
+    };
+    changeRadiusSelection = function(scale) {
+      style.point.radiusSelected *= scale;
+      return drawCanvas();
+    };
+    changeRadius = function(scale) {
+      style.point.radius *= scale;
+      return drawCanvas();
+    };
+    changeRedColor = function(panX) {
+      this.red = Math.min(panX, (panX > 255 ? 255 : panX));
+      return drawCanvas();
+    };
+    changeGreenColor = function(panX) {
+      this.green = Math.min(panX, (panX > 255 ? 255 : panX));
+      return drawCanvas();
+    };
+    changeBlueColor = function(panX) {
+      this.blue = Math.min(panX, (panX > 255 ? 255 : panX));
       return drawCanvas();
     };
     j = 0;
