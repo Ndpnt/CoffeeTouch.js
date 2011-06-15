@@ -63,9 +63,6 @@
     }
     return this;
   };
-  $ = function(element) {
-    return document.getElementById(element);
-  };
   String.prototype.contains = function(it) {
     return this.indexOf(it) !== -1;
   };
@@ -87,6 +84,9 @@
       }
     }
     return destination;
+  };
+  $ = function(element) {
+    return document.getElementById(element);
   };
   StateMachine = (function() {
     function StateMachine(identifier, router) {
@@ -451,6 +451,7 @@
       this.informations = {};
       this.informations.global = {};
       date = new Date();
+      this.fingerArraySize = 0;
       this.informations.global.timeStart = date.getTime();
     }
     Analyser.prototype.notify = function(fingerID, gestureName, eventObj) {
@@ -465,8 +466,9 @@
       } else {
         this.fingersArray[fingerID] = new FingerGesture(fingerID, gestureName, this.eventObj);
         this.fingers.push(this.fingersArray[fingerID]);
+        this.fingerArraySize++;
       }
-      if (_.size(this.fingersArray) === this.totalNbFingers) {
+      if (this.fingerArraySize === this.totalNbFingers) {
         return this.analyse(this.totalNbFingers);
       }
     };
@@ -680,6 +682,7 @@
             if (finger.isFlick) {
               gestureName.push("" + (digit_name(gestures[gesture].n)) + ":flick");
               gestureNameDrag.push("" + (digit_name(gestures[gesture].n)) + ":flick:" + finger.params.dragDirection);
+              triggerDrag = true;
               break;
             }
           }

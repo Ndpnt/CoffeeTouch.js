@@ -38,9 +38,6 @@ Element::trigger = (ev) ->
 			i.apply(this, arguments)
 	return this
 
-$ = (element) ->
-	document.getElementById element
-
 String::contains = (it) ->
 	this.indexOf(it) != -1;
 
@@ -53,3 +50,7 @@ Object.merge = (destination, source) ->
 	for property of source
 		destination[property] = source[property] if source.hasOwnProperty property
 	return destination
+
+# To be removed
+$ = (element) ->
+	document.getElementById element

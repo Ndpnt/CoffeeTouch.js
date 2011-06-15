@@ -7,6 +7,7 @@ class Analyser
 		@informations = {} ## All informations which will be send with the event gesture
 		@informations.global = {} ## Informations corresponding to all fingers
 		date = new Date()
+		@fingerArraySize = 0
 		@informations.global.timeStart = date.getTime()
 
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
@@ -21,8 +22,9 @@ class Analyser
 		else
 			@fingersArray[fingerID] =  new FingerGesture(fingerID, gestureName, @eventObj)
 			@fingers.push @fingersArray[fingerID]
+			@fingerArraySize++
 		## Analyse event only when it receives the information from each fingers of the gesture.
-		@analyse @totalNbFingers if _.size(@fingersArray) is @totalNbFingers
+		@analyse @totalNbFingers if @fingerArraySize is @totalNbFingers
 	
 	analyse: (nbFingers) ->
 		@init() if @firstAnalysis
@@ -156,6 +158,7 @@ class Analyser
 					if finger.isFlick
 						gestureName.push "#{digit_name(gestures[gesture].n)}:flick" 
 						gestureNameDrag.push "#{digit_name(gestures[gesture].n)}:flick:#{finger.params.dragDirection}"
+						triggerDrag = true
 						break
 			else if gesture == "dragDirection"
 				for gestureDirection of gestures[gesture]
