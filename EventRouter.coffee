@@ -15,8 +15,6 @@ class EventRouter
 		@grouper.refreshFingerCount @fingerCount, @element
 
 		a = (z.identifier + " " for z in event.touches)
-		$('debug').innerHTML = a + $('debug').innerHTML + "<br/>\n" 
-
 		for i in event.changedTouches			
 			if !@machines[i.identifier]?
 				@addGlobal(event, i)
@@ -27,8 +25,7 @@ class EventRouter
 
 	touchend: (event) ->
 		event.preventDefault()
-		for iMKey in Object.keys(@machines)
-			iMKey = parseInt(iMKey)
+		for iMKey of @machines
 			exists = false			
 			for iTouch in event.touches
 				if iTouch.identifier == iMKey

@@ -38,76 +38,19 @@ Element::trigger = (ev) ->
 			i.apply(this, arguments)
 	return this
 
-$ = (element) ->
-	document.getElementById element
-
 String::contains = (it) ->
 	this.indexOf(it) != -1;
+
 Array::contains = (element) ->
 	for el in this
 		if (el == element) then return true
 	return false
 
-####################### Misc          ####################### 
-`
-function dump(arr) {
-		var dumped_text = "["
-		for(var item in arr) {
-			var value = arr[item];
-			if(typeof(value)=='function')
-				continue;
-			else if(typeof(value)=='object')
-				dumped_text += dump(value);
-			else
-				dumped_text += item + "=" + value + " ";
-		}
-	return dumped_text + "]";
-}
-function print_r(obj) {
-  win_print_r = window.open('about:blank', 'win_print_r');
-  win_print_r.document.write('<html><body>');
-  r_print_r(obj, win_print_r);
-  win_print_r.document.write('</body></html>');
- }
+Object.merge = (destination, source) ->
+	for property of source
+		destination[property] = source[property] if source.hasOwnProperty property
+	return destination
 
- function r_print_r(theObj, win_print_r) {
-  if(theObj.constructor == Array ||
-   theObj.constructor == Object){
-   if (win_print_r == null)
-    win_print_r = window.open('about:blank', 'win_print_r');
-   }
-   for(var p in theObj){
-    if(theObj[p].constructor == Array||
-     theObj[p].constructor == Object){
-     win_print_r.document.write("<li>["+p+"] =>"+typeof(theObj)+"</li>");
-     win_print_r.document.write("<ul>")
-     r_print_r(theObj[p], win_print_r);
-     win_print_r.document.write("</ul>")
-    } else {
-     win_print_r.document.write("<li>["+p+"] =>"+theObj[p]+"</li>");
-    }
-   }
-  win_print_r.document.write("</ul>")
- }
-
-
-Object.keys = function (object)
-{
-  var keys = [];
-  for(var i in object) if (object.hasOwnProperty(i))
-  {
-    keys.push(i);
-  }
-  return keys;
-}
-
-
-Object.merge = function(destination, source) {
-    for (var property in source) {
-        if (source.hasOwnProperty(property)) {
-            destination[property] = source[property];
-        }
-    }
-    return destination;
-}
-`
+# To be removed
+$ = (element) ->
+	document.getElementById element
