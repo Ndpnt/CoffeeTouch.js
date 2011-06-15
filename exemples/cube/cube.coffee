@@ -23,7 +23,7 @@ window.onload = ->
 		$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
 	
 
-	$('body').onGesture "rotation", (params) ->
+	$('body').onGesture "rotate", (params) ->
 		zAngle = params.global.rotation
 		$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
 	

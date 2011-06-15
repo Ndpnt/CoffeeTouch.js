@@ -15,8 +15,6 @@ class EventRouter
 		@grouper.refreshFingerCount @fingerCount, @element
 
 		a = (z.identifier + " " for z in event.touches)
-		$('debug').innerHTML = a + $('debug').innerHTML + "<br/>\n" 
-
 		for i in event.changedTouches			
 			if !@machines[i.identifier]?
 				@addGlobal(event, i)

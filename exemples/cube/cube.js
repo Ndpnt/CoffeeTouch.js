@@ -23,7 +23,7 @@
       yAngle += 360;
       return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)";
     });
-    return $('body').onGesture("rotation", function(params) {
+    return $('body').onGesture("rotate", function(params) {
       zAngle = params.global.rotation;
       return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)";
     });

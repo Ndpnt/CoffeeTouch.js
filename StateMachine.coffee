@@ -67,7 +67,7 @@ class Drag extends GenericState
 		@initialY = @eventObj.clientY	
 		@delta = 25
 		that = this		
-		setTimeout (->that.isTap = false), 75
+		setTimeout (-> that.isTap = false), 150
 
 	touchmove: ->
 		@notify "drag"
