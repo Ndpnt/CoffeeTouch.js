@@ -1,6 +1,6 @@
 (function() {
   window.onload = function() {
-    var $, add, allPoint, allvalidatePoint, canvas, clear, ctx, dPoint, drag, dragEnd, dragStart, dragging, drawCanvas, drawvalidatePoints, firsttime, init, j, point, selectPoint, style, validate;
+    var $, add, allPoint, allvalidatePoint, canvas, changeBlueColor, changeGreenColor, changeRadius, changeRadiusSelection, changeRedColor, clear, ctx, dPoint, drag, dragEnd, dragStart, dragging, drawCanvas, drawvalidatePoints, firsttime, init, j, point, selectPoint, style, validate;
     $ = function(element) {
       return document.getElementById(element);
     };
@@ -9,7 +9,7 @@
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     firsttime = true;
-    $('canvas').bind("tap", function(params) {
+    $('canvas').onGesture("tap", function(params) {
       selectPoint(params.first.x, params.first.y);
       ctx.fillStyle = "rgba(0,0,0,1)";
       ctx.beginPath();
@@ -17,7 +17,7 @@
       ctx.closePath();
       return ctx.fill();
     });
-    $('canvas').bind("tap,tap", function(params) {
+    $('canvas').onGesture("tap,tap", function(params) {
       var p1, p2;
       p1 = {
         x: params.first.x,
@@ -29,7 +29,7 @@
       };
       return init(p1, p2);
     });
-    $('canvas').bind("drag", function(params) {
+    $('canvas').onGesture("drag", function(params) {
       if (firsttime) {
         dragStart(params);
         return firsttime = false;
@@ -37,21 +37,41 @@
         return dragging(params);
       }
     });
-    $('canvas').bind("doubletap", function(params) {
+    $('canvas').onGesture("doubletap", function(params) {
       return add(params.first.x, params.first.y);
     });
-    $('canvas').bind("tap,tap,tap", function(params) {
+    $('canvas').onGesture("tap,tap,tap", function(params) {
       return validate();
     });
-    $('canvas').bind("dragend", function(params) {
+    $('canvas').onGesture("dragend", function(params) {
       firsttime = true;
       return dragEnd(params);
     });
-    $('canvas').bind("three:down", function(params) {
-      return clear();
+    $('canvas').onGesture("three:down", function(params) {
+      if (params.global.firsTrigger) {
+        return clear();
+      }
     });
-    $('canvas').bind("all", function(a, params) {
+    $('canvas').onGesture("all", function(a, params) {
       return $('debug').innerHTML = a + "<br/>" + $('debug').innerHTML;
+    });
+    $('canvas').onGesture("two:spread", function(params) {
+      return changeRadiusSelection(params.global.scale);
+    });
+    $('canvas').onGesture("two:pinch", function(params) {
+      return changeRadiusSelection(params.global.scale);
+    });
+    $('canvas').onGesture("three:spread", function(params) {
+      return changeRadius(params.global.scale);
+    });
+    $('canvas').onGesture("three:pinch", function(params) {
+      return changeRadius(params.global.scale);
+    });
+    $('canvas').onGesture("three:drag", function(params) {
+      changeRedColor(params.first.panY);
+      changeGreenColor(params.second.panY);
+      changeBlueColor(params.third.panY);
+      return changeRedColor;
     });
     style = {};
     allPoint = [];
@@ -59,10 +79,15 @@
     allvalidatePoint = [];
     dPoint = {};
     drag = null;
+    ({
+      red: 250,
+      green: 33,
+      blue: 33
+    });
     style = {
       curve: {
         width: 4,
-        color: "#333"
+        color: "rgb(" + this.red + "," + this.green + "," + this.blue + ")"
       },
       cpline: {
         width: 1,
@@ -128,6 +153,26 @@
         validate: false
       };
       allPoint.push(point);
+      return drawCanvas();
+    };
+    changeRadiusSelection = function(scale) {
+      style.point.radiusSelected *= scale;
+      return drawCanvas();
+    };
+    changeRadius = function(scale) {
+      style.point.radius *= scale;
+      return drawCanvas();
+    };
+    changeRedColor = function(panX) {
+      this.red = Math.min(panX, (panX > 255 ? 255 : panX));
+      return drawCanvas();
+    };
+    changeGreenColor = function(panX) {
+      this.green = Math.min(panX, (panX > 255 ? 255 : panX));
+      return drawCanvas();
+    };
+    changeBlueColor = function(panX) {
+      this.blue = Math.min(panX, (panX > 255 ? 255 : panX));
       return drawCanvas();
     };
     j = 0;

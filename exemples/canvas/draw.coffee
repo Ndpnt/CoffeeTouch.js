@@ -7,9 +7,6 @@ window.onload = ->
 	ctx.lineCap = "round"
 	ctx.lineJoin = "round"
 	firsttime = true
-	$('canvas').bind "tap", (params) ->
-		
-
 	$('canvas').onGesture "tap", (params) ->
 		selectPoint(params.first.x, params.first.y)
 		ctx.fillStyle = "rgba(0,0,0,1)";
@@ -18,6 +15,7 @@ window.onload = ->
 		ctx.closePath();
 		ctx.fill();
 	$('canvas').onGesture "tap,tap", (params) ->
+
 		p1 = {
 			x: params.first.x,
 			y: params.first.y
@@ -45,22 +43,44 @@ window.onload = ->
 		firsttime = true
 		dragEnd(params)
 
-	$('canvas').bind "three:down", (params) ->
-		clear()
+	$('canvas').onGesture "three:down", (params) ->
+		clear() if params.global.firsTrigger
 	
 	$('canvas').onGesture "all", (a, params) ->
 		$('debug').innerHTML = a + "<br/>" + $('debug').innerHTML
 	
+	$('canvas').onGesture "two:spread", (params) ->
+		changeRadiusSelection params.global.scale
+
+	$('canvas').onGesture "two:pinch", (params) ->
+		changeRadiusSelection params.global.scale
+	
+	$('canvas').onGesture "three:spread", (params) ->
+		changeRadius params.global.scale
+
+	$('canvas').onGesture "three:pinch", (params) ->
+		changeRadius params.global.scale
+		
+	$('canvas').onGesture "three:drag", (params) ->
+		changeRedColor params.first.panY
+		changeGreenColor params.second.panY		
+		changeBlueColor params.third.panY
+	
+		changeRedColor
 	style = {}
 	allPoint = []
 	point = {}
 	allvalidatePoint = []
 	dPoint = {}
 	drag = null	
+	red: 250
+	green: 33
+	blue: 33
 	style =
 		curve:
 			width: 4
-			color: "#333"
+			color: "rgb(#{@red},#{@green},#{@blue})"
+			
 		cpline:
 			width: 1
 			color: "#C00"
@@ -115,6 +135,27 @@ window.onload = ->
 			validate: false
 		allPoint.push(point)
 		drawCanvas()
+	
+	changeRadiusSelection = (scale) ->
+		style.point.radiusSelected *= scale
+		drawCanvas()
+	
+	changeRadius = (scale) ->
+		style.point.radius *= scale
+		drawCanvas()
+		
+	changeRedColor = (panX) ->
+		@red = Math.min(panX, (if panX > 255 then 255 else panX))
+		drawCanvas()
+	
+	changeGreenColor = (panX) ->
+		@green = Math.min(panX, (if panX > 255 then 255 else panX))
+		drawCanvas()
+
+	changeBlueColor = (panX) ->
+		@blue = Math.min(panX, (if panX > 255 then 255 else panX))
+		drawCanvas()
+
 	
 	j = 0
 	validate = ->

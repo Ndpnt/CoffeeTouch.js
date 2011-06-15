@@ -5,13 +5,13 @@
       return document.getElementById(element);
     };
     canvas = new window.Viewer($('canvas'));
-    $('canvas').bind("tap", function(params) {
+    $('canvas').onGesture("tap", function(params) {
       return canvas.displayPoint(params.first.x, params.first.y, "FF0000");
     });
-    $('canvas').bind("tap,tap", function(params) {
+    $('canvas').onGesture("tap,tap", function(params) {
       return canvas.displayLine(params.first.x, params.first.y, params.second.x, params.second.y, "#0000AA");
     });
-    $('canvas').bind("tap,tap,tap", function(params) {
+    $('canvas').onGesture("tap,tap,tap", function(params) {
       canvas.displayPoint(params.first.x, params.first.y, "#FF0000");
       canvas.displayPoint(params.second.x, params.second.y, "#FF0000");
       canvas.displayPoint(params.third.x, params.third.y, "#FF0000");
@@ -19,16 +19,16 @@
       canvas.displayLine(params.second.x, params.second.y, params.third.x, params.third.y, "#0000AA");
       return canvas.displayLine(params.first.x, params.first.y, params.third.x, params.third.y, "#0000AA");
     });
-    $('canvas').bind("right", function(params) {
+    $('canvas').onGesture("right", function(params) {
       return draw(params);
     });
-    $('canvas').bind("left", function(params) {
+    $('canvas').onGesture("left", function(params) {
       return draw(params);
     });
-    $('canvas').bind("up", function(params) {
+    $('canvas').onGesture("up", function(params) {
       return draw(params);
     });
-    $('canvas').bind("down", function(params) {
+    $('canvas').onGesture("down", function(params) {
       return draw(params);
     });
     started = false;
@@ -52,11 +52,11 @@
         return previousY = params.first.y;
       }
     };
-    $('canvas').bind("dragend", function(params) {
+    $('canvas').onGesture("dragend", function(params) {
       started = false;
       return context.closePath();
     });
-    return $('canvas').bind("all", function(a, params) {
+    return $('canvas').onGesture("all", function(a, params) {
       return $('debug').innerHTML += a + "<br>";
     });
   };

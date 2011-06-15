@@ -179,20 +179,20 @@ Object.merge = function(destination, source) {
     return GenericState;
   })();
   NoTouch = (function() {
-    __extends(NoTouch, GenericState);
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(NoTouch, GenericState);
     NoTouch.prototype.touchstart = function() {
       return this.machine.setState(new FirstTouch(this.machine));
     };
     return NoTouch;
   })();
   FirstTouch = (function() {
-    __extends(FirstTouch, GenericState);
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(FirstTouch, GenericState);
     FirstTouch.prototype.init = function() {
       var _machine;
       _machine = this.machine;
@@ -215,10 +215,10 @@ Object.merge = function(destination, source) {
     return FirstTouch;
   })();
   Fixed = (function() {
-    __extends(Fixed, GenericState);
     function Fixed() {
       Fixed.__super__.constructor.apply(this, arguments);
     }
+    __extends(Fixed, GenericState);
     Fixed.prototype.init = function() {
       return this.notify("fixed");
     };
@@ -229,10 +229,10 @@ Object.merge = function(destination, source) {
     return Fixed;
   })();
   Drag = (function() {
-    __extends(Drag, GenericState);
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
+    __extends(Drag, GenericState);
     Drag.prototype.init = function() {
       var that;
       this.isTap = true;
@@ -421,7 +421,6 @@ Object.merge = function(destination, source) {
       if (this.fingerCount < newCount) {
         this.fingerCount = newCount;
         this.analyser = new Analyser(this.fingerCount, element);
-        $('debug').innerHTML = ("/new " + this.fingerCount + "/\n") + $('debug').innerHTML;
         _ref = Object.keys(this.fixedSave);
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -435,7 +434,6 @@ Object.merge = function(destination, source) {
       this.send(name, eventObj);
       if (name === "tap") {
         if ((this.savedTap[eventObj.identifier] != null) && ((new Date().getTime()) - this.savedTap[eventObj.identifier].time) < 400) {
-          $('debug').innerHTML = "/doubletap/\n" + $('debug').innerHTML;
           return this.send("doubletap", eventObj);
         } else {
           this.savedTap[eventObj.identifier] = {};
@@ -527,6 +525,7 @@ Object.merge = function(destination, source) {
   })();
   Analyser = (function() {
     function Analyser(totalNbFingers, targetElement) {
+      var date;
       this.totalNbFingers = totalNbFingers;
       this.targetElement = targetElement;
       this.fingersArray = {};
@@ -534,16 +533,19 @@ Object.merge = function(destination, source) {
       this.firstAnalysis = true;
       this.informations = {};
       this.informations.global = {};
+      date = new Date();
+      this.informations.global.timeStart = date.getTime();
     }
     Analyser.prototype.notify = function(fingerID, gestureName, eventObj) {
+      var date;
       this.eventObj = eventObj;
-      $('debug').innerHTML = ("/notify " + gestureName + "/\n") + $('debug').innerHTML;
       this.informations.global.rotation = this.eventObj.global.rotation;
       this.informations.global.scale = this.eventObj.global.scale;
+      date = new Date();
+      this.informations.global.timeElasped = date.getTime() - this.informations.global.timeStart;
       if (this.fingersArray[fingerID] != null) {
         this.fingersArray[fingerID].update(gestureName, this.eventObj);
       } else {
-        $('debug').innerHTML = "/newgesture/\n" + $('debug').innerHTML;
         this.fingersArray[fingerID] = new FingerGesture(fingerID, gestureName, this.eventObj);
         this.fingers.push(this.fingersArray[fingerID]);
       }
