@@ -50,21 +50,21 @@ window.onload = ->
 #		$('debug').innerHTML = a + "<br/>" + $('debug').innerHTML
 	
 	$('canvas').onGesture "two:spread", (params) ->
-		changeRadiusSelection params.global.scale
+		changeRadiusSelection params.scale
 
 	$('canvas').onGesture "two:pinch", (params) ->
-		changeRadiusSelection params.global.scale
+		changeRadiusSelection params.scale
 	
 	$('canvas').onGesture "three:spread", (params) ->
-		changeRadius params.global.scale
+		changeRadius params.scale
 
 	$('canvas').onGesture "three:pinch", (params) ->
-		changeRadius params.global.scale
+		changeRadius params.scale
 		
 	$('canvas').onGesture "three:drag", (params) ->
-		changeRedColor params.first.panY
-		changeGreenColor params.second.panY		
-		changeBlueColor params.third.panY
+		changeRedColor params.fingers[0].panY
+		changeGreenColor params.fingers[1].panY		
+		changeBlueColor params.fingers[2].panY
 	
 		changeRedColor
 	style = {}
@@ -162,7 +162,7 @@ window.onload = ->
 		ctx.clearRect(0, 0, canvas.width, canvas.height)
 		for i in [0..allPoint.length - 1]
 			allPoint[i].validate = true if allPoint[i]
-			if !allPoint[i].group?
+			if !allPoint[i].group
 				allPoint[i].group = j
 		j++
 		drawvalidatePoints()

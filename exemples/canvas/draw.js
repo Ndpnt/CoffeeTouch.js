@@ -50,21 +50,21 @@
       return clear();
     });
     $('canvas').onGesture("two:spread", function(params) {
-      return changeRadiusSelection(params.global.scale);
+      return changeRadiusSelection(params.scale);
     });
     $('canvas').onGesture("two:pinch", function(params) {
-      return changeRadiusSelection(params.global.scale);
+      return changeRadiusSelection(params.scale);
     });
     $('canvas').onGesture("three:spread", function(params) {
-      return changeRadius(params.global.scale);
+      return changeRadius(params.scale);
     });
     $('canvas').onGesture("three:pinch", function(params) {
-      return changeRadius(params.global.scale);
+      return changeRadius(params.scale);
     });
     $('canvas').onGesture("three:drag", function(params) {
-      changeRedColor(params.first.panY);
-      changeGreenColor(params.second.panY);
-      changeBlueColor(params.third.panY);
+      changeRedColor(params.fingers[0].panY);
+      changeGreenColor(params.fingers[1].panY);
+      changeBlueColor(params.fingers[2].panY);
       return changeRedColor;
     });
     style = {};
@@ -177,7 +177,7 @@
         if (allPoint[i]) {
           allPoint[i].validate = true;
         }
-        if (!(allPoint[i].group != null)) {
+        if (!allPoint[i].group !== "undefined") {
           allPoint[i].group = j;
         }
       }
