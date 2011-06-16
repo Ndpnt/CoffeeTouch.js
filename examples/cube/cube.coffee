@@ -3,7 +3,7 @@ window.onload = ->
 		document.getElementById element
 	xAngle = 0
 	yAngle = 0
-	zAngle = 0;
+	zAngle = 0
 
 	$('body').onGesture "flick:up", (params) ->
 		xAngle += 360
