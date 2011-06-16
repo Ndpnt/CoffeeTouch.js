@@ -52,12 +52,9 @@
         return previousY = params.first.y;
       }
     };
-    $('canvas').onGesture("dragend", function(params) {
+    return $('canvas').onGesture("dragend", function(params) {
       started = false;
       return context.closePath();
-    });
-    return $('canvas').onGesture("all", function(a, params) {
-      return $('debug').innerHTML += a + "<br>";
     });
   };
 }).call(this);
