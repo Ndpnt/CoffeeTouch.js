@@ -126,20 +126,20 @@
     return GenericState;
   })();
   NoTouch = (function() {
+    __extends(NoTouch, GenericState);
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
-    __extends(NoTouch, GenericState);
     NoTouch.prototype.touchstart = function() {
       return this.machine.setState(new FirstTouch(this.machine));
     };
     return NoTouch;
   })();
   FirstTouch = (function() {
+    __extends(FirstTouch, GenericState);
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
-    __extends(FirstTouch, GenericState);
     FirstTouch.prototype.init = function() {
       var _machine;
       _machine = this.machine;
@@ -160,10 +160,10 @@
     return FirstTouch;
   })();
   Fixed = (function() {
+    __extends(Fixed, GenericState);
     function Fixed() {
       Fixed.__super__.constructor.apply(this, arguments);
     }
-    __extends(Fixed, GenericState);
     Fixed.prototype.init = function() {
       return this.notify("fixed");
     };
@@ -174,10 +174,10 @@
     return Fixed;
   })();
   Drag = (function() {
+    __extends(Drag, GenericState);
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
-    __extends(Drag, GenericState);
     Drag.prototype.init = function() {
       var that;
       this.isTap = true;
@@ -505,6 +505,27 @@
         }
       }
     };
+    Analyser.prototype.triggerDragDirections = function() {
+      var finger, gestureName, _i, _len, _ref;
+      gestureName = [];
+      _ref = this.fingers;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        finger = _ref[_i];
+        gestureName.push(finger.params.dragDirection);
+      }
+      if (!gestureName.contains("unknown")) {
+        return this.targetElement.trigger(gestureName, this.informations);
+      }
+    };
+    Analyser.prototype.triggerPinchOrSpread = function() {
+      if (this.informations.scale < 1.1) {
+        this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":pinch", this.informations);
+        return this.targetElement.trigger("pinch", this.informations);
+      } else if (this.informations.scale > 1.1) {
+        this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":spread", this.informations);
+        return this.targetElement.trigger("spread", this.informations);
+      }
+    };
     Analyser.prototype.triggerFixed = function() {
       var dontTrigger, finger, gestureName, _i, _len, _ref;
       if (this.gestureName.length > 1 && this.gestureName.contains("fixed")) {
@@ -554,24 +575,6 @@
         }
       }
     };
-    Analyser.prototype.triggerDragDirections = function() {
-      var finger, gestureName, _i, _len, _ref;
-      gestureName = [];
-      _ref = this.fingers;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        finger = _ref[_i];
-        gestureName.push(finger.params.dragDirection);
-      }
-      if (!gestureName.contains("unknown")) {
-        return this.targetElement.trigger(gestureName, this.informations);
-      }
-    };
-    Analyser.prototype.calculateRotation = function() {
-      if (!this.initialRotation) {
-        this.initialRotation = Math.atan2(this.fingers[1].params.y - this.fingers[0].params.y, this.fingers[1].params.x - this.fingers[0].params.x);
-      }
-      return this.informations.rotation = this.informations.rotation + Math.atan2(this.fingers[1].params.y - this.fingers[0].params.y, this.fingers[1].params.x - this.fingers[0].params.x) - this.initialRotation;
-    };
     Analyser.prototype.triggerRotation = function() {
       var rotationDirection;
       if (!(this.lastRotation != null)) {
@@ -587,15 +590,6 @@
       this.targetElement.trigger("rotate", this.informations);
       this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":" + rotationDirection, this.informations);
       return this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":rotate", this.informations);
-    };
-    Analyser.prototype.triggerPinchOrSpread = function() {
-      if (this.informations.scale < 1.1) {
-        this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":pinch", this.informations);
-        return this.targetElement.trigger("pinch", this.informations);
-      } else if (this.informations.scale > 1.1) {
-        this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":spread", this.informations);
-        return this.targetElement.trigger("spread", this.informations);
-      }
     };
     Analyser.prototype.generateGrouppedFingerName = function() {
       var finger, gesture, gestureDirection, gestureName, gestureNameDrag, gestures, triggerDrag, _i, _j, _len, _len2, _ref, _ref2;
@@ -692,12 +686,4 @@
     };
     return Analyser;
   })();
-  window.onload = function() {
-    $('blue').onGesture("tap", function(params) {
-      return $('debug').innerHTML = "bite" + "<br/>" + $('debug').innerHTML;
-    });
-    return $('blue').onGesture("tap,tap", function(params) {
-      return $('debug').innerHTML = "biteuxxxx" + "<br/>" + $('debug').innerHTML;
-    });
-  };
 }).call(this);

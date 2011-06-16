@@ -1,4 +1,12 @@
-####################### State Machine ####################### 
+##	State Machine
+## 		Analyse all possible basic gesture of a single finger
+##
+##	Authors:
+##		Pierre Corsini (pcorsini@polytech.unice.fr)
+##		Nicolas Dupont (npg.dupont@gmail.com)
+##		Nicolas Fernandez (fernande@polytech.unice.fr)
+##		Nima Izadi (nim.izadi@gmail.com)
+
 class StateMachine
 	constructor: (@identifier, @router)-> 
 		@currentState = new NoTouch(this)
