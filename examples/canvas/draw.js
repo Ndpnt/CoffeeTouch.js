@@ -145,7 +145,7 @@
       return drawCanvas();
     };
     changeRadiusSelection = function(scale) {
-      var bool, i, _ref;
+      var bool, i, s, _ref;
       bool = false;
       for (i = 0, _ref = allPoint.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
         if (allPoint[i] && allPoint[i].selected === true) {
@@ -153,11 +153,20 @@
           break;
         }
       }
-      style.point.radiusSelected *= scale > 1 ? 1.1 : this.bool ? 0.9 : void 0;
+      if (this.bool) {
+        s = style.point.radiusSelected * (scale > 1 ? 1.1 : 0.9);
+      }
+      if ((0 < s && s < 100)) {
+        style.point.radiusSelected = s;
+      }
       return drawCanvas();
     };
     changeRadius = function(scale) {
-      style.point.radiusSelected *= scale > 1 ? 1.1 : 0.9;
+      var s;
+      s = style.point.radius * (scale > 1 ? 1.1 : 0.9);
+      if ((0 < s && s < 100)) {
+        style.point.radius = s;
+      }
       return drawCanvas();
     };
     j = 0;
