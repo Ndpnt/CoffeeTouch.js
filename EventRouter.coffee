@@ -14,7 +14,6 @@ class EventRouter
 		@fingerCount = event.touches.length
 		@grouper.refreshFingerCount @fingerCount, @element
 
-		a = (z.identifier + " " for z in event.touches)
 		for i in event.changedTouches	
 			if !@machines[i.identifier]
 				@addGlobal(event, i)
@@ -26,7 +25,8 @@ class EventRouter
 	touchend: (event) ->
 		event.preventDefault()
 		for iMKey of @machines
-			exists = false			
+			iMKey = parseInt(iMKey)
+			exists = false	
 			for iTouch in event.touches
 				if iTouch.identifier == iMKey
 					exists = true

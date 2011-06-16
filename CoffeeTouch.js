@@ -126,20 +126,20 @@
     return GenericState;
   })();
   NoTouch = (function() {
+    __extends(NoTouch, GenericState);
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
-    __extends(NoTouch, GenericState);
     NoTouch.prototype.touchstart = function() {
       return this.machine.setState(new FirstTouch(this.machine));
     };
     return NoTouch;
   })();
   FirstTouch = (function() {
+    __extends(FirstTouch, GenericState);
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
-    __extends(FirstTouch, GenericState);
     FirstTouch.prototype.init = function() {
       var _machine;
       _machine = this.machine;
@@ -160,10 +160,10 @@
     return FirstTouch;
   })();
   Fixed = (function() {
+    __extends(Fixed, GenericState);
     function Fixed() {
       Fixed.__super__.constructor.apply(this, arguments);
     }
-    __extends(Fixed, GenericState);
     Fixed.prototype.init = function() {
       return this.notify("fixed");
     };
@@ -174,10 +174,10 @@
     return Fixed;
   })();
   Drag = (function() {
+    __extends(Drag, GenericState);
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
-    __extends(Drag, GenericState);
     Drag.prototype.init = function() {
       var that;
       this.isTap = true;
@@ -278,20 +278,10 @@
       });
     }
     EventRouter.prototype.touchstart = function(event) {
-      var a, i, iMachine, z, _i, _len, _ref, _results;
+      var i, iMachine, _i, _len, _ref, _results;
       event.preventDefault();
       this.fingerCount = event.touches.length;
       this.grouper.refreshFingerCount(this.fingerCount, this.element);
-      a = (function() {
-        var _i, _len, _ref, _results;
-        _ref = event.touches;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          z = _ref[_i];
-          _results.push(z.identifier + " ");
-        }
-        return _results;
-      })();
       _ref = event.changedTouches;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -304,6 +294,7 @@
       var exists, iMKey, iTouch, _i, _len, _ref;
       event.preventDefault();
       for (iMKey in this.machines) {
+        iMKey = parseInt(iMKey);
         exists = false;
         _ref = event.touches;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {

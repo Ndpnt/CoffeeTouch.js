@@ -144,32 +144,7 @@
       return drawCanvas();
     };
     changeRadiusSelection = function(scale) {
-<<<<<<< HEAD
-      var _ref;
-      if ((20 < (_ref = style.point.radiusSelected * scale) && _ref < 60)) {
-        style.point.radiusSelected *= scale;
-        return drawCanvas();
-      }
-    };
-    changeRadius = function(scale) {
-      var _ref;
-      if ((20 < (_ref = style.point.radius * scale) && _ref < 60)) {
-        style.point.radius *= scale;
-        return drawCanvas();
-      }
-    };
-    changeRedColor = function(panX) {
-      this.red = Math.min(panX, (panX > 255 ? 255 : panX));
-      return drawCanvas();
-    };
-    changeGreenColor = function(panX) {
-      this.green = Math.min(panX, (panX > 255 ? 255 : panX));
-      return drawCanvas();
-    };
-    changeBlueColor = function(panX) {
-      this.blue = Math.min(panX, (panX > 255 ? 255 : panX));
-=======
-      var bool, i, _ref;
+      var bool, i, _ref, _ref2;
       bool = false;
       for (i = 0, _ref = allPoint.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
         if (allPoint[i].selected === true) {
@@ -177,13 +152,17 @@
           break;
         }
       }
-      style.point.radiusSelected *= scale > 1 ? 1.1 : this.bool ? 0.9 : void 0;
-      return drawCanvas();
+      if ((25 < (_ref2 = style.point.radiusSelected * scale) && _ref2 < 65)) {
+        style.point.radiusSelected *= scale > 1 ? 1.1 : this.bool ? 0.9 : void 0;
+        return drawCanvas();
+      }
     };
     changeRadius = function(scale) {
-      style.point.radiusSelected *= scale > 1 ? 1.1 : 0.9;
->>>>>>> f06fd8a510d75019feb91f2065bb66d3138318bd
-      return drawCanvas();
+      var _ref;
+      if ((25 < (_ref = style.point.radiusSelected * scale) && _ref < 65)) {
+        style.point.radiusSelected *= scale > 1 ? 1.1 : 0.9;
+        return drawCanvas();
+      }
     };
     j = 0;
     validate = function() {
