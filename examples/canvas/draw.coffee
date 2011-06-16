@@ -131,7 +131,7 @@ window.onload = ->
 	changeRadiusSelection = (scale) ->
 		bool = false
 		for i in [0..allPoint.length - 1]
-			if allPoint[i].selected == true
+			if allPoint[i] and allPoint[i].selected == true
 				@bool = true 
 				break
 		style.point.radiusSelected *= if scale > 1 then 1.1 else 0.9 if @bool
