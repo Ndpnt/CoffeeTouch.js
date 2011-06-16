@@ -72,7 +72,7 @@ class EventGrouper
 		if @fingerCount < newCount
 			@fingerCount = newCount
 			@analyser = new Analyser @fingerCount, element
-			@analyser.notify(@fixedSave[i].identifier, "fixed", @fixedSave[i]) for i in Object.keys(@fixedSave)	
+			@analyser.notify(@fixedSave[i].identifier, "fixed", @fixedSave[i]) for i of @fixedSave
 			
 
 	receive: (name, eventObj, fingerCount, element) ->
@@ -92,7 +92,7 @@ class EventGrouper
 	send: (name, eventObj) ->
 		if name == "fixed" then @fixedSave[eventObj.identifier] = eventObj
 		else if name =="fixedend"
-			for i in Object.keys(@fixedSave)
+			for i of @fixedSave
 				delete @fixedSave[i] if eventObj.identifier == parseInt(i)
 		@analyser.notify(eventObj.identifier, name, eventObj)
 	
