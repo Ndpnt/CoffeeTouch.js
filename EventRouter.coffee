@@ -15,8 +15,8 @@ class EventRouter
 		@grouper.refreshFingerCount @fingerCount, @element
 
 		a = (z.identifier + " " for z in event.touches)
-		for i in event.changedTouches			
-			if !@machines[i.identifier]?
+		for i in event.changedTouches	
+			if !@machines[i.identifier]
 				@addGlobal(event, i)
 				iMachine = new StateMachine i.identifier, this
 				iMachine.apply "touchstart", i
@@ -30,10 +30,11 @@ class EventRouter
 			for iTouch in event.touches
 				if iTouch.identifier == iMKey
 					exists = true
-
-			if !exists
+			if !exists and @machines[iMKey]?
 				@machines[iMKey].apply("touchend", @addGlobal(event, {}))
-				delete @machines[iMKey]	
+				delete @machines[iMKey]
+
+					
 		@fingerCount = event.touches.length
 		@grouper.refreshFingerCount @fingerCount, @element			
 

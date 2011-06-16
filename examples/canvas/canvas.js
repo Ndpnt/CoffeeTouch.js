@@ -8,7 +8,7 @@
     $('canvas').onGesture("tap", function(params) {
       return canvas.displayPoint(params.first.x, params.first.y, "FF0000");
     });
-    $('canvas').onGesture("tap,tap", function(params) {
+    $('canvas').onGesture("two:tap", function(params) {
       return canvas.displayLine(params.first.x, params.first.y, params.second.x, params.second.y, "#0000AA");
     });
     $('canvas').onGesture("tap,tap,tap", function(params) {
@@ -52,12 +52,9 @@
         return previousY = params.first.y;
       }
     };
-    $('canvas').onGesture("dragend", function(params) {
+    return $('canvas').onGesture("dragend", function(params) {
       started = false;
       return context.closePath();
-    });
-    return $('canvas').onGesture("all", function(a, params) {
-      return $('debug').innerHTML += a + "<br>";
     });
   };
 }).call(this);

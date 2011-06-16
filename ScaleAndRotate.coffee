@@ -27,7 +27,7 @@
 		@informations.global.centroid = centroid
 		scale = averageDistance / @informations.global.initialAverageDistanceToCentroid ##/
 
-calculateRotation: -> 
+	calculateRotation: -> 
 		if !@initialRotation?
 			@initialRotation = Math.atan2(@fingers[1].params.y - @fingers[0].params.y, @fingers[1].params.x - @fingers[0].params.x)
 		@informations.global.rotation = @informations.global.rotation + Math.atan2(@fingers[1].params.y - @fingers[0].params.y, @fingers[1].params.x - @fingers[0].params.x) - @initialRotation

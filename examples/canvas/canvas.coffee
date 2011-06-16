@@ -5,8 +5,7 @@ window.onload = ->
 	$('canvas').onGesture "tap", (params) ->
 		canvas.displayPoint(params.first.x, params.first.y, "FF0000")
 		
-	$('canvas').onGesture "tap,tap", (params) ->
-		
+	$('canvas').onGesture "two:tap", (params) ->
 		canvas.displayLine(params.first.x, params.first.y, params.second.x, params.second.y, "#0000AA")
 		
 	$('canvas').onGesture "tap,tap,tap", (params) ->

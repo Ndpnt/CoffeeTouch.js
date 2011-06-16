@@ -24,7 +24,7 @@
       return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)";
     });
     return $('body').onGesture("rotate", function(params) {
-      zAngle = params.global.rotation;
+      zAngle = params.rotation;
       return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)";
     });
   };

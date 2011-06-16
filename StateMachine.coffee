@@ -3,7 +3,9 @@ class StateMachine
 	constructor: (@identifier, @router)-> 
 		@currentState = new NoTouch(this)
 		@analyser = new Analyser
-	apply: (eventName, eventObj) -> @currentState.apply(eventName, eventObj)
+	apply: (eventName, eventObj) ->
+		@currentState.apply(eventName, eventObj)
+
 	setState: (newState) -> @currentState = newState
 	getState: -> @currentState
 	
@@ -63,7 +65,7 @@ class Drag extends GenericState
 		@isTap = true
 		@initialX = @eventObj.clientX
 		@initialY = @eventObj.clientY	
-		@delta = 25
+		@delta = 15
 		that = this		
 		setTimeout (-> that.isTap = false), 150
 
@@ -71,9 +73,8 @@ class Drag extends GenericState
 		@notify "drag"
 
 	touchend: ->
-		if @isTap && (Math.abs(@eventObj.clientX - @initialX) < @delta) && (Math.abs(@eventObj.clientY - @initialY) < @delta)
+		if @isTap and (Math.abs(@eventObj.clientX - @initialX) < @delta) && (Math.abs(@eventObj.clientY - @initialY) < @delta)
 			@notify "tap"
 		else
 			@notify "dragend"
-
 		@machine.setState(new NoTouch @machine)

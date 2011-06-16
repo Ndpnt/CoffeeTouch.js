@@ -183,7 +183,7 @@
       this.isTap = true;
       this.initialX = this.eventObj.clientX;
       this.initialY = this.eventObj.clientY;
-      this.delta = 25;
+      this.delta = 15;
       that = this;
       return setTimeout((function() {
         return that.isTap = false;
@@ -222,6 +222,7 @@
       this.params.timeElasped = 0;
       this.params.panX = 0;
       this.params.panY = 0;
+      this.params.gestureName = this.gestureName;
       this.updatePosition(eventObj);
       this.params.speed = 0;
       this.params.dragDirection = "unknown";
@@ -295,7 +296,7 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
-        _results.push(!(this.machines[i.identifier] != null) ? (this.addGlobal(event, i), iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine) : void 0);
+        _results.push(!this.machines[i.identifier] ? (this.addGlobal(event, i), iMachine = new StateMachine(i.identifier, this), iMachine.apply("touchstart", i), this.machines[i.identifier] = iMachine) : void 0);
       }
       return _results;
     };
@@ -311,7 +312,7 @@
             exists = true;
           }
         }
-        if (!exists) {
+        if (!exists && (this.machines[iMKey] != null)) {
           this.machines[iMKey].apply("touchend", this.addGlobal(event, {}));
           delete this.machines[iMKey];
         }
@@ -578,6 +579,12 @@
         return this.targetElement.trigger(gestureName, this.informations);
       }
     };
+    Analyser.prototype.calculateRotation = function() {
+      if (!this.initialRotation) {
+        this.initialRotation = Math.atan2(this.fingers[1].params.y - this.fingers[0].params.y, this.fingers[1].params.x - this.fingers[0].params.x);
+      }
+      return this.informations.rotation = this.informations.rotation + Math.atan2(this.fingers[1].params.y - this.fingers[0].params.y, this.fingers[1].params.x - this.fingers[0].params.x) - this.initialRotation;
+    };
     Analyser.prototype.triggerRotation = function() {
       var rotationDirection;
       if (!(this.lastRotation != null)) {
@@ -589,7 +596,6 @@
       } else {
         rotationDirection = "rotate:ccw";
       }
-      this.lastRotation = this.informations.rotation;
       this.targetElement.trigger(rotationDirection, this.informations);
       this.targetElement.trigger("rotate", this.informations);
       this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":" + rotationDirection, this.informations);

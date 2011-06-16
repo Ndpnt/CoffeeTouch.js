@@ -19,6 +19,7 @@ class FingerGesture
 		@params.timeElasped = 0
 		@params.panX = 0
 		@params.panY = 0
+		@params.gestureName = @gestureName
 		@updatePosition(eventObj)
 		@params.speed = 0
 		@params.dragDirection = "unknown"

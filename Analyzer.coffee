@@ -11,6 +11,7 @@ class Analyser
 		date = new Date()
 		@fingerArraySize = 0
 		@informations.timeStart = date.getTime()
+#		@informations.rotation = 0
 
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
 	notify: (fingerID, gestureName, @eventObj) ->
@@ -90,12 +91,19 @@ class Analyser
 		gestureName.push finger.params.dragDirection for finger in @fingers
 		@targetElement.trigger gestureName, @informations if !gestureName.contains "unknown"
 		
+	calculateRotation: -> 
+		if !@initialRotation
+			@initialRotation = Math.atan2(@fingers[1].params.y - @fingers[0].params.y, @fingers[1].params.x - @fingers[0].params.x)
+		@informations.rotation = @informations.rotation + Math.atan2(@fingers[1].params.y - @fingers[0].params.y, @fingers[1].params.x - @fingers[0].params.x) - @initialRotation
+
 	triggerRotation: -> 
+		#@calculateRotation()
 		if !@lastRotation?
 			@lastRotation = @informations.rotation
 		rotationDirection = ""
 		if @informations.rotation > @lastRotation then rotationDirection = "rotate:cw" else rotationDirection = "rotate:ccw"	
-		@lastRotation = @informations.rotation
+		#@lastRotation = @informations.rotation
+
 		
 		@targetElement.trigger rotationDirection, @informations
 		@targetElement.trigger "rotate", @informations

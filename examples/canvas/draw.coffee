@@ -73,7 +73,7 @@ window.onload = ->
 	allvalidatePoint = []
 	dPoint = {}
 	drag = null	
-	red: 250
+	red: 33
 	green: 33
 	blue: 33
 	style =
@@ -137,12 +137,14 @@ window.onload = ->
 		drawCanvas()
 	
 	changeRadiusSelection = (scale) ->
-		style.point.radiusSelected *= scale
-		drawCanvas()
+		if 20 < style.point.radiusSelected * scale < 60
+			style.point.radiusSelected *= scale
+			drawCanvas()
 	
 	changeRadius = (scale) ->
-		style.point.radius *= scale
-		drawCanvas()
+		if 20 < style.point.radius * scale < 60
+			style.point.radius *= scale
+			drawCanvas()
 		
 	changeRedColor = (panX) ->
 		@red = Math.min(panX, (if panX > 255 then 255 else panX))

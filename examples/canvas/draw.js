@@ -74,7 +74,7 @@
     dPoint = {};
     drag = null;
     ({
-      red: 250,
+      red: 33,
       green: 33,
       blue: 33
     });
@@ -150,12 +150,18 @@
       return drawCanvas();
     };
     changeRadiusSelection = function(scale) {
-      style.point.radiusSelected *= scale;
-      return drawCanvas();
+      var _ref;
+      if ((20 < (_ref = style.point.radiusSelected * scale) && _ref < 60)) {
+        style.point.radiusSelected *= scale;
+        return drawCanvas();
+      }
     };
     changeRadius = function(scale) {
-      style.point.radius *= scale;
-      return drawCanvas();
+      var _ref;
+      if ((20 < (_ref = style.point.radius * scale) && _ref < 60)) {
+        style.point.radius *= scale;
+        return drawCanvas();
+      }
     };
     changeRedColor = function(panX) {
       this.red = Math.min(panX, (panX > 255 ? 255 : panX));
@@ -177,7 +183,7 @@
         if (allPoint[i]) {
           allPoint[i].validate = true;
         }
-        if (!allPoint[i].group !== "undefined") {
+        if (!allPoint[i].group) {
           allPoint[i].group = j;
         }
       }
