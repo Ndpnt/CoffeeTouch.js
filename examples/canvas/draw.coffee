@@ -10,11 +10,12 @@ window.onload = ->
 
 	$('canvas').onGesture "tap", (params) ->
 		selectPoint(params.fingers[0].x, params.fingers[0].y)
-		ctx.fillStyle = "rgba(0,0,0,1)";
-		ctx.beginPath();
-		ctx.arc(params.fingers[0].x, params.fingers[0].y, 3, 0, Math.PI * 2,true);
-		ctx.closePath();
-		ctx.fill();
+		ctx.fillStyle = "rgba(0,0,0,1)"
+		ctx.beginPath()
+		ctx.arc(params.fingers[0].x, params.fingers[0].y, 3, 0, Math.PI * 2,true)
+		ctx.closePath()
+		ctx.fill()
+
 		
 	$('canvas').onGesture "tap,tap", (params) ->
 		p1 = {
@@ -31,8 +32,12 @@ window.onload = ->
 		if firsttime
 			dragStart(params)
 			firsttime = false
-		else
-			dragging(params)
+		else dragging(params)
+		
+		
+	$('canvas').onGesture "dragend", (params) ->
+		dragEnd(params)
+		firsttime = true
 		
 	$('canvas').onGesture "doubletap", (params) ->
 		add(params.fingers[0].x, params.fingers[0].y)
@@ -40,12 +45,8 @@ window.onload = ->
 	$('canvas').onGesture "tap,tap,tap", (params) ->
 		validate()
 	
-	$('canvas').onGesture "tap", (params) ->
-		dragEnd(params)
-
 	$('canvas').onGesture "three:flick:down", (params) ->
 		clear()
-
 	
 	$('canvas').onGesture "two:spread", (params) ->
 		changeRadiusSelection params.scale
