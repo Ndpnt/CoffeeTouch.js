@@ -8,21 +8,21 @@ window.onload = ->
 	ctx.lineJoin = "round"
 	firsttime = true
 	$('canvas').onGesture "tap", (params) ->
-		selectPoint(params.first.x, params.first.y)
+		selectPoint(params.fingers[0].x, params.fingers[0].y)
 		ctx.fillStyle = "rgba(0,0,0,1)";
 		ctx.beginPath();
-		ctx.arc(params.first.x, params.first.y, 3, 0, Math.PI * 2,true);
+		ctx.arc(params.fingers[0].x, params.fingers[0].y, 3, 0, Math.PI * 2,true);
 		ctx.closePath();
 		ctx.fill();
 	$('canvas').onGesture "tap,tap", (params) ->
 
 		p1 = {
-			x: params.first.x,
-			y: params.first.y
+			x: params.fingers[0].x,
+			y: params.fingers[0].y
 		}
 		p2 = {
-			x: params.second.x,
-			y: params.second.y
+			x: params.fingers[1].x,
+			y: params.fingers[1].y
 		}
 		init(p1,p2)
 	
@@ -34,7 +34,7 @@ window.onload = ->
 			dragging(params)
 		
 	$('canvas').onGesture "doubletap", (params) ->
-		add(params.first.x, params.first.y)
+		add(params.fingers[0].x, params.fingers[0].y)
 		
 	$('canvas').onGesture "tap,tap,tap", (params) ->
 		validate()
@@ -43,43 +43,39 @@ window.onload = ->
 		firsttime = true
 		dragEnd(params)
 
-	$('canvas').onGesture "three:down", (params) ->
-		clear() if params.global.firsTrigger
+	$('canvas').onGesture "three:flick:down", (params) ->
+		clear()
 	
+	###
 	$('canvas').onGesture "all", (a, params) ->
 		$('debug').innerHTML = a + "<br/>" + $('debug').innerHTML
+	###
 	
 	$('canvas').onGesture "two:spread", (params) ->
-		changeRadiusSelection params.global.scale
+		changeRadiusSelection params.scale
 
 	$('canvas').onGesture "two:pinch", (params) ->
-		changeRadiusSelection params.global.scale
+		changeRadiusSelection params.scale
 	
 	$('canvas').onGesture "three:spread", (params) ->
-		changeRadius params.global.scale
+		changeRadius params.scale
 
 	$('canvas').onGesture "three:pinch", (params) ->
-		changeRadius params.global.scale
-		
-	$('canvas').onGesture "three:drag", (params) ->
-		changeRedColor params.first.panY
-		changeGreenColor params.second.panY		
-		changeBlueColor params.third.panY
+		changeRadius params.scale
 	
-		changeRedColor
 	style = {}
 	allPoint = []
 	point = {}
 	allvalidatePoint = []
 	dPoint = {}
 	drag = null	
-	red: 250
+	red: 33
 	green: 33
 	blue: 33
 	style =
 		curve:
 			width: 4
-			color: "rgb(#{@red},#{@green},#{@blue})"
+			color: "#333"
 			
 		cpline:
 			width: 1
@@ -137,25 +133,17 @@ window.onload = ->
 		drawCanvas()
 	
 	changeRadiusSelection = (scale) ->
-		style.point.radiusSelected *= scale
+		bool = false
+		for i in [0..allPoint.length - 1]
+			if allPoint[i].selected == true
+				@bool = true 
+				break
+		style.point.radiusSelected *= if scale > 1 then 1.1 else 0.9 if @bool
 		drawCanvas()
 	
 	changeRadius = (scale) ->
-		style.point.radius *= scale
+		style.point.radiusSelected *= if scale > 1 then 1.1 else 0.9
 		drawCanvas()
-		
-	changeRedColor = (panX) ->
-		@red = Math.min(panX, (if panX > 255 then 255 else panX))
-		drawCanvas()
-	
-	changeGreenColor = (panX) ->
-		@green = Math.min(panX, (if panX > 255 then 255 else panX))
-		drawCanvas()
-
-	changeBlueColor = (panX) ->
-		@blue = Math.min(panX, (if panX > 255 then 255 else panX))
-		drawCanvas()
-
 	
 	j = 0
 	validate = ->
@@ -225,8 +213,8 @@ window.onload = ->
 
 	dragStart = (event) ->
 		e =
-			x: event.first.x
-			y: event.first.y
+			x: event.fingers[0].x
+			y: event.fingers[0].y
 		dx = dy = 0
 		for value of allPoint
 			if allPoint[value].validate == false
@@ -247,8 +235,8 @@ window.onload = ->
 	dragging = (event) ->
 		if drag?
 			e =
-				x: event.first.x
-				y: event.first.y
+				x: event.fingers[0].x
+				y: event.fingers[0].y
 			drag.x += e.x - dPoint.x
 			drag.y += e.y - dPoint.y
 			dPoint = e

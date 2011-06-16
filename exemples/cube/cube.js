@@ -8,7 +8,7 @@
     yAngle = 0;
     zAngle = 0;
     $('body').onGesture("flick:up", function(params) {
-      xAngle += 360;
+      xAngle += 160;
       return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)";
     });
     $('body').onGesture("flick:down", function(params) {
