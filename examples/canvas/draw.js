@@ -144,25 +144,20 @@
       return drawCanvas();
     };
     changeRadiusSelection = function(scale) {
-      var bool, i, _ref, _ref2;
+      var bool, i, _ref;
       bool = false;
       for (i = 0, _ref = allPoint.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
-        if (allPoint[i].selected === true) {
+        if (allPoint[i] && allPoint[i].selected === true) {
           this.bool = true;
           break;
         }
       }
-      if ((25 < (_ref2 = style.point.radiusSelected * scale) && _ref2 < 65)) {
-        style.point.radiusSelected *= scale > 1 ? 1.1 : this.bool ? 0.9 : void 0;
-        return drawCanvas();
-      }
+      style.point.radiusSelected *= scale > 1 ? 1.1 : this.bool ? 0.9 : void 0;
+      return drawCanvas();
     };
     changeRadius = function(scale) {
-      var _ref;
-      if ((25 < (_ref = style.point.radiusSelected * scale) && _ref < 65)) {
-        style.point.radiusSelected *= scale > 1 ? 1.1 : 0.9;
-        return drawCanvas();
-      }
+      style.point.radiusSelected *= scale > 1 ? 1.1 : 0.9;
+      return drawCanvas();
     };
     j = 0;
     validate = function() {

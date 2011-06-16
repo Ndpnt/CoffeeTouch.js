@@ -347,17 +347,15 @@
       this.fingerCount = 0;
     }
     EventGrouper.prototype.refreshFingerCount = function(newCount, element) {
-      var i, _i, _len, _ref, _results;
+      var i, _results;
       if (newCount === 0) {
         this.fingerCount = -1;
       }
       if (this.fingerCount < newCount) {
         this.fingerCount = newCount;
         this.analyser = new Analyser(this.fingerCount, element);
-        _ref = Object.keys(this.fixedSave);
         _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          i = _ref[_i];
+        for (i in this.fixedSave) {
           _results.push(this.analyser.notify(this.fixedSave[i].identifier, "fixed", this.fixedSave[i]));
         }
         return _results;
@@ -376,13 +374,11 @@
       }
     };
     EventGrouper.prototype.send = function(name, eventObj) {
-      var i, _i, _len, _ref;
+      var i;
       if (name === "fixed") {
         this.fixedSave[eventObj.identifier] = eventObj;
       } else if (name === "fixedend") {
-        _ref = Object.keys(this.fixedSave);
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          i = _ref[_i];
+        for (i in this.fixedSave) {
           if (eventObj.identifier === parseInt(i)) {
             delete this.fixedSave[i];
           }
