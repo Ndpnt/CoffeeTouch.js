@@ -7,6 +7,7 @@ window.onload = ->
 	ctx.lineCap = "round"
 	ctx.lineJoin = "round"
 	firsttime = true
+
 	$('canvas').onGesture "tap", (params) ->
 		selectPoint(params.fingers[0].x, params.fingers[0].y)
 		ctx.fillStyle = "rgba(0,0,0,1)";
@@ -39,17 +40,12 @@ window.onload = ->
 	$('canvas').onGesture "tap,tap,tap", (params) ->
 		validate()
 	
-	$('canvas').onGesture "dragend", (params) ->
-		firsttime = true
+	$('canvas').onGesture "tap", (params) ->
 		dragEnd(params)
 
 	$('canvas').onGesture "three:flick:down", (params) ->
 		clear()
-	
-	###
-	$('canvas').onGesture "all", (a, params) ->
-		$('debug').innerHTML = a + "<br/>" + $('debug').innerHTML
-	###
+
 	
 	$('canvas').onGesture "two:spread", (params) ->
 		changeRadiusSelection params.scale
@@ -62,7 +58,7 @@ window.onload = ->
 
 	$('canvas').onGesture "three:pinch", (params) ->
 		changeRadius params.scale
-	
+
 	style = {}
 	allPoint = []
 	point = {}
@@ -150,7 +146,7 @@ window.onload = ->
 		ctx.clearRect(0, 0, canvas.width, canvas.height)
 		for i in [0..allPoint.length - 1]
 			allPoint[i].validate = true if allPoint[i]
-			if !allPoint[i].group?
+			if !allPoint[i].group
 				allPoint[i].group = j
 		j++
 		drawvalidatePoints()

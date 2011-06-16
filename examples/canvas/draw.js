@@ -43,8 +43,7 @@
     $('canvas').onGesture("tap,tap,tap", function(params) {
       return validate();
     });
-    $('canvas').onGesture("dragend", function(params) {
-      firsttime = true;
+    $('canvas').onGesture("tap", function(params) {
       return dragEnd(params);
     });
     $('canvas').onGesture("three:flick:down", function(params) {
@@ -65,6 +64,15 @@
     });
     $('canvas').onGesture("three:pinch", function(params) {
       return changeRadius(params.scale);
+<<<<<<< HEAD:exemples/canvas/draw.js
+=======
+    });
+    $('canvas').onGesture("three:drag", function(params) {
+      changeRedColor(params.fingers[0].panY);
+      changeGreenColor(params.fingers[1].panY);
+      changeBlueColor(params.fingers[2].panY);
+      return changeRedColor;
+>>>>>>> f052a2e8b05c728760acbb815a7ff019f83661cc:examples/canvas/draw.js
     });
     style = {};
     allPoint = [];
@@ -172,7 +180,7 @@
         if (allPoint[i]) {
           allPoint[i].validate = true;
         }
-        if (!(allPoint[i].group != null)) {
+        if (!allPoint[i].group !== "undefined") {
           allPoint[i].group = j;
         }
       }

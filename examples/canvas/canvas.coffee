@@ -57,5 +57,5 @@ window.onload = ->
 		context.closePath();
 
 
-	$('canvas').onGesture "all", (a, params) ->
-		$('debug').innerHTML += a + "<br>"
+#	$('canvas').onGesture "all", (a, params) ->
+#		$('debug').innerHTML += a + "<br>"

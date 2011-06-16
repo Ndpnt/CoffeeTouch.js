@@ -17,8 +17,7 @@ class Analyser
 		@informations.rotation = @eventObj.global.rotation 
 		@informations.scale = @eventObj.global.scale
 		date = new Date()
-		@informations.timeElasped = date.getTime() - @informations.timeStart		
-
+		@informations.timeElasped = date.getTime() - @informations.timeStart
 		if @fingersArray[fingerID]?
 			@fingersArray[fingerID].update gestureName, @eventObj
 		else
@@ -32,9 +31,9 @@ class Analyser
 		@init() if @firstAnalysis
 		@gestureName = []
 		@gestureName.push finger.gestureName for finger in @fingers
-		@triggerDrag()
 		@targetElement.trigger @gestureName, @informations
 		@generateGrouppedFingerName()
+		@triggerDrag()
 		@triggerFixed()
 		@triggerFlick()
 		@informations.firstTrigger = false if @informations.firstTrigger
@@ -62,7 +61,7 @@ class Analyser
 			dontTrigger = false
 			gestureName = []
 			for finger in @fingers
-				if finger.gestureName == "drag" and finger.params.dragDirection == "unknown"
+				if finger.gestureName == "drag" and finger.params.dragDirection == "triggerDrag"
 					dontTrigger = true
 					break
 				if finger.gestureName == "drag" then gestureName.push finger.params.dragDirection else gestureName.push "fixed"
@@ -171,5 +170,5 @@ class Analyser
 		@targetElement.trigger gestureNameDrag, @informations if triggerDrag
 				
 window.onload = ->
-	$("blue").onGesture "all", (name, event) ->
-		$('debug').innerHTML = "#{name}<br />" + $('debug').innerHTML
+	$('blue').onGesture "three:flick:down", (params) ->
+		alert "?"
