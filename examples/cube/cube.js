@@ -24,6 +24,10 @@
       return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)";
     });
     return $('body').onGesture("rotate", function(params) {
+<<<<<<< HEAD
+=======
+      $('debug').innerHTML = params.rotation + '<br/>' + $('debug').innerHTML;
+>>>>>>> f06fd8a510d75019feb91f2065bb66d3138318bd
       zAngle = params.rotation;
       return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)";
     });

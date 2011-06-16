@@ -1,6 +1,6 @@
 (function() {
   window.onload = function() {
-    var $, add, allPoint, allvalidatePoint, canvas, changeBlueColor, changeGreenColor, changeRadius, changeRadiusSelection, changeRedColor, clear, ctx, dPoint, drag, dragEnd, dragStart, dragging, drawCanvas, drawvalidatePoints, firsttime, init, j, point, selectPoint, style, validate;
+    var $, add, allPoint, allvalidatePoint, canvas, changeRadius, changeRadiusSelection, clear, ctx, dPoint, drag, dragEnd, dragStart, dragging, drawCanvas, drawvalidatePoints, firsttime, init, j, point, selectPoint, style, validate;
     $ = function(element) {
       return document.getElementById(element);
     };
@@ -61,12 +61,6 @@
     $('canvas').onGesture("three:pinch", function(params) {
       return changeRadius(params.scale);
     });
-    $('canvas').onGesture("three:drag", function(params) {
-      changeRedColor(params.fingers[0].panY);
-      changeGreenColor(params.fingers[1].panY);
-      changeBlueColor(params.fingers[2].panY);
-      return changeRedColor;
-    });
     style = {};
     allPoint = [];
     point = {};
@@ -81,7 +75,7 @@
     style = {
       curve: {
         width: 4,
-        color: "rgb(" + this.red + "," + this.green + "," + this.blue + ")"
+        color: "#333"
       },
       cpline: {
         width: 1,
@@ -150,6 +144,7 @@
       return drawCanvas();
     };
     changeRadiusSelection = function(scale) {
+<<<<<<< HEAD
       var _ref;
       if ((20 < (_ref = style.point.radiusSelected * scale) && _ref < 60)) {
         style.point.radiusSelected *= scale;
@@ -173,6 +168,21 @@
     };
     changeBlueColor = function(panX) {
       this.blue = Math.min(panX, (panX > 255 ? 255 : panX));
+=======
+      var bool, i, _ref;
+      bool = false;
+      for (i = 0, _ref = allPoint.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
+        if (allPoint[i].selected === true) {
+          this.bool = true;
+          break;
+        }
+      }
+      style.point.radiusSelected *= scale > 1 ? 1.1 : this.bool ? 0.9 : void 0;
+      return drawCanvas();
+    };
+    changeRadius = function(scale) {
+      style.point.radiusSelected *= scale > 1 ? 1.1 : 0.9;
+>>>>>>> f06fd8a510d75019feb91f2065bb66d3138318bd
       return drawCanvas();
     };
     j = 0;

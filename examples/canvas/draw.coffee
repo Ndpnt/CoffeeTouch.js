@@ -15,8 +15,8 @@ window.onload = ->
 		ctx.arc(params.fingers[0].x, params.fingers[0].y, 3, 0, Math.PI * 2,true);
 		ctx.closePath();
 		ctx.fill();
+		
 	$('canvas').onGesture "tap,tap", (params) ->
-
 		p1 = {
 			x: params.fingers[0].x,
 			y: params.fingers[0].y
@@ -45,9 +45,7 @@ window.onload = ->
 
 	$('canvas').onGesture "three:flick:down", (params) ->
 		clear()
-	
-#	$('canvas').onGesture "all", (a, params) ->
-#		$('debug').innerHTML = a + "<br/>" + $('debug').innerHTML
+
 	
 	$('canvas').onGesture "two:spread", (params) ->
 		changeRadiusSelection params.scale
@@ -60,13 +58,7 @@ window.onload = ->
 
 	$('canvas').onGesture "three:pinch", (params) ->
 		changeRadius params.scale
-		
-	$('canvas').onGesture "three:drag", (params) ->
-		changeRedColor params.fingers[0].panY
-		changeGreenColor params.fingers[1].panY		
-		changeBlueColor params.fingers[2].panY
-	
-		changeRedColor
+
 	style = {}
 	allPoint = []
 	point = {}
@@ -79,7 +71,7 @@ window.onload = ->
 	style =
 		curve:
 			width: 4
-			color: "rgb(#{@red},#{@green},#{@blue})"
+			color: "#333"
 			
 		cpline:
 			width: 1
@@ -137,27 +129,17 @@ window.onload = ->
 		drawCanvas()
 	
 	changeRadiusSelection = (scale) ->
-		if 20 < style.point.radiusSelected * scale < 60
-			style.point.radiusSelected *= scale
-			drawCanvas()
+		bool = false
+		for i in [0..allPoint.length - 1]
+			if allPoint[i].selected == true
+				@bool = true 
+				break
+		style.point.radiusSelected *= if scale > 1 then 1.1 else 0.9 if @bool
+		drawCanvas()
 	
 	changeRadius = (scale) ->
-		if 20 < style.point.radius * scale < 60
-			style.point.radius *= scale
-			drawCanvas()
-		
-	changeRedColor = (panX) ->
-		@red = Math.min(panX, (if panX > 255 then 255 else panX))
+		style.point.radiusSelected *= if scale > 1 then 1.1 else 0.9
 		drawCanvas()
-	
-	changeGreenColor = (panX) ->
-		@green = Math.min(panX, (if panX > 255 then 255 else panX))
-		drawCanvas()
-
-	changeBlueColor = (panX) ->
-		@blue = Math.min(panX, (if panX > 255 then 255 else panX))
-		drawCanvas()
-
 	
 	j = 0
 	validate = ->

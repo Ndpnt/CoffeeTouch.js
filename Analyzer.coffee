@@ -178,5 +178,7 @@ class Analyser
 		@targetElement.trigger gestureNameDrag, @informations if triggerDrag
 				
 window.onload = ->
-	$('blue').onGesture "three:flick:down", (params) ->
-		alert "?"
+	$('blue').onGesture "tap", (params) ->
+		$('debug').innerHTML = "bite" + "<br/>" + $('debug').innerHTML
+	$('blue').onGesture "tap,tap", (params) ->
+		$('debug').innerHTML = "biteuxxxx" + "<br/>" + $('debug').innerHTML
