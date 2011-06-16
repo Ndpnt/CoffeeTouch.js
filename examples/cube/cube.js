@@ -8,7 +8,7 @@
     yAngle = 0;
     zAngle = 0;
     $('body').onGesture("flick:up", function(params) {
-      xAngle += 160;
+      xAngle += 360;
       return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)";
     });
     $('body').onGesture("flick:down", function(params) {
@@ -24,7 +24,8 @@
       return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)";
     });
     return $('body').onGesture("rotate", function(params) {
-      zAngle = params.global.rotation;
+      $('debug').innerHTML = params.rotation + '<br/>' + $('debug').innerHTML;
+      zAngle = params.rotation;
       return $('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)";
     });
   };

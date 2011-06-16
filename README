@@ -6,4 +6,4 @@ If you want to bind to all events, the callback function will have two arguments
 first: name
 second: eventParam
 Example:
-	bind("all", function (name, event))
+	onGesture("all", function (name, event))

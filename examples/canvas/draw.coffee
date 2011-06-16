@@ -15,8 +15,8 @@ window.onload = ->
 		ctx.arc(params.fingers[0].x, params.fingers[0].y, 3, 0, Math.PI * 2,true);
 		ctx.closePath();
 		ctx.fill();
+		
 	$('canvas').onGesture "tap,tap", (params) ->
-
 		p1 = {
 			x: params.fingers[0].x,
 			y: params.fingers[0].y
