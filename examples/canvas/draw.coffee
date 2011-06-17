@@ -26,7 +26,7 @@ window.onload = ->
 			x: params.fingers[1].x,
 			y: params.fingers[1].y
 		}
-		init(p1,p2)
+		addTwoPoint(p1,p2)
 	
 	$('canvas').onGesture "drag", (params) ->
 		if firsttime
@@ -66,9 +66,6 @@ window.onload = ->
 	allvalidatePoint = []
 	dPoint = {}
 	drag = null	
-	red: 33
-	green: 33
-	blue: 33
 	style =
 		curve:
 			width: 4
@@ -87,7 +84,7 @@ window.onload = ->
 			arc1: 0
 			arc2: 2 * Math.PI
 
-	init = (a,b) ->
+	addTwoPoint = (a,b) ->
 		point1 =
 			p:
 				x: a.x
@@ -110,46 +107,6 @@ window.onload = ->
 		allPoint.push point2
 		##default styles
 		drawCanvas()
-
-	dragEnd = (e) ->
-		drag = null
-		drawCanvas()
-		
-	add = (x,y) ->
-		point =
-			p:
-				x: x
-				y: y
-				selected: false
-			cp:
-				x: (x + 50)
-				y: (y + 50)
-				selected: false
-			validate: false
-		allPoint.push(point)
-		drawCanvas()
-	
-	changeRadiusSelection = (scale) ->
-		s = style.point.radiusSelected * (if scale > 1 then 1.1 else 0.9)
-		if 25 < s < 80
-			style.point.radiusSelected = s
-		drawCanvas()
-	
-	changeRadius = (scale) ->
-		s = style.point.radius * (if scale > 1 then 1.1 else 0.9)
-		if 10 < s < 80
-			style.point.radius = s
-		drawCanvas()
-	
-	j = 0
-	validate = ->
-		ctx.clearRect(0, 0, canvas.width, canvas.height)
-		for i in [0..allPoint.length - 1]
-			allPoint[i].validate = true if allPoint[i]
-			if !allPoint[i].group
-				allPoint[i].group = j
-		j++
-		drawvalidatePoints()
 		
 	drawCanvas = ->
 		ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -237,6 +194,10 @@ window.onload = ->
 			drag.y += e.y - dPoint.y
 			dPoint = e
 			drawCanvas()
+				
+	dragEnd = (e) ->
+		drag = null
+		drawCanvas()
 	
 	selectPoint = (x,y) ->
 		e =
@@ -269,3 +230,40 @@ window.onload = ->
 	clear = ->
 		ctx.clearRect(0, 0, canvas.width, canvas.height)
 		allPoint = []
+		
+	add = (x,y) ->
+		point =
+			p:
+				x: x
+				y: y
+				selected: false
+			cp:
+				x: (x + 50)
+				y: (y + 50)
+				selected: false
+			validate: false
+		allPoint.push(point)
+		drawCanvas()
+	
+	changeRadiusSelection = (scale) ->
+		s = style.point.radiusSelected * (if scale > 1 then 1.1 else 0.9)
+		if 25 < s < 80
+			style.point.radiusSelected = s
+		drawCanvas()
+	
+	changeRadius = (scale) ->
+		s = style.point.radius * (if scale > 1 then 1.1 else 0.9)
+		if 10 < s < 80
+			style.point.radius = s
+		drawCanvas()
+	
+	j = 0
+	validate = ->
+		ctx.clearRect(0, 0, canvas.width, canvas.height)
+		for i in [0..allPoint.length - 1]
+			allPoint[i].validate = true if allPoint[i]
+			if !allPoint[i].group
+				allPoint[i].group = j
+		j++
+		drawvalidatePoints()
+

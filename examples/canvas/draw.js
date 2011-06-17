@@ -1,6 +1,6 @@
 (function() {
   window.onload = function() {
-    var $, add, allPoint, allvalidatePoint, canvas, changeRadius, changeRadiusSelection, clear, ctx, dPoint, drag, dragEnd, dragStart, dragging, drawCanvas, drawvalidatePoints, firsttime, init, j, point, selectPoint, style, validate;
+    var $, add, addTwoPoint, allPoint, allvalidatePoint, canvas, changeRadius, changeRadiusSelection, clear, ctx, dPoint, drag, dragEnd, dragStart, dragging, drawCanvas, drawvalidatePoints, firsttime, j, point, selectPoint, style, validate;
     $ = function(element) {
       return document.getElementById(element);
     };
@@ -27,7 +27,7 @@
         x: params.fingers[1].x,
         y: params.fingers[1].y
       };
-      return init(p1, p2);
+      return addTwoPoint(p1, p2);
     });
     $('canvas').onGesture("drag", function(params) {
       if (firsttime) {
@@ -93,7 +93,7 @@
         arc2: 2 * Math.PI
       }
     };
-    init = function(a, b) {
+    addTwoPoint = function(a, b) {
       var point1, point2;
       point1 = {
         p: {
@@ -122,58 +122,6 @@
       allPoint.push(point1);
       allPoint.push(point2);
       return drawCanvas();
-    };
-    dragEnd = function(e) {
-      drag = null;
-      return drawCanvas();
-    };
-    add = function(x, y) {
-      point = {
-        p: {
-          x: x,
-          y: y,
-          selected: false
-        },
-        cp: {
-          x: x + 50,
-          y: y + 50,
-          selected: false
-        },
-        validate: false
-      };
-      allPoint.push(point);
-      return drawCanvas();
-    };
-    changeRadiusSelection = function(scale) {
-      var s;
-      s = style.point.radiusSelected * (scale > 1 ? 1.1 : 0.9);
-      if ((25 < s && s < 80)) {
-        style.point.radiusSelected = s;
-      }
-      return drawCanvas();
-    };
-    changeRadius = function(scale) {
-      var s;
-      s = style.point.radius * (scale > 1 ? 1.1 : 0.9);
-      if ((10 < s && s < 80)) {
-        style.point.radius = s;
-      }
-      return drawCanvas();
-    };
-    j = 0;
-    validate = function() {
-      var i, _ref;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (i = 0, _ref = allPoint.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
-        if (allPoint[i]) {
-          allPoint[i].validate = true;
-        }
-        if (!allPoint[i].group) {
-          allPoint[i].group = j;
-        }
-      }
-      j++;
-      return drawvalidatePoints();
     };
     drawCanvas = function() {
       var i, radius, value, _ref;
@@ -275,6 +223,10 @@
         return drawCanvas();
       }
     };
+    dragEnd = function(e) {
+      drag = null;
+      return drawCanvas();
+    };
     selectPoint = function(x, y) {
       var dcx, dcy, dx, dy, e, value, _results;
       e = {
@@ -313,9 +265,57 @@
       }
       return _results;
     };
-    return clear = function() {
+    clear = function() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       return allPoint = [];
+    };
+    add = function(x, y) {
+      point = {
+        p: {
+          x: x,
+          y: y,
+          selected: false
+        },
+        cp: {
+          x: x + 50,
+          y: y + 50,
+          selected: false
+        },
+        validate: false
+      };
+      allPoint.push(point);
+      return drawCanvas();
+    };
+    changeRadiusSelection = function(scale) {
+      var s;
+      s = style.point.radiusSelected * (scale > 1 ? 1.1 : 0.9);
+      if ((25 < s && s < 80)) {
+        style.point.radiusSelected = s;
+      }
+      return drawCanvas();
+    };
+    changeRadius = function(scale) {
+      var s;
+      s = style.point.radius * (scale > 1 ? 1.1 : 0.9);
+      if ((10 < s && s < 80)) {
+        style.point.radius = s;
+      }
+      return drawCanvas();
+    };
+    j = 0;
+    return validate = function() {
+      var i, _ref;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (i = 0, _ref = allPoint.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
+        if (allPoint[i]) {
+          allPoint[i].validate = true;
+        }
+        if (!allPoint[i].group) {
+          allPoint[i].group = j;
+        }
+      }
+      j++;
+      return drawvalidatePoints();
     };
   };
 }).call(this);

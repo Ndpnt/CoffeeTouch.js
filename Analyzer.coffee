@@ -2,6 +2,7 @@
 ## 		Analyse and trigger events sent by the Event Router
 ##
 ## Copyright (c) 2011
+## Publication date: 06/17/2011
 ##		Pierre Corsini (pcorsini@polytech.unice.fr)
 ##		Nicolas Dupont (npg.dupont@gmail.com)
 ##		Nicolas Fernandez (fernande@polytech.unice.fr)
