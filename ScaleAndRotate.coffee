@@ -1,4 +1,7 @@
-
+###
+	TRASH
+	Method unused
+###
 	getCentroid: ->
 		sumX = sumY = 0
 		for finger in @fingers

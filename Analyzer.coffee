@@ -1,3 +1,11 @@
+##	Analyser
+## 		Analyse and trigger events sent by the Event Router
+##	Authors:
+##		Pierre Corsini (pcorsini@polytech.unice.fr)
+##		Nicolas Dupont (npg.dupont@gmail.com)
+##		Nicolas Fernandez (fernande@polytech.unice.fr)
+##		Nima Izadi (nim.izadi@gmail.com)	
+
 class Analyser
 	## Create an analyser object with total number of fingers and an array of all fingers as attribute
 	constructor: (@totalNbFingers, @targetElement) ->
@@ -11,7 +19,6 @@ class Analyser
 		date = new Date()
 		@fingerArraySize = 0
 		@informations.timeStart = date.getTime()
-#		@informations.rotation = 0
 
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
 	notify: (fingerID, gestureName, @eventObj) ->
@@ -38,7 +45,9 @@ class Analyser
 		@triggerFixed()
 		@triggerFlick()
 		@informations.firstTrigger = false if @informations.firstTrigger
-		
+	
+	## Sort fingers and initialize some informations that will be triggered to the user
+	## Is called before analysis
 	init: ->
 		## Sort fingers. Left to Right and Top to Bottom
 		@fingers = @fingers.sort (a,b) ->
@@ -50,6 +59,7 @@ class Analyser
 			@informations.fingers[i] = @fingers[i].params
 		@firstAnalysis = false
 	
+	## Trigger all names related to the drag event
 	triggerDrag: -> 
 		if @gestureName.contains "drag"
 			@triggerDragDirections()
@@ -57,6 +67,26 @@ class Analyser
 				@triggerPinchOrSpread()
 				@triggerRotation()
 
+	## Trigger all names related to the drag direction
+	triggerDragDirections: ->
+		gestureName = []
+		gestureName.push finger.params.dragDirection for finger in @fingers
+		@targetElement.trigger gestureName, @informations if !gestureName.contains "unknown"
+
+	## Test if the drag is a pinch or a spread
+	triggerPinchOrSpread: ->
+		# The scale is already sent in the event Object
+		# @informations.scale = @calculateScale()
+		## Spread and Pinch detection
+		if @informations.scale < 1.1
+			@targetElement.trigger "#{digit_name(@fingers.length)}:pinch", @informations
+			@targetElement.trigger "pinch", @informations
+		else if @informations.scale > 1.1
+			@targetElement.trigger "#{digit_name(@fingers.length)}:spread", @informations
+			@targetElement.trigger "spread", @informations
+
+
+	## Trigger all names related to the fixed event
 	triggerFixed: ->
 		if @gestureName.length > 1 and @gestureName.contains "fixed"
 			dontTrigger = false
@@ -69,6 +99,7 @@ class Analyser
 			if !dontTrigger
 				@targetElement.trigger gestureName, @informations
 			
+	## Trigger all names related to the flick event
 	triggerFlick: ->
 		if @gestureName.contains "dragend"
 			gestureName1 = []
@@ -85,19 +116,10 @@ class Analyser
 			if !dontTrigger
 				@targetElement.trigger gestureName1, @informations
 				@targetElement.trigger gestureName2, @informations
-
-	triggerDragDirections: ->
-		gestureName = []
-		gestureName.push finger.params.dragDirection for finger in @fingers
-		@targetElement.trigger gestureName, @informations if !gestureName.contains "unknown"
 		
-	calculateRotation: -> 
-		if !@initialRotation
-			@initialRotation = Math.atan2(@fingers[1].params.y - @fingers[0].params.y, @fingers[1].params.x - @fingers[0].params.x)
-		@informations.rotation = @informations.rotation + Math.atan2(@fingers[1].params.y - @fingers[0].params.y, @fingers[1].params.x - @fingers[0].params.x) - @initialRotation
 
+	## Trigger if it is a rotation, and specify if it is clockwise or counterclockwise
 	triggerRotation: -> 
-		#@calculateRotation()
 		if !@lastRotation?
 			@lastRotation = @informations.rotation
 		rotationDirection = ""
@@ -110,17 +132,7 @@ class Analyser
 		@targetElement.trigger "#{digit_name(@fingers.length)}:#{rotationDirection}", @informations
 		@targetElement.trigger "#{digit_name(@fingers.length)}:rotate", @informations
 
-	triggerPinchOrSpread: ->
-		# The scale is already sent in the event Object
-		# @informations.scale = @calculateScale()
-		## Spread and Pinch detection
-		if @informations.scale < 1.1
-			@targetElement.trigger "#{digit_name(@fingers.length)}:pinch", @informations
-			@targetElement.trigger "pinch", @informations
-		else if @informations.scale > 1.1
-			@targetElement.trigger "#{digit_name(@fingers.length)}:spread", @informations
-			@targetElement.trigger "spread", @informations
-
+	## Trigger combination of names which are like "one:....,two:..." etc.
 	generateGrouppedFingerName: -> 
 		gestureName = [] 
 		gestureNameDrag = []

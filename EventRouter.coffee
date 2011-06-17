@@ -1,4 +1,10 @@
-####################### EventRouter   ####################### 
+##	EventRouter
+##	Authors:
+##		Pierre Corsini (pcorsini@polytech.unice.fr)
+##		Nicolas Dupont (npg.dupont@gmail.com)
+##		Nicolas Fernandez (fernande@polytech.unice.fr)
+##		Nima Izadi (nim.izadi@gmail.com)	
+
 class EventRouter
 	constructor: (@element) ->
 		@grouper = new EventGrouper

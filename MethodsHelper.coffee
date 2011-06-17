@@ -1,8 +1,14 @@
-###
- The unbind and trigger function have been taken from Backbone Framework. 
- The onGesture function is inspired by the bind functon of Backbone Framework. 
-###
+##	Functions helpers
+## 		Analyse all possible basic gesture of a single finger
+##
+##	Authors:
+##		Pierre Corsini (pcorsini@polytech.unice.fr)
+##		Nicolas Dupont (npg.dupont@gmail.com)
+##		Nicolas Fernandez (fernande@polytech.unice.fr)
+##		Nima Izadi (nim.izadi@gmail.com)
 
+## The unbind and trigger function have been taken from Backbone Framework. 
+## The onGesture function is inspired by the bind functon of Backbone Framework. 
 Element::onGesture = (eventName, callback) ->
 	if !this.router?
 		this.router = new EventRouter this
