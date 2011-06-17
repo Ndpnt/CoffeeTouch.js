@@ -50,7 +50,3 @@ Object.merge = (destination, source) ->
 	for property of source
 		destination[property] = source[property] if source.hasOwnProperty property
 	return destination
-
-# To be removed
-$ = (element) ->
-	document.getElementById element

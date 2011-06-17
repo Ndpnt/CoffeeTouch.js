@@ -130,19 +130,14 @@ window.onload = ->
 		drawCanvas()
 	
 	changeRadiusSelection = (scale) ->
-		bool = false
-		for i in [0..allPoint.length - 1]
-			if allPoint[i] and allPoint[i].selected == true
-				@bool = true 
-				break
-		s = style.point.radiusSelected * (if scale > 1 then 1.1 else 0.9) if @bool
-		if 0 < s < 100
+		s = style.point.radiusSelected * (if scale > 1 then 1.1 else 0.9)
+		if 25 < s < 80
 			style.point.radiusSelected = s
 		drawCanvas()
 	
 	changeRadius = (scale) ->
 		s = style.point.radius * (if scale > 1 then 1.1 else 0.9)
-		if 0 < s < 100
+		if 10 < s < 80
 			style.point.radius = s
 		drawCanvas()
 	
