@@ -8,7 +8,8 @@
 ##		Pierre Corsini (pcorsini@polytech.unice.fr)
 ##		Nicolas Dupont (npg.dupont@gmail.com)
 ##		Nicolas Fernandez (fernande@polytech.unice.fr)
-##		Nima Izadi (nim.izadi@gmail.com)	
+##		Nima Izadi (nim.izadi@gmail.com)
+##		And supervised by Raphaël Bellec (r.bellec@structure-computation.com)
 ##
 ## Permission is hereby granted, free of charge, to any person obtaining a 
 ## copy of this software and associated documentation files (the "Software"),

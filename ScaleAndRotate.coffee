@@ -8,8 +8,8 @@
 			sumX += finger.params.startX
 			sumY += finger.params.startY
 		centroid =
-			x: sumX / @fingers.length #/
-			y: sumY / @fingers.length #/
+			x: sumX / @fingers.length
+			y: sumY / @fingers.length
 		
 	
 	## Calculate the scale using centroid
@@ -21,14 +21,14 @@
 			
 			for finger in @fingers
 				sumAverageDistance += distanceBetweenTwoPoints finger.params.startX, finger.params.startY, centroid.x, centroid.y
-			@informations.global.initialAverageDistanceToCentroid = sumAverageDistance / @fingers.length ##/
+			@informations.global.initialAverageDistanceToCentroid = sumAverageDistance / @fingers.length
 		centroid = @getCentroid()
 		sumAverageDistance = 0
 		for finger in @fingers
 			sumAverageDistance += distanceBetweenTwoPoints finger.params.x, finger.params.y, centroid.x, centroid.y
-		averageDistance = sumAverageDistance / @fingers.length #/
+		averageDistance = sumAverageDistance / @fingers.length
 		@informations.global.centroid = centroid
-		scale = averageDistance / @informations.global.initialAverageDistanceToCentroid ##/
+		scale = averageDistance / @informations.global.initialAverageDistanceToCentroid
 
 	calculateRotation: -> 
 		if !@initialRotation?
