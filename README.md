@@ -5,13 +5,14 @@
 To compile in javascript file:
 `coffee -c -j CoffeeTouch MethodsHelper.coffee StateMachine.coffee Finger.coffee EventRouter.coffee AnalyzerHelper.coffee Analyzer.coffee`
 
-### Simple example: 
+### Simple example
 	document.getElementById("myElement").onGesture("two:tap", function (event){
 		...
 	})
 
-### Important:
+### Important
 If you want to bind to all events, the callback function will have two arguments:
+
 - first: name
 - second: eventParam
 
