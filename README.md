@@ -8,8 +8,8 @@ To compile in javascript file:
 
 ### Simple example
 
-	document.getElementById("myElement").onGesture("two:tap", function (event){
-		...
+	document.getElementById("myElement").onGesture("tap", function (event){
+		... // Do something when a 'tap' on the touchscreen has been made
 	})
 
 ### Important
