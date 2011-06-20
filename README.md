@@ -2,6 +2,8 @@
 
 ## Getting Started
 
+[CoffeeScript](http://jashkenas.github.com/coffee-script/) is required
+
 To compile in javascript file:
 
 `coffee -c -j CoffeeTouch MethodsHelper.coffee StateMachine.coffee Finger.coffee EventRouter.coffee AnalyzerHelper.coffee Analyzer.coffee`
