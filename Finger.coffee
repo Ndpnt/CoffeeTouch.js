@@ -5,6 +5,7 @@
 ##		params
 ##
 ## Copyright (c) 2011
+## Publication date: 06/17/2011
 ##		Pierre Corsini (pcorsini@polytech.unice.fr)
 ##		Nicolas Dupont (npg.dupont@gmail.com)
 ##		Nicolas Fernandez (fernande@polytech.unice.fr)
@@ -41,7 +42,7 @@ class FingerGesture
 		@params.startX = eventObj.clientX
 		@params.startY = eventObj.clientY
 		@params.timeStart = date.getTime()
-		@params.timeElasped = 0
+		@params.timeElapsed = 0
 		@params.panX = 0
 		@params.panY = 0
 		@params.gestureName = @gestureName
@@ -57,7 +58,7 @@ class FingerGesture
 			x: eventObj.clientX
 			y: eventObj.clientY
 			time: date.getTime()
-		@params.timeElasped = date.getTime() - @params.timeStart
+		@params.timeElapsed = date.getTime() - @params.timeStart
 		@updatePosition eventObj
 		if @gestureName == "drag"
 			movedX = @params.x - @positions[@positionCount - 1].x
@@ -65,7 +66,7 @@ class FingerGesture
 			@params.speed = Math.sqrt(movedX * movedX  + movedY  * movedY) / (@positions[@positionCount].time - @positions[@positionCount - 1].time) #/
 			@params.dragDirection = getDragDirection(this)
 		if @gestureName == "dragend"
-			if @params.speed > 0.5 or @params.timeElasped < 100
+			if @params.speed > 0.5 or @params.timeElapsed < 100
 				@isFlick = true
 
 	updatePosition: (eventObj) ->

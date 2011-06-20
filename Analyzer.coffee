@@ -45,7 +45,7 @@ class Analyser
 		@informations.rotation = @eventObj.global.rotation 
 		@informations.scale = @eventObj.global.scale
 		date = new Date()
-		@informations.timeElasped = date.getTime() - @informations.timeStart
+		@informations.timeElapsed = date.getTime() - @informations.timeStart
 		if @fingersArray[fingerID]?
 			@fingersArray[fingerID].update gestureName, @eventObj
 		else

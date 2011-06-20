@@ -1,3 +1,8 @@
+See wiki for a more complete documentation:
+https://github.com/Crozis/CoffeeTouch/wiki/CoffeeTouch---User's-Manual
+
+-----
+
 To compile:
 coffee -c -j CoffeeTouch MethodsHelper.coffee StateMachine.coffee Finger.coffee EventRouter.coffee AnalyzerHelper.coffee Analyzer.coffee 
 
