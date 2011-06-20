@@ -109,19 +109,31 @@ window.onload = ->
 		drawCanvas()
 		
 	drawCanvas = ->
-		ctx.clearRect(0, 0, canvas.width, canvas.height)
-		for value of allPoint
-			if allPoint[value].validate == false
-				if allPoint[value].p
+		ctx.clearRect(0, 0, canvas.width, canvas.height)			
+		for i in [0..allPoint.length - 1]
+			if allPoint[i].validate == false
+				if allPoint[i].p
 					ctx.lineWidth = style.cpline.width
 					ctx.strokeStyle = style.cpline.color
 					ctx.beginPath()
-					ctx.moveTo(allPoint[value].p.x, allPoint[value].p.y)
-					ctx.lineTo(allPoint[value].cp.x, allPoint[value].cp.y)
+					ctx.moveTo(allPoint[i].p.x, allPoint[i].p.y)
+					ctx.lineTo(allPoint[i].cp.x, allPoint[i].cp.y)
 					ctx.stroke()
 					ctx.closePath()
-		
-		for i in [0..allPoint.length - 1]
+					ctx.lineWidth = style.point.width
+					ctx.strokeStyle = style.point.color
+					ctx.fillStyle = style.point.fill
+					ctx.beginPath()
+					radius = if(allPoint[i].p.selected == true) then style.point.radiusSelected else style.point.radius
+					ctx.arc(allPoint[i].p.x, allPoint[i].p.y, radius, style.point.arc1, style.point.arc2, true)
+					ctx.fill()
+					ctx.stroke()
+					ctx.beginPath()
+					radius = if(allPoint[i].cp.selected == true) then style.point.radiusSelected else style.point.radius
+					ctx.arc(allPoint[i].cp.x, allPoint[i].cp.y, radius, style.point.arc1, style.point.arc2, true)
+					ctx.fill()
+					ctx.stroke()
+					ctx.closePath()
 			if allPoint[i] and allPoint[i].validate == false and allPoint[i + 1]
 				ctx.lineWidth = style.curve.width
 				ctx.strokeStyle = style.curve.color
@@ -130,30 +142,6 @@ window.onload = ->
 				ctx.bezierCurveTo(allPoint[i].cp.x, allPoint[i].cp.y, allPoint[i + 1].cp.x, allPoint[i + 1].cp.y, allPoint[i + 1].p.x, allPoint[i + 1].p.y)
 				ctx.stroke()
 				ctx.closePath()
-			
-		
-		for value of allPoint
-			if allPoint[value].validate == false
-				if allPoint[value].p
-					ctx.lineWidth = style.point.width
-					ctx.strokeStyle = style.point.color
-					ctx.fillStyle = style.point.fill
-					ctx.beginPath()
-					radius = if(allPoint[value].p.selected == true) then style.point.radiusSelected else style.point.radius
-					ctx.arc(allPoint[value].p.x, allPoint[value].p.y, radius, style.point.arc1, style.point.arc2, true)
-					ctx.fill()
-					ctx.stroke()
-					ctx.beginPath()
-					radius = if(allPoint[value].cp.selected == true) then style.point.radiusSelected else style.point.radius
-					ctx.arc(allPoint[value].cp.x, allPoint[value].cp.y, radius, style.point.arc1, style.point.arc2, true)
-					ctx.fill()
-					ctx.stroke()
-					ctx.closePath()
-		drawvalidatePoints()
-	
-	
-	drawvalidatePoints = ->
-		for i in [0..allPoint.length - 1]
 			if allPoint[i] and allPoint[i].validate == true and allPoint[i + 1] and allPoint[i].group == allPoint[i + 1].group
 				ctx.lineWidth = style.curve.width
 				ctx.strokeStyle = style.curve.color
@@ -162,7 +150,6 @@ window.onload = ->
 				ctx.bezierCurveTo(allPoint[i].cp.x, allPoint[i].cp.y, allPoint[i + 1].cp.x, allPoint[i + 1].cp.y, allPoint[i + 1].p.x, allPoint[i + 1].p.y)
 				ctx.stroke()
 				ctx.closePath()
-		
 
 	dragStart = (event) ->
 		e =
@@ -258,6 +245,7 @@ window.onload = ->
 		drawCanvas()
 	
 	j = 0
+	
 	validate = ->
 		ctx.clearRect(0, 0, canvas.width, canvas.height)
 		for i in [0..allPoint.length - 1]
@@ -265,5 +253,5 @@ window.onload = ->
 			if !allPoint[i].group
 				allPoint[i].group = j
 		j++
-		drawvalidatePoints()
+		drawCanvas()
 

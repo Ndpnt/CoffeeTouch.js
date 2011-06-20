@@ -39,7 +39,7 @@ class Analyser
 		date = new Date()
 		@fingerArraySize = 0
 		@informations.timeStart = date.getTime()
-
+		
 	## Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
 	notify: (fingerID, gestureName, @eventObj) ->
 		@informations.rotation = @eventObj.global.rotation 
@@ -95,13 +95,14 @@ class Analyser
 
 	## Test if the drag is a pinch or a spread
 	triggerPinchOrSpread: ->
-		# The scale is already sent in the event Object
-		# @informations.scale = @calculateScale()
 		## Spread and Pinch detection
-		if @informations.scale < 1.1
+		sameDirection = false
+		for finger in @fingers
+			alert finger.params.dragDirection 
+		if @informations.scale < 1.1 and !sameDirection
 			@targetElement.trigger "#{digit_name(@fingers.length)}:pinch", @informations
 			@targetElement.trigger "pinch", @informations
-		else if @informations.scale > 1.1
+		else if @informations.scale > 1.1 and !sameDirection
 			@targetElement.trigger "#{digit_name(@fingers.length)}:spread", @informations
 			@targetElement.trigger "spread", @informations
 

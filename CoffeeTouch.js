@@ -1,8 +1,5 @@
 (function() {
-  /*
-   The unbind and trigger function have been taken from Backbone Framework. 
-   The onGesture function is inspired by the bind functon of Backbone Framework. 
-  */  var $, Analyser, Drag, EventGrouper, EventRouter, FingerGesture, FirstTouch, Fixed, GenericState, NoTouch, StateMachine, digit_name, distanceBetweenTwoPoints, getDirection, getDragDirection;
+  var Analyser, Drag, EventGrouper, EventRouter, FingerGesture, FirstTouch, Fixed, GenericState, NoTouch, StateMachine, digit_name, distanceBetweenTwoPoints, getDirection, getDragDirection;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -85,9 +82,6 @@
     }
     return destination;
   };
-  $ = function(element) {
-    return document.getElementById(element);
-  };
   StateMachine = (function() {
     function StateMachine(identifier, router) {
       this.identifier = identifier;
@@ -126,20 +120,20 @@
     return GenericState;
   })();
   NoTouch = (function() {
-    __extends(NoTouch, GenericState);
     function NoTouch() {
       NoTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(NoTouch, GenericState);
     NoTouch.prototype.touchstart = function() {
       return this.machine.setState(new FirstTouch(this.machine));
     };
     return NoTouch;
   })();
   FirstTouch = (function() {
-    __extends(FirstTouch, GenericState);
     function FirstTouch() {
       FirstTouch.__super__.constructor.apply(this, arguments);
     }
+    __extends(FirstTouch, GenericState);
     FirstTouch.prototype.init = function() {
       var _machine;
       _machine = this.machine;
@@ -160,10 +154,10 @@
     return FirstTouch;
   })();
   Fixed = (function() {
-    __extends(Fixed, GenericState);
     function Fixed() {
       Fixed.__super__.constructor.apply(this, arguments);
     }
+    __extends(Fixed, GenericState);
     Fixed.prototype.init = function() {
       return this.notify("fixed");
     };
@@ -174,10 +168,10 @@
     return Fixed;
   })();
   Drag = (function() {
-    __extends(Drag, GenericState);
     function Drag() {
       Drag.__super__.constructor.apply(this, arguments);
     }
+    __extends(Drag, GenericState);
     Drag.prototype.init = function() {
       var that;
       this.isTap = true;
@@ -518,10 +512,17 @@
       }
     };
     Analyser.prototype.triggerPinchOrSpread = function() {
-      if (this.informations.scale < 1.1) {
+      var finger, sameDirection, _i, _len, _ref;
+      sameDirection = false;
+      _ref = this.fingers;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        finger = _ref[_i];
+        alert(finger.params.dragDirection);
+      }
+      if (this.informations.scale < 1.1 && !sameDirection) {
         this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":pinch", this.informations);
         return this.targetElement.trigger("pinch", this.informations);
-      } else if (this.informations.scale > 1.1) {
+      } else if (this.informations.scale > 1.1 && !sameDirection) {
         this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":spread", this.informations);
         return this.targetElement.trigger("spread", this.informations);
       }

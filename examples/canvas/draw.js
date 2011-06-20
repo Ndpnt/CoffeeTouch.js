@@ -1,6 +1,6 @@
 (function() {
   window.onload = function() {
-    var $, add, addTwoPoint, allPoint, allvalidatePoint, canvas, changeRadius, changeRadiusSelection, clear, ctx, dPoint, drag, dragEnd, dragStart, dragging, drawCanvas, drawvalidatePoints, firsttime, j, point, selectPoint, style, validate;
+    var $, add, addTwoPoint, allPoint, allvalidatePoint, canvas, changeRadius, changeRadiusSelection, clear, ctx, dPoint, drag, dragEnd, dragStart, dragging, drawCanvas, firsttime, j, point, selectPoint, style, validate;
     $ = function(element) {
       return document.getElementById(element);
     };
@@ -68,11 +68,6 @@
     allvalidatePoint = [];
     dPoint = {};
     drag = null;
-    ({
-      red: 33,
-      green: 33,
-      blue: 33
-    });
     style = {
       curve: {
         width: 4,
@@ -124,22 +119,35 @@
       return drawCanvas();
     };
     drawCanvas = function() {
-      var i, radius, value, _ref;
+      var i, radius, _ref, _results;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (value in allPoint) {
-        if (allPoint[value].validate === false) {
-          if (allPoint[value].p) {
+      _results = [];
+      for (i = 0, _ref = allPoint.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
+        if (allPoint[i].validate === false) {
+          if (allPoint[i].p) {
             ctx.lineWidth = style.cpline.width;
             ctx.strokeStyle = style.cpline.color;
             ctx.beginPath();
-            ctx.moveTo(allPoint[value].p.x, allPoint[value].p.y);
-            ctx.lineTo(allPoint[value].cp.x, allPoint[value].cp.y);
+            ctx.moveTo(allPoint[i].p.x, allPoint[i].p.y);
+            ctx.lineTo(allPoint[i].cp.x, allPoint[i].cp.y);
+            ctx.stroke();
+            ctx.closePath();
+            ctx.lineWidth = style.point.width;
+            ctx.strokeStyle = style.point.color;
+            ctx.fillStyle = style.point.fill;
+            ctx.beginPath();
+            radius = allPoint[i].p.selected === true ? style.point.radiusSelected : style.point.radius;
+            ctx.arc(allPoint[i].p.x, allPoint[i].p.y, radius, style.point.arc1, style.point.arc2, true);
+            ctx.fill();
+            ctx.stroke();
+            ctx.beginPath();
+            radius = allPoint[i].cp.selected === true ? style.point.radiusSelected : style.point.radius;
+            ctx.arc(allPoint[i].cp.x, allPoint[i].cp.y, radius, style.point.arc1, style.point.arc2, true);
+            ctx.fill();
             ctx.stroke();
             ctx.closePath();
           }
         }
-      }
-      for (i = 0, _ref = allPoint.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
         if (allPoint[i] && allPoint[i].validate === false && allPoint[i + 1]) {
           ctx.lineWidth = style.curve.width;
           ctx.strokeStyle = style.curve.color;
@@ -149,33 +157,6 @@
           ctx.stroke();
           ctx.closePath();
         }
-      }
-      for (value in allPoint) {
-        if (allPoint[value].validate === false) {
-          if (allPoint[value].p) {
-            ctx.lineWidth = style.point.width;
-            ctx.strokeStyle = style.point.color;
-            ctx.fillStyle = style.point.fill;
-            ctx.beginPath();
-            radius = allPoint[value].p.selected === true ? style.point.radiusSelected : style.point.radius;
-            ctx.arc(allPoint[value].p.x, allPoint[value].p.y, radius, style.point.arc1, style.point.arc2, true);
-            ctx.fill();
-            ctx.stroke();
-            ctx.beginPath();
-            radius = allPoint[value].cp.selected === true ? style.point.radiusSelected : style.point.radius;
-            ctx.arc(allPoint[value].cp.x, allPoint[value].cp.y, radius, style.point.arc1, style.point.arc2, true);
-            ctx.fill();
-            ctx.stroke();
-            ctx.closePath();
-          }
-        }
-      }
-      return drawvalidatePoints();
-    };
-    drawvalidatePoints = function() {
-      var i, _ref, _results;
-      _results = [];
-      for (i = 0, _ref = allPoint.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
         _results.push(allPoint[i] && allPoint[i].validate === true && allPoint[i + 1] && allPoint[i].group === allPoint[i + 1].group ? (ctx.lineWidth = style.curve.width, ctx.strokeStyle = style.curve.color, ctx.beginPath(), ctx.moveTo(allPoint[i].p.x, allPoint[i].p.y), ctx.bezierCurveTo(allPoint[i].cp.x, allPoint[i].cp.y, allPoint[i + 1].cp.x, allPoint[i + 1].cp.y, allPoint[i + 1].p.x, allPoint[i + 1].p.y), ctx.stroke(), ctx.closePath()) : void 0);
       }
       return _results;
@@ -315,7 +296,7 @@
         }
       }
       j++;
-      return drawvalidatePoints();
+      return drawCanvas();
     };
   };
 }).call(this);
