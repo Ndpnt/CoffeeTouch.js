@@ -2,6 +2,9 @@
 
 ## Getting Started
 
+If you just want to *use the library*, skip to the [User's manual](https://github.com/Crozis/CoffeeTouch/wiki/CoffeeTouch---User's-Manual)
+
+If you want to *fork or improve* the library:
 [CoffeeScript](http://jashkenas.github.com/coffee-script/) is required
 
 To compile in javascript file:

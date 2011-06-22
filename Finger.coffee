@@ -29,6 +29,13 @@
 ## WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 ## IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
+## FingerGesture Object
+##		Contains all informations relative to a finger during all its gesture
+## @params: 
+## 		@fingerId: 		id given by the browser event. Used to differentiate all fingers
+##		@gestureName: 	Basic gesture name ("drag", "tap", "doubletap", etc.)
+## 		eventObj:		Event object given by the browsers. Useful for basics informations (position etc.)
 class FingerGesture
 	constructor: (@fingerId, @gestureName, eventObj) ->
 		date = new Date()
@@ -50,7 +57,8 @@ class FingerGesture
 		@params.speed = 0
 		@params.dragDirection = "unknown"
 		@isFlick = false
-
+	
+	## Function called when the finger move on the screen
 	update: (@gestureName, eventObj) ->
 		@positionCount++
 		date = new Date()
@@ -69,6 +77,7 @@ class FingerGesture
 			if @params.speed > 0.5 or @params.timeElapsed < 100
 				@isFlick = true
 
+	## Update finger position
 	updatePosition: (eventObj) ->
 		@params.x = eventObj.clientX
 		@params.y = eventObj.clientY

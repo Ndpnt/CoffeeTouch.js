@@ -92,7 +92,7 @@ class EventGrouper
 		@fixedSave = {}
 		@fingerCount = 0
 		
-	refreshFingerCount: (newCount, element) -> #Initialize a new Analyzer, only if the number of fingers increase or is reset
+	refreshFingerCount: (newCount, element) -> # Initialize a new Analyzer, only if the number of fingers increase or is reset
 		@fingerCount = -1 if newCount == 0
 
 		if @fingerCount < newCount

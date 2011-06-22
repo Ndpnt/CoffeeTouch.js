@@ -26,6 +26,12 @@
 ## WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 ## IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
+## Analyser
+## Analyse a gesture and "notify" the @targetElement that "a given gesture" has been made.
+## @params:
+## 		@totalNbFingers:	Number of finger of the gesture beeing made.
+##		@targetElement:		DOM Element which will be informed of the gesture
 class Analyser
 	## Create an analyser object with total number of fingers and an array of all fingers as attribute
 	constructor: (@totalNbFingers, @targetElement) ->
@@ -55,6 +61,8 @@ class Analyser
 		## Analyse event only when it receives the information from each fingers of the gesture.
 		@analyse @totalNbFingers if @fingerArraySize is @totalNbFingers
 	
+	## Analayse precisly the gesture.
+	## Is called only when the analyser has been informed that all fingers have done a basic gesture.
 	analyse: (nbFingers) ->
 		@init() if @firstAnalysis
 		@gestureName = []

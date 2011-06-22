@@ -63,14 +63,19 @@ Element::trigger = (ev) ->
 			i.apply(this, arguments)
 	return this
 
+## Basic functions added to String.
+## Returns true if the string contains the substring "it"
 String::contains = (it) ->
 	this.indexOf(it) != -1;
 
+## Basic functions added to Array.
+## Returns true if the array contains the substring "it"
 Array::contains = (element) ->
 	for el in this
 		if (el == element) then return true
 	return false
 
+## Merge two hashes.
 Object.merge = (destination, source) ->
 	for property of source
 		destination[property] = source[property] if source.hasOwnProperty property

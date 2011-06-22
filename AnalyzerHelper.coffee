@@ -25,14 +25,20 @@
 ## WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 ## IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+## Swap two object with each others.
 Object.swap = (obj1, obj2) ->
 	temp = obj2
 	obj2 = obj1
 	obj1 = obj2
 
+## Compute the distance between two poits
 distanceBetweenTwoPoints = (x1, y1, x2, y2) -> 
 	Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)))
 
+## Returns a diretion regarding two given delta.
+## @params
+##		deltaX: 	basicly: (currentX - lastX)
+##		deltaY: 	basicly: (currentY - lastY)
 getDirection = (deltaX, deltaY) ->
 	if deltaX == deltaY == 0
 		return "unknown"
@@ -42,11 +48,13 @@ getDirection = (deltaX, deltaY) ->
 	else
 		if deltaY < 0 then "up" else "down"
 
+## Returns the direction of the given finger
 getDragDirection = (finger) ->
 	deltaX = finger.params.x - finger.positions[finger.positionCount - 1].x
 	deltaY = finger.params.y - finger.positions[finger.positionCount - 1].y
 	getDirection deltaX, deltaY	
 
+## Returns the litteral digit of the numeral digit
 digit_name = (->
 	names = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
 	(n) -> 
