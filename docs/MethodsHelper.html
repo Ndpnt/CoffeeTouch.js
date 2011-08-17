@@ -1,0 +1,72 @@
+<!DOCTYPE html>  <html> <head>   <title>MethodsHelper.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="Analyzer.html">                 Analyzer.coffee               </a>                                           <a class="source" href="AnalyzerHelper.html">                 AnalyzerHelper.coffee               </a>                                           <a class="source" href="EventRouter.html">                 EventRouter.coffee               </a>                                           <a class="source" href="Finger.html">                 Finger.coffee               </a>                                           <a class="source" href="MethodsHelper.html">                 MethodsHelper.coffee               </a>                                           <a class="source" href="StateMachine.html">                 StateMachine.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               MethodsHelper.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>Functions helpers
+        Analyse all possible basic gesture of a single finger</p>
+
+<p>Copyright (c) 2011
+Publication date: 06/17/2011
+    Pierre Corsini (pcorsini@polytech.unice.fr)
+    Nicolas Dupont (npg.dupont@gmail.com)
+    Nicolas Fernandez (fernande@polytech.unice.fr)
+    Nima Izadi (nim.izadi@gmail.com)
+    And supervised by Raphaël Bellec (r.bellec@structure-computation.com)</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a 
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+and/or sell copies of the Software, and to permit persons to whom the Software 
+is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>The unbind and trigger function have been taken from Backbone Framework. 
+The onGesture function is inspired by the bind functon of Backbone Framework. </p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">Element::onGesture = </span><span class="nf">(eventName, callback) -&gt;</span>
+	<span class="k">if</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">router</span><span class="o">?</span>
+		<span class="k">this</span><span class="p">.</span><span class="nv">router = </span><span class="k">new</span> <span class="nx">EventRouter</span> <span class="k">this</span>
+	<span class="nv">calls = </span><span class="nx">@_callbacks</span> <span class="o">or</span> <span class="vi">@_callbacks = </span><span class="p">{}</span>
+	<span class="nv">list = </span><span class="nx">@_callbacks</span><span class="p">[</span><span class="nx">eventName</span><span class="p">]</span> <span class="o">or</span> <span class="nx">@_callbacks</span><span class="p">[</span><span class="nx">eventName</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="nx">list</span><span class="p">.</span><span class="nx">push</span> <span class="nx">callback</span>
+	<span class="k">return</span> <span class="k">this</span>
+
+<span class="nv">Element::unbindGesture = </span><span class="nf">(ev, callback) -&gt;</span>
+	<span class="k">if</span> <span class="o">!</span><span class="nx">ev</span>
+		<span class="vi">@_callbacks = </span><span class="p">{}</span>
+	<span class="k">else</span> <span class="k">if</span> <span class="nv">calls = </span><span class="nx">@_callbacks</span>
+		<span class="k">if</span> <span class="o">!</span><span class="nx">callback</span>
+			<span class="nx">calls</span><span class="p">[</span><span class="nx">ev</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="k">else</span>
+			<span class="nv">list = </span><span class="nx">calls</span><span class="p">[</span><span class="nx">ev</span><span class="p">];</span>
+			<span class="k">if</span> <span class="o">!</span><span class="nx">list</span> 
+				<span class="k">return</span> <span class="k">this</span>
+			<span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">list</span>
+				<span class="k">if</span> <span class="nx">callback</span> <span class="o">==</span> <span class="nx">list</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+					<span class="nx">list</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+					<span class="k">break</span>
+	<span class="k">return</span> <span class="k">this</span>
+
+<span class="nv">Element::trigger = </span><span class="nf">(ev) -&gt;</span>
+	<span class="k">if</span> <span class="o">!</span><span class="p">(</span><span class="nv">calls = </span><span class="err">@</span><span class="p">.</span><span class="nx">_callbacks</span><span class="p">)</span> <span class="k">then</span> <span class="k">return</span> <span class="k">this</span>
+	<span class="k">if</span> <span class="nv">list = </span><span class="nx">calls</span><span class="p">[</span><span class="nx">ev</span><span class="p">]</span>
+		<span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">list</span>
+			<span class="nx">i</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="mi">1</span><span class="p">));</span>
+
+	<span class="k">if</span> <span class="nv">list = </span><span class="nx">calls</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]</span>
+		<span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">list</span>
+			<span class="nx">i</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">)</span>
+	<span class="k">return</span> <span class="k">this</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Basic functions added to String.
+Returns true if the string contains the substring "it"</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nb">String</span><span class="o">::</span><span class="nv">contains = </span><span class="nf">(it) -&gt;</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">it</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Basic functions added to Array.
+Returns true if the array contains the substring "it"</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nb">Array</span><span class="o">::</span><span class="nv">contains = </span><span class="nf">(element) -&gt;</span>
+	<span class="k">for</span> <span class="nx">el</span> <span class="k">in</span> <span class="k">this</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">el</span> <span class="o">==</span> <span class="nx">element</span><span class="p">)</span> <span class="k">then</span> <span class="k">return</span> <span class="kc">true</span>
+	<span class="k">return</span> <span class="kc">false</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Merge two hashes.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nb">Object</span><span class="p">.</span><span class="nv">merge = </span><span class="nf">(destination, source) -&gt;</span>
+	<span class="k">for</span> <span class="nx">property</span> <span class="k">of</span> <span class="nx">source</span>
+		<span class="nx">destination</span><span class="p">[</span><span class="nx">property</span><span class="p">]</span> <span class="o">=</span> <span class="nx">source</span><span class="p">[</span><span class="nx">property</span><span class="p">]</span> <span class="k">if</span> <span class="nx">source</span><span class="p">.</span><span class="nx">hasOwnProperty</span> <span class="nx">property</span>
+	<span class="k">return</span> <span class="nx">destination</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

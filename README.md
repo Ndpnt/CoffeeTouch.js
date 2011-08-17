@@ -2,6 +2,9 @@
 
 ## Getting Started
 
+If you just want to *use the library*, skip to the [User's manual](https://github.com/Crozis/CoffeeTouch/wiki/CoffeeTouch---User's-Manual)
+
+If you want to *fork or improve* the library:
 [CoffeeScript](http://jashkenas.github.com/coffee-script/) is required
 
 To compile in javascript file:
@@ -11,7 +14,7 @@ To compile in javascript file:
 ### Simple example
 
 	document.getElementById("myElement").onGesture("tap", function (event){
-		... // Do something when a 'tap' on the touchscreen has been made.
+		... // Do something when a 'tap' on the DOM element called 'myElement' has been made.
 	})
 
 ### Important

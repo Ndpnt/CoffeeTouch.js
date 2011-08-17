@@ -17,6 +17,9 @@
       ctx.closePath();
       return ctx.fill();
     });
+    $('canvas').onGesture("all", function(name, params) {
+      return $('debug').innerHTML = name + '<br/>' + $('debug').innerHTML;
+    });
     $('canvas').onGesture("tap,tap", function(params) {
       var p1, p2;
       p1 = {

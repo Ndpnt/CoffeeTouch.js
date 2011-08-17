@@ -16,6 +16,8 @@ window.onload = ->
 		ctx.closePath()
 		ctx.fill()
 
+	$('canvas').onGesture "all", (name, params) ->
+    $('debug').innerHTML = name + '<br/>' +$('debug').innerHTML
 		
 	$('canvas').onGesture "tap,tap", (params) ->
 		p1 = {
