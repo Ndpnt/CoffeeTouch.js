@@ -1,0 +1,78 @@
+<!DOCTYPE html>  <html> <head>   <title>Finger.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="Analyzer.html">                 Analyzer.coffee               </a>                                           <a class="source" href="AnalyzerHelper.html">                 AnalyzerHelper.coffee               </a>                                           <a class="source" href="EventRouter.html">                 EventRouter.coffee               </a>                                           <a class="source" href="Finger.html">                 Finger.coffee               </a>                                           <a class="source" href="MethodsHelper.html">                 MethodsHelper.coffee               </a>                                           <a class="source" href="StateMachine.html">                 StateMachine.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               Finger.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>Finger Object which contains an Id, a gesture and all important parameters about the finger
+Params:
+    fingerId
+    gestureName
+    params</p>
+
+<p>Copyright (c) 2011
+Publication date: 06/17/2011
+    Pierre Corsini (pcorsini@polytech.unice.fr)
+    Nicolas Dupont (npg.dupont@gmail.com)
+    Nicolas Fernandez (fernande@polytech.unice.fr)
+    Nima Izadi (nim.izadi@gmail.com)
+    And supervised by Raphaël Bellec (r.bellec@structure-computation.com)</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a 
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+and/or sell copies of the Software, and to permit persons to whom the Software 
+is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>FingerGesture Object
+    Contains all informations relative to a finger during all its gesture
+@params: 
+        @fingerId:      id given by the browser event. Used to differentiate all fingers
+    @gestureName:   Basic gesture name ("drag", "tap", "doubletap", etc.)
+        eventObj:       Event object given by the browsers. Useful for basics informations (position etc.)</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">FingerGesture</span>
+	<span class="nv">constructor: </span><span class="nf">(@fingerId, @gestureName, eventObj) -&gt;</span>
+		<span class="nv">date = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">()</span>
+		<span class="vi">@params = </span><span class="p">{}</span>
+		<span class="vi">@positions = </span><span class="p">[]</span>
+		<span class="nx">@positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> 
+			<span class="nv">x: </span><span class="nx">eventObj</span><span class="p">.</span><span class="nx">clientX</span>
+			<span class="nv">y: </span><span class="nx">eventObj</span><span class="p">.</span><span class="nx">clientY</span>
+			<span class="nv">time: </span><span class="nx">date</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span>
+		<span class="vi">@positionCount = </span><span class="mi">0</span>
+		<span class="vi">@params.startX = </span><span class="nx">eventObj</span><span class="p">.</span><span class="nx">clientX</span>
+		<span class="vi">@params.startY = </span><span class="nx">eventObj</span><span class="p">.</span><span class="nx">clientY</span>
+		<span class="vi">@params.timeStart = </span><span class="nx">date</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span>
+		<span class="vi">@params.timeElapsed = </span><span class="mi">0</span>
+		<span class="vi">@params.panX = </span><span class="mi">0</span>
+		<span class="vi">@params.panY = </span><span class="mi">0</span>
+		<span class="vi">@params.gestureName = </span><span class="nx">@gestureName</span>
+		<span class="nx">@updatePosition</span><span class="p">(</span><span class="nx">eventObj</span><span class="p">)</span>
+		<span class="vi">@params.speed = </span><span class="mi">0</span>
+		<span class="vi">@params.dragDirection = </span><span class="s2">&quot;unknown&quot;</span>
+		<span class="vi">@isFlick = </span><span class="kc">false</span>
+	</pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Function called when the finger move on the screen</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="nv">update: </span><span class="nf">(@gestureName, eventObj) -&gt;</span>
+		<span class="nx">@positionCount</span><span class="o">++</span>
+		<span class="nv">date = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">()</span>
+		<span class="nx">@positions</span><span class="p">[</span><span class="nx">@positionCount</span><span class="p">]</span> <span class="o">=</span>
+			<span class="nv">x: </span><span class="nx">eventObj</span><span class="p">.</span><span class="nx">clientX</span>
+			<span class="nv">y: </span><span class="nx">eventObj</span><span class="p">.</span><span class="nx">clientY</span>
+			<span class="nv">time: </span><span class="nx">date</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span>
+		<span class="vi">@params.timeElapsed = </span><span class="nx">date</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">-</span> <span class="nx">@params</span><span class="p">.</span><span class="nx">timeStart</span>
+		<span class="nx">@updatePosition</span> <span class="nx">eventObj</span>
+		<span class="k">if</span> <span class="nx">@gestureName</span> <span class="o">==</span> <span class="s2">&quot;drag&quot;</span>
+			<span class="nv">movedX = </span><span class="nx">@params</span><span class="p">.</span><span class="nx">x</span> <span class="o">-</span> <span class="nx">@positions</span><span class="p">[</span><span class="nx">@positionCount</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="nx">x</span>
+			<span class="nv">movedY = </span><span class="nx">@params</span><span class="p">.</span><span class="nx">y</span> <span class="o">-</span> <span class="nx">@positions</span><span class="p">[</span><span class="nx">@positionCount</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="nx">y</span>
+			<span class="vi">@params.speed = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">(</span><span class="nx">movedX</span> <span class="o">*</span> <span class="nx">movedX</span>  <span class="o">+</span> <span class="nx">movedY</span>  <span class="o">*</span> <span class="nx">movedY</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nx">@positions</span><span class="p">[</span><span class="nx">@positionCount</span><span class="p">].</span><span class="nx">time</span> <span class="o">-</span> <span class="nx">@positions</span><span class="p">[</span><span class="nx">@positionCount</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="nx">time</span><span class="p">)</span> <span class="c1">#/</span>
+			<span class="vi">@params.dragDirection = </span><span class="nx">getDragDirection</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">@gestureName</span> <span class="o">==</span> <span class="s2">&quot;dragend&quot;</span>
+			<span class="k">if</span> <span class="nx">@params</span><span class="p">.</span><span class="nx">speed</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="o">or</span> <span class="nx">@params</span><span class="p">.</span><span class="nx">timeElapsed</span> <span class="o">&lt;</span> <span class="mi">100</span>
+				<span class="vi">@isFlick = </span><span class="kc">true</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Update finger position</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="nv">updatePosition: </span><span class="nf">(eventObj) -&gt;</span>
+		<span class="vi">@params.x = </span><span class="nx">eventObj</span><span class="p">.</span><span class="nx">clientX</span>
+		<span class="vi">@params.y = </span><span class="nx">eventObj</span><span class="p">.</span><span class="nx">clientY</span>
+		<span class="vi">@params.panX = </span><span class="nx">@params</span><span class="p">.</span><span class="nx">x</span> <span class="o">-</span> <span class="nx">@params</span><span class="p">.</span><span class="nx">startX</span>
+		<span class="vi">@params.panY = </span><span class="nx">@params</span><span class="p">.</span><span class="nx">y</span> <span class="o">-</span> <span class="nx">@params</span><span class="p">.</span><span class="nx">startY</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

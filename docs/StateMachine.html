@@ -1,0 +1,107 @@
+<!DOCTYPE html>  <html> <head>   <title>StateMachine.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="Analyzer.html">                 Analyzer.coffee               </a>                                           <a class="source" href="AnalyzerHelper.html">                 AnalyzerHelper.coffee               </a>                                           <a class="source" href="EventRouter.html">                 EventRouter.coffee               </a>                                           <a class="source" href="Finger.html">                 Finger.coffee               </a>                                           <a class="source" href="MethodsHelper.html">                 MethodsHelper.coffee               </a>                                           <a class="source" href="StateMachine.html">                 StateMachine.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               StateMachine.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>State Machine
+        Analyse all possible basic gesture of a single finger</p>
+
+<p>Copyright (c) 2011
+Publication date: 06/17/2011
+    Pierre Corsini (pcorsini@polytech.unice.fr)
+    Nicolas Dupont (npg.dupont@gmail.com)
+    Nicolas Fernandez (fernande@polytech.unice.fr)
+    Nima Izadi (nim.izadi@gmail.com)
+    And supervised by Raphaël Bellec (r.bellec@structure-computation.com)</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a 
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+and/or sell copies of the Software, and to permit persons to whom the Software 
+is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">StateMachine</span>
+	<span class="nv">constructor: </span><span class="nf">(@identifier, @router)-&gt;</span> 
+		<span class="vi">@currentState = </span><span class="k">new</span> <span class="nx">NoTouch</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+		<span class="vi">@analyser = </span><span class="k">new</span> <span class="nx">Analyser</span>
+	<span class="nv">apply: </span><span class="nf">(eventName, eventObj) -&gt;</span>
+		<span class="nx">@currentState</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">eventName</span><span class="p">,</span> <span class="nx">eventObj</span><span class="p">)</span>
+
+	<span class="nv">setState: </span><span class="nf">(newState) -&gt;</span> <span class="vi">@currentState = </span><span class="nx">newState</span>
+	<span class="nv">getState: </span><span class="o">-&gt;</span> <span class="nx">@currentState</span>
+	
+	
+
+<span class="k">class</span> <span class="nx">GenericState</span>
+	<span class="nv">init: </span><span class="o">-&gt;</span> <span class="c1"># Defined par les sous classes</span>
+
+	<span class="nv">constructor: </span><span class="nf">(@machine) -&gt;</span>
+		<span class="vi">@eventObj = </span><span class="k">if</span> <span class="nx">@machine</span><span class="p">.</span><span class="nx">currentState</span><span class="o">?</span> <span class="k">then</span> <span class="nx">@machine</span><span class="p">.</span><span class="nx">currentState</span><span class="p">.</span><span class="nx">eventObj</span> <span class="k">else</span> <span class="p">{}</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">init</span><span class="p">()</span>
+
+	<span class="nv">apply: </span><span class="nf">(eventName, arg) -&gt;</span>
+		<span class="nb">Object</span><span class="p">.</span><span class="nx">merge</span><span class="p">(</span><span class="nx">@eventObj</span><span class="p">,</span> <span class="nx">arg</span><span class="p">)</span>
+		<span class="k">this</span><span class="p">[</span><span class="nx">eventName</span><span class="p">]()</span>
+
+	<span class="nv">touchstart: </span><span class="o">-&gt;</span> <span class="c1">#throw &quot;undefined&quot;</span>
+	<span class="nv">touchmove: </span><span class="o">-&gt;</span> <span class="c1">#throw &quot;undefined&quot;</span>
+	<span class="nv">touchend: </span><span class="o">-&gt;</span> <span class="c1">#throw &quot;undefined&quot;</span>
+
+	<span class="nv">notify: </span><span class="nf">(name) -&gt;</span>
+		<span class="nx">@machine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">broadcast</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">@eventObj</span><span class="p">)</span>	
+
+
+<span class="k">class</span> <span class="nx">NoTouch</span> <span class="k">extends</span> <span class="nx">GenericState</span>
+	<span class="nv">touchstart: </span><span class="o">-&gt;</span>
+		<span class="nx">@machine</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="k">new</span> <span class="nx">FirstTouch</span> <span class="nx">@machine</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nx">FirstTouch</span> <span class="k">extends</span> <span class="nx">GenericState</span>
+	<span class="nv">init: </span><span class="o">-&gt;</span>
+		<span class="nv">_machine = </span><span class="nx">@machine</span>
+		<span class="vi">@fixedtimer = </span><span class="nx">setTimeout</span> <span class="p">(</span><span class="o">-&gt;</span><span class="p">(</span><span class="nx">_machine</span><span class="p">.</span><span class="nx">setState</span> <span class="k">new</span> <span class="nx">Fixed</span> <span class="nx">_machine</span><span class="p">)),</span> <span class="mi">300</span>
+
+	<span class="nv">touchend: </span><span class="o">-&gt;</span>
+		<span class="nx">clearTimeout</span> <span class="nx">@fixedtimer</span>
+		<span class="nx">@notify</span> <span class="s2">&quot;tap&quot;</span>
+		<span class="nx">@machine</span><span class="p">.</span><span class="nx">setState</span> <span class="k">new</span> <span class="nx">NoTouch</span> <span class="nx">@machine</span>
+
+	<span class="nv">touchmove: </span><span class="o">-&gt;</span>
+		<span class="nx">clearTimeout</span> <span class="nx">@fixedtimer</span>
+		<span class="nx">@notify</span> <span class="s2">&quot;drag&quot;</span>
+		<span class="nx">@machine</span><span class="p">.</span><span class="nx">setState</span> <span class="k">new</span> <span class="nx">Drag</span> <span class="nx">@machine</span>
+
+		
+<span class="k">class</span> <span class="nx">Fixed</span> <span class="k">extends</span> <span class="nx">GenericState</span>
+	<span class="nv">init: </span><span class="o">-&gt;</span>
+		<span class="nx">@notify</span> <span class="s2">&quot;fixed&quot;</span>
+
+	<span class="nv">touchend: </span><span class="o">-&gt;</span>
+		<span class="nx">@notify</span> <span class="s2">&quot;fixedend&quot;</span>
+		<span class="nx">@machine</span><span class="p">.</span><span class="nx">setState</span> <span class="k">new</span> <span class="nx">NoTouch</span> <span class="nx">@machine</span>
+
+
+<span class="k">class</span> <span class="nx">Drag</span> <span class="k">extends</span> <span class="nx">GenericState</span>
+	<span class="nv">init: </span><span class="o">-&gt;</span>
+		<span class="vi">@isTap = </span><span class="kc">true</span>
+		<span class="vi">@initialX = </span><span class="nx">@eventObj</span><span class="p">.</span><span class="nx">clientX</span>
+		<span class="vi">@initialY = </span><span class="nx">@eventObj</span><span class="p">.</span><span class="nx">clientY</span>	
+		<span class="vi">@delta = </span><span class="mi">15</span>
+		<span class="nv">that = </span><span class="k">this</span>		
+		<span class="nx">setTimeout</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="nv">that.isTap = </span><span class="kc">false</span><span class="p">),</span> <span class="mi">150</span>
+
+	<span class="nv">touchmove: </span><span class="o">-&gt;</span>
+		<span class="nx">@notify</span> <span class="s2">&quot;drag&quot;</span>
+
+	<span class="nv">touchend: </span><span class="o">-&gt;</span>
+		<span class="k">if</span> <span class="nx">@isTap</span> <span class="o">and</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">@eventObj</span><span class="p">.</span><span class="nx">clientX</span> <span class="o">-</span> <span class="nx">@initialX</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nx">@delta</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">@eventObj</span><span class="p">.</span><span class="nx">clientY</span> <span class="o">-</span> <span class="nx">@initialY</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nx">@delta</span><span class="p">)</span>
+			<span class="nx">@notify</span> <span class="s2">&quot;tap&quot;</span>
+		<span class="k">else</span>
+			<span class="nx">@notify</span> <span class="s2">&quot;dragend&quot;</span>
+		<span class="nx">@machine</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="k">new</span> <span class="nx">NoTouch</span> <span class="nx">@machine</span><span class="p">)</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

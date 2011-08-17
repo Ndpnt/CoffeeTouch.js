@@ -6,20 +6,20 @@ window.onload = ->
 	zAngle = 0
 
 	$('body').onGesture "flick:up", (params) ->
-		xAngle += 360
+		xAngle += 90
 		$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
 
 	$('body').onGesture "flick:down", (params) ->
-		xAngle -= 360
+		xAngle -= 90
 		$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
 	
 	$('body').onGesture "flick:left", (params) ->
-		yAngle -= 360
+		yAngle -= 90
 		$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
 		
 
 	$('body').onGesture "flick:right", (params) ->
-		yAngle += 360
+		yAngle += 90
 		$('cube').style.webkitTransform = "rotateX(" + xAngle + "deg) rotateY(" + yAngle + "deg) rotateZ(" + zAngle + "deg)"
 	
 
