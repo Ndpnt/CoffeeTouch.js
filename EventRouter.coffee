@@ -79,7 +79,7 @@ class EventRouter
 		target.global =
 			scale: event.scale
 			rotation: event.rotation
-		
+			event: event
 
 
 	broadcast: (name, eventObj) ->

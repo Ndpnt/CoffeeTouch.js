@@ -44,6 +44,7 @@ class Analyser
 	notify: (fingerID, gestureName, @eventObj) ->
 		@informations.rotation = @eventObj.global.rotation 
 		@informations.scale = @eventObj.global.scale
+		@informations.target = @eventObj.global.event.targetTouches[0]
 		date = new Date()
 		@informations.timeElapsed = date.getTime() - @informations.timeStart
 		if @fingersArray[fingerID]?

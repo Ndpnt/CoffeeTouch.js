@@ -326,7 +326,8 @@
       target.global = {};
       return target.global = {
         scale: event.scale,
-        rotation: event.rotation
+        rotation: event.rotation,
+        event: event
       };
     };
     EventRouter.prototype.broadcast = function(name, eventObj) {
@@ -443,6 +444,7 @@
       this.eventObj = eventObj;
       this.informations.rotation = this.eventObj.global.rotation;
       this.informations.scale = this.eventObj.global.scale;
+      this.informations.target = this.eventObj.global.event.targetTouches[0];
       date = new Date();
       this.informations.timeElapsed = date.getTime() - this.informations.timeStart;
       if (this.fingersArray[fingerID] != null) {
