@@ -84,8 +84,6 @@ class Analyser
 	triggerPinchOrSpread: ->
 		# Spread and Pinch detection
 		sameDirection = false
-		for finger in @fingers
-			alert finger.params.dragDirection 
 		if @informations.scale < 1.1 and !sameDirection
 			@targetElement.trigger "#{digit_name(@fingers.length)}:pinch", @informations
 			@targetElement.trigger "pinch", @informations
@@ -132,67 +130,8 @@ class Analyser
 			@lastRotation = @informations.rotation
 		rotationDirection = ""
 		if @informations.rotation > @lastRotation then rotationDirection = "rotate:cw" else rotationDirection = "rotate:ccw"	
-		#@lastRotation = @informations.rotation
-
 		
 		@targetElement.trigger rotationDirection, @informations
 		@targetElement.trigger "rotate", @informations
 		@targetElement.trigger "#{digit_name(@fingers.length)}:#{rotationDirection}", @informations
 		@targetElement.trigger "#{digit_name(@fingers.length)}:rotate", @informations
-
-	# Trigger combination of names which are like "one:....,two:..." etc.
-	generateGrouppedFingerName: -> 
-		gestureName = [] 
-		gestureNameDrag = []
-		triggerDrag = false
-		gestures = 
-			tap: 0
-			doubletap: 0
-			fixed: 0
-			fixedend: 0
-			drag: 0
-			dragend: {n: 0, fingers: []}
-			dragDirection:
-				up: 0
-				down: 0
-				left: 0
-				right: 0
-				drag: 0
-		
-		for finger in @fingers
-			switch finger.gestureName
-				when "tap" then gestures.tap++
-				when "doubletap" then gestures.doubletap++
-				when "fixed" then gestures.fixed++
-				when "fixedend" then gestures.fixedend++
-				when "dragend" 
-					gestures.dragend.n++
-					gestures.dragend.fingers.push finger
-				when "drag"
-					gestures.drag++
-					switch finger.params.dragDirection
-						when "up" then gestures.dragDirection.up++
-						when "down" then gestures.dragDirection.down++
-						when "right" then gestures.dragDirection.right++
-						when "left" then gestures.dragDirection.left++
-		for gesture of gestures
-			# For the flick, I consider that if two drag end has been done at the same time and one of them is
-			# a flick, both of them where flick
-			if gesture == "dragend" and gestures[gesture].n > 0
-				for finger in gestures[gesture].fingers
-					if finger.isFlick
-						gestureName.push "#{digit_name(gestures[gesture].n)}:flick" 
-						gestureNameDrag.push "#{digit_name(gestures[gesture].n)}:flick:#{finger.params.dragDirection}"
-						triggerDrag = true
-						break
-			else if gesture == "dragDirection"
-				for gestureDirection of gestures[gesture]
-					if gestures[gesture][gestureDirection] > 0
-						gestureNameDrag.push "#{digit_name(gestures[gesture][gestureDirection])}:#{gestureDirection}" 
-						triggerDrag = true
-			else if gestures[gesture] > 0
-				gestureName.push "#{digit_name(gestures[gesture])}:#{gesture}"
-				gestureNameDrag.push "#{digit_name(gestures[gesture])}:#{gesture}" if gesture != "drag"
-
-		@targetElement.trigger gestureName, @informations if gestureName.length > 0
-		@targetElement.trigger gestureNameDrag, @informations if triggerDrag

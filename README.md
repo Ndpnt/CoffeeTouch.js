@@ -29,6 +29,9 @@ Example:
 		...
 	})
 
+Events functions have been taken from Backbone and have been added to Element's prototype.
+You can refer to [Backbone Events](http://documentcloud.github.com/backbone/#Events).
+
 ### User's manual
 
 See wiki for a more complete documentation:
