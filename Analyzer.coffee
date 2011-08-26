@@ -47,7 +47,6 @@ class Analyser
 		@gestureName = []
 		@gestureName.push finger.gestureName for finger in @fingers
 		@targetElement.trigger @gestureName, @informations
-		@generateGrouppedFingerName()
 		@triggerDrag()
 		@triggerFixed()
 		@triggerFlick()

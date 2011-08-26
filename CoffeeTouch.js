@@ -1,5 +1,5 @@
 (function() {
-  var Drag, EventGrouper, EventRouter, FingerGesture, FirstTouch, Fixed, GenericState, NoTouch, StateMachine;
+  var Analyser, Drag, EventGrouper, EventRouter, FingerGesture, FirstTouch, Fixed, GenericState, NoTouch, StateMachine, digit_name, distanceBetweenTwoPoints, getDirection, getDragDirection;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -383,11 +383,6 @@
     };
     return EventGrouper;
   })();
-}).call(this);
-tifier, name, eventObj);
-    };
-    return EventGrouper;
-  })();
   Object.swap = function(obj1, obj2) {
     var temp;
     temp = obj2;
@@ -475,7 +470,6 @@ tifier, name, eventObj);
         this.gestureName.push(finger.gestureName);
       }
       this.targetElement.trigger(this.gestureName, this.informations);
-      this.generateGrouppedFingerName();
       this.triggerDrag();
       this.triggerFixed();
       this.triggerFlick();
