@@ -113,7 +113,7 @@ window.onload = ->
 	drawCanvas = ->
 		ctx.clearRect(0, 0, canvas.width, canvas.height)			
 		for i in [0..allPoint.length - 1]
-			if allPoint[i].validate == false
+			if allPoint[i] and allPoint[i].validate == false
 				if allPoint[i].p
 					ctx.lineWidth = style.cpline.width
 					ctx.strokeStyle = style.cpline.color

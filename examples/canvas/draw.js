@@ -123,7 +123,7 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       _results = [];
       for (i = 0, _ref = allPoint.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
-        if (allPoint[i].validate === false) {
+        if (allPoint[i] && allPoint[i].validate === false) {
           if (allPoint[i].p) {
             ctx.lineWidth = style.cpline.width;
             ctx.strokeStyle = style.cpline.color;
