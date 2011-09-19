@@ -61,3 +61,10 @@ Object.merge = (destination, source) ->
 	for property of source
 		destination[property] = source[property] if source.hasOwnProperty property
 	return destination
+
+if jQuery?
+  ( ($) ->
+    $.fn.onGesture = (eventName, callback) ->
+      return this.each (i, element) ->
+        element.onGesture(eventName, callback)
+  )(jQuery)

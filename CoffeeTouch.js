@@ -82,6 +82,15 @@
     }
     return destination;
   };
+  if (typeof jQuery !== "undefined" && jQuery !== null) {
+    (function($) {
+      return $.fn.onGesture = function(eventName, callback) {
+        return this.each(function(i, element) {
+          return element.onGesture(eventName, callback);
+        });
+      };
+    })(jQuery);
+  }
   StateMachine = (function() {
     function StateMachine(identifier, router) {
       this.identifier = identifier;
