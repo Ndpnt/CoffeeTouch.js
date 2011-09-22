@@ -2,6 +2,11 @@ body{
   font-size   : 2em;
   font-family: 'Sigmar One', sans-serif;
 }
+p.example{
+  color       : #777;
+  font-style  : italic;
+  font-size   : 0.8em;
+}
 #animation_box{
   text-align      : center;
   font-size       : 3em;
