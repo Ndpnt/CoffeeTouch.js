@@ -46,7 +46,7 @@ class Analyser
 		@init() if @firstAnalysis
 		@gestureName = []
 		@gestureName.push finger.gestureName for finger in @fingers
-		@targetElement.trigger @gestureName, @informations
+		@targetElement.makeGesture @gestureName, @informations
 		@triggerDrag()
 		@triggerFixed()
 		@triggerFlick()
@@ -77,18 +77,18 @@ class Analyser
 	triggerDragDirections: ->
 		gestureName = []
 		gestureName.push finger.params.dragDirection for finger in @fingers
-		@targetElement.trigger gestureName, @informations if !gestureName.contains "unknown"
+		@targetElement.makeGesture gestureName, @informations if !gestureName.contains "unknown"
 
 	# Test if the drag is a pinch or a spread
 	triggerPinchOrSpread: ->
 		# Spread and Pinch detection
 		sameDirection = false
 		if @informations.scale < 1.1 and !sameDirection
-			@targetElement.trigger "#{digit_name(@fingers.length)}:pinch", @informations
-			@targetElement.trigger "pinch", @informations
+			@targetElement.makeGesture "#{digit_name(@fingers.length)}:pinch", @informations
+			@targetElement.makeGesture "pinch", @informations
 		else if @informations.scale > 1.1 and !sameDirection
-			@targetElement.trigger "#{digit_name(@fingers.length)}:spread", @informations
-			@targetElement.trigger "spread", @informations
+			@targetElement.makeGesture "#{digit_name(@fingers.length)}:spread", @informations
+			@targetElement.makeGesture "spread", @informations
 
 
 	# Trigger all names related to the fixed event
@@ -102,7 +102,7 @@ class Analyser
 					break
 				if finger.gestureName == "drag" then gestureName.push finger.params.dragDirection else gestureName.push "fixed"
 			if !dontTrigger
-				@targetElement.trigger gestureName, @informations
+				@targetElement.makeGesture gestureName, @informations
 			
 	# Trigger all names related to the flick event
 	triggerFlick: ->
@@ -119,8 +119,8 @@ class Analyser
 					gestureName1.push finger.params.dragDirection
 					gestureName2.push finger.params.dragDirection
 			if !dontTrigger
-				@targetElement.trigger gestureName1, @informations
-				@targetElement.trigger gestureName2, @informations
+				@targetElement.makeGesture gestureName1, @informations
+				@targetElement.makeGesture gestureName2, @informations
 		
 
 	# Trigger if it is a rotation, and specify if it is clockwise or counterclockwise
@@ -130,7 +130,7 @@ class Analyser
 		rotationDirection = ""
 		if @informations.rotation > @lastRotation then rotationDirection = "rotate:cw" else rotationDirection = "rotate:ccw"	
 		
-		@targetElement.trigger rotationDirection, @informations
-		@targetElement.trigger "rotate", @informations
-		@targetElement.trigger "#{digit_name(@fingers.length)}:#{rotationDirection}", @informations
-		@targetElement.trigger "#{digit_name(@fingers.length)}:rotate", @informations
+		@targetElement.makeGesture rotationDirection, @informations
+		@targetElement.makeGesture "rotate", @informations
+		@targetElement.makeGesture "#{digit_name(@fingers.length)}:#{rotationDirection}", @informations
+		@targetElement.makeGesture "#{digit_name(@fingers.length)}:rotate", @informations

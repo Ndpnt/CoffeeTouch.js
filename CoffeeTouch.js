@@ -19,7 +19,7 @@
     return this;
   };
   Element.prototype.unbindGesture = function(ev, callback) {
-    var calls, i, list, _i, _len;
+    var callbackfunction, calls, i, list, _len;
     if (!ev) {
       this._callbacks = {};
     } else if (calls = this._callbacks) {
@@ -30,9 +30,9 @@
         if (!list) {
           return this;
         }
-        for (_i = 0, _len = list.length; _i < _len; _i++) {
-          i = list[_i];
-          if (callback === list[i]) {
+        for (i = 0, _len = list.length; i < _len; i++) {
+          callbackfunction = list[i];
+          if (callback === callbackfunction) {
             list.splice(i, 1);
             break;
           }
@@ -41,21 +41,21 @@
     }
     return this;
   };
-  Element.prototype.trigger = function(ev) {
-    var calls, i, list, _i, _j, _len, _len2;
+  Element.prototype.makeGesture = function(ev) {
+    var callbacFunction, calls, list, _i, _j, _len, _len2;
     if (!(calls = this._callbacks)) {
       return this;
     }
     if (list = calls[ev]) {
       for (_i = 0, _len = list.length; _i < _len; _i++) {
-        i = list[_i];
-        i.apply(this, Array.prototype.slice.call(arguments, 1));
+        callbacFunction = list[_i];
+        callbacFunction.apply(this, Array.prototype.slice.call(arguments, 1));
       }
     }
     if (list = calls['all']) {
       for (_j = 0, _len2 = list.length; _j < _len2; _j++) {
-        i = list[_j];
-        i.apply(this, arguments);
+        callbacFunction = list[_j];
+        callbacFunction.apply(this, arguments);
       }
     }
     return this;
@@ -84,9 +84,19 @@
   };
   if (typeof jQuery !== "undefined" && jQuery !== null) {
     (function($) {
-      return $.fn.onGesture = function(eventName, callback) {
+      $.fn.onGesture = function(eventName, callback) {
         return this.each(function(i, element) {
           return element.onGesture(eventName, callback);
+        });
+      };
+      $.fn.unbindGesture = function(eventName, callback) {
+        return this.each(function(i, element) {
+          return element.unbindGesture(eventName, callback);
+        });
+      };
+      return $.fn.makeGesture = function(eventName) {
+        return this.each(function(i, element) {
+          return element.makeGesture(eventName);
         });
       };
     })(jQuery);
@@ -478,7 +488,7 @@
         finger = _ref[_i];
         this.gestureName.push(finger.gestureName);
       }
-      this.targetElement.trigger(this.gestureName, this.informations);
+      this.targetElement.makeGesture(this.gestureName, this.informations);
       this.triggerDrag();
       this.triggerFixed();
       this.triggerFlick();
@@ -518,18 +528,18 @@
         gestureName.push(finger.params.dragDirection);
       }
       if (!gestureName.contains("unknown")) {
-        return this.targetElement.trigger(gestureName, this.informations);
+        return this.targetElement.makeGesture(gestureName, this.informations);
       }
     };
     Analyser.prototype.triggerPinchOrSpread = function() {
       var sameDirection;
       sameDirection = false;
       if (this.informations.scale < 1.1 && !sameDirection) {
-        this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":pinch", this.informations);
-        return this.targetElement.trigger("pinch", this.informations);
+        this.targetElement.makeGesture("" + (digit_name(this.fingers.length)) + ":pinch", this.informations);
+        return this.targetElement.makeGesture("pinch", this.informations);
       } else if (this.informations.scale > 1.1 && !sameDirection) {
-        this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":spread", this.informations);
-        return this.targetElement.trigger("spread", this.informations);
+        this.targetElement.makeGesture("" + (digit_name(this.fingers.length)) + ":spread", this.informations);
+        return this.targetElement.makeGesture("spread", this.informations);
       }
     };
     Analyser.prototype.triggerFixed = function() {
@@ -551,7 +561,7 @@
           }
         }
         if (!dontTrigger) {
-          return this.targetElement.trigger(gestureName, this.informations);
+          return this.targetElement.makeGesture(gestureName, this.informations);
         }
       }
     };
@@ -576,8 +586,8 @@
           }
         }
         if (!dontTrigger) {
-          this.targetElement.trigger(gestureName1, this.informations);
-          return this.targetElement.trigger(gestureName2, this.informations);
+          this.targetElement.makeGesture(gestureName1, this.informations);
+          return this.targetElement.makeGesture(gestureName2, this.informations);
         }
       }
     };
@@ -592,10 +602,10 @@
       } else {
         rotationDirection = "rotate:ccw";
       }
-      this.targetElement.trigger(rotationDirection, this.informations);
-      this.targetElement.trigger("rotate", this.informations);
-      this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":" + rotationDirection, this.informations);
-      return this.targetElement.trigger("" + (digit_name(this.fingers.length)) + ":rotate", this.informations);
+      this.targetElement.makeGesture(rotationDirection, this.informations);
+      this.targetElement.makeGesture("rotate", this.informations);
+      this.targetElement.makeGesture("" + (digit_name(this.fingers.length)) + ":" + rotationDirection, this.informations);
+      return this.targetElement.makeGesture("" + (digit_name(this.fingers.length)) + ":rotate", this.informations);
     };
     return Analyser;
   })();

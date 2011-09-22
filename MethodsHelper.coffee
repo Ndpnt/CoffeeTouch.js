@@ -18,30 +18,30 @@ Element::onGesture = (eventName, callback) ->
 	return this
 
 Element::unbindGesture = (ev, callback) ->
-	if !ev
-		@_callbacks = {}
-	else if calls = @_callbacks
-		if !callback
-			calls[ev] = []
-		else
-			list = calls[ev];
-			if !list 
-				return this
-			for i in list
-				if callback == list[i]
-					list.splice(i, 1)
-					break
-	return this
+  if !ev
+    @_callbacks = {}
+  else if calls = @_callbacks
+    if !callback
+      calls[ev] = []
+    else
+      list = calls[ev]
+      if !list
+        return this
+      for callbackfunction, i in list
+        if callback == callbackfunction
+          list.splice(i, 1)
+          break
+  return this
 
-Element::trigger = (ev) ->
+Element::makeGesture = (ev) ->
 	if !(calls = @._callbacks) then return this
 	if list = calls[ev]
-		for i in list
-			i.apply(this, Array.prototype.slice.call(arguments, 1));
+		for callbacFunction in list
+			callbacFunction.apply(this, Array.prototype.slice.call(arguments, 1));
 
 	if list = calls['all']
-		for i in list
-			i.apply(this, arguments)
+		for callbacFunction in list
+			callbacFunction.apply(this, arguments)
 	return this
 
 # Basic functions added to String.
@@ -67,4 +67,11 @@ if jQuery?
     $.fn.onGesture = (eventName, callback) ->
       return this.each (i, element) ->
         element.onGesture(eventName, callback)
+    $.fn.unbindGesture = (eventName, callback) ->
+      return this.each (i, element) ->
+        element.unbindGesture(eventName, callback)
+    $.fn.makeGesture = (eventName) ->
+      return this.each (i, element) ->
+        element.makeGesture(eventName)
   )(jQuery)
+  
