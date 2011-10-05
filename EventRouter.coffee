@@ -8,12 +8,11 @@
 
 class EventRouter
 	constructor: (@element) ->
-		@grouper = new EventGrouper
+		@grouper = new EventGrouper()
 		@machines = {}
-		that = this
-		@element.addEventListener "touchstart", (event) -> that.touchstart(event)
-		@element.addEventListener "touchend", (event) -> that.touchend(event)
-		@element.addEventListener "touchmove", (event) -> that.touchmove(event)	
+		@element.addEventListener "touchstart", (event) => @touchstart(event)
+		@element.addEventListener "touchend", (event) => @touchend(event)
+		@element.addEventListener "touchmove", (event) => @touchmove(event)	
 
 
 	touchstart: (event) ->
@@ -86,14 +85,18 @@ class EventGrouper
 		@send name, eventObj
 
 		if name == "tap"
-			if @savedTap[eventObj.identifier]? && ((new Date().getTime()) - @savedTap[eventObj.identifier].time) < 400
-				@send "doubletap", eventObj
-	
-			else
-				@savedTap[eventObj.identifier] =  {}
-				@savedTap[eventObj.identifier].event = eventObj
-				@savedTap[eventObj.identifier].time = new Date().getTime()
-	
+      if typeof this.first != 'undefined' 
+        t = (new Date().getTime() - this.last)
+        this.first = false
+      else
+        this.first = true
+      if !this.first and t < 300 # Same delta as iOS System
+        @send("doubletap", eventObj)
+      else
+        @savedTap[eventObj.identifier] =  {}
+        @savedTap[eventObj.identifier].event = eventObj
+        @savedTap[eventObj.identifier].time = new Date().getTime()
+      this.last = new Date().getTime()
 
 
 	send: (name, eventObj) ->

@@ -7,7 +7,7 @@
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  };
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   Element.prototype.onGesture = function(eventName, callback) {
     var calls, list;
     if (!(this.router != null)) {
@@ -275,20 +275,18 @@
   })();
   EventRouter = (function() {
     function EventRouter(element) {
-      var that;
       this.element = element;
-      this.grouper = new EventGrouper;
+      this.grouper = new EventGrouper();
       this.machines = {};
-      that = this;
-      this.element.addEventListener("touchstart", function(event) {
-        return that.touchstart(event);
-      });
-      this.element.addEventListener("touchend", function(event) {
-        return that.touchend(event);
-      });
-      this.element.addEventListener("touchmove", function(event) {
-        return that.touchmove(event);
-      });
+      this.element.addEventListener("touchstart", __bind(function(event) {
+        return this.touchstart(event);
+      }, this));
+      this.element.addEventListener("touchend", __bind(function(event) {
+        return this.touchend(event);
+      }, this));
+      this.element.addEventListener("touchmove", __bind(function(event) {
+        return this.touchmove(event);
+      }, this));
     }
     EventRouter.prototype.touchstart = function(event) {
       var i, iMachine, _i, _len, _ref, _results;
@@ -376,15 +374,23 @@
       }
     };
     EventGrouper.prototype.receive = function(name, eventObj, fingerCount, element) {
+      var t;
       this.send(name, eventObj);
       if (name === "tap") {
-        if ((this.savedTap[eventObj.identifier] != null) && ((new Date().getTime()) - this.savedTap[eventObj.identifier].time) < 400) {
-          return this.send("doubletap", eventObj);
+        if (typeof this.first !== 'undefined') {
+          t = new Date().getTime() - this.last;
+          this.first = false;
+        } else {
+          this.first = true;
+        }
+        if (!this.first && t < 300) {
+          this.send("doubletap", eventObj);
         } else {
           this.savedTap[eventObj.identifier] = {};
           this.savedTap[eventObj.identifier].event = eventObj;
-          return this.savedTap[eventObj.identifier].time = new Date().getTime();
+          this.savedTap[eventObj.identifier].time = new Date().getTime();
         }
+        return this.last = new Date().getTime();
       }
     };
     EventGrouper.prototype.send = function(name, eventObj) {
@@ -459,11 +465,16 @@
       this.informations.timeStart = date.getTime();
     }
     Analyser.prototype.notify = function(fingerID, gestureName, eventObj) {
-      var date;
+      var date, targetTouch, _i, _len, _ref;
       this.eventObj = eventObj;
       this.informations.rotation = this.eventObj.global.rotation;
       this.informations.scale = this.eventObj.global.scale;
-      this.informations.target = this.eventObj.global.event.targetTouches[0];
+      this.informations.targets = [];
+      _ref = this.eventObj.global.event.targetTouches;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        targetTouch = _ref[_i];
+        this.informations.targets.push(targetTouch.target);
+      }
       date = new Date();
       this.informations.timeElapsed = date.getTime() - this.informations.timeStart;
       if (this.fingersArray[fingerID] != null) {
