@@ -10,9 +10,7 @@ $ ->
     $('#animation_box').onGesture(lastGesture, callbackFunction)
     
   callbackFunction = ->
-    $('#animation_box').stop(true, true).animate({
-      opacity: 1
-    }, 500 ).animate({
+    $('#animation_box').stop(true, false).animate({
       backgroundColor: '#ccc'
     }, 500 ).animate({
       backgroundColor: '#123'
