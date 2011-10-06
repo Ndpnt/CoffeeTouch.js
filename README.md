@@ -2,7 +2,7 @@
 
 ## Getting Started
 
-Try it online with your multitouch device! (Multitouch works only(?) on iPad) [Examples](https://github.com/Crozis/CoffeeTouch/wiki/Examples)
+Try it online with your multitouch device! (Multitouch works (only?) on iPad) [Examples](https://github.com/Crozis/CoffeeTouch/wiki/Examples)
 
 If you just want to *use the library*, skip to the [User's manual](https://github.com/Crozis/CoffeeTouch/wiki/CoffeeTouch---User's-Manual)
 
