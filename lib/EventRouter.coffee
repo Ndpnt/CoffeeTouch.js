@@ -12,7 +12,7 @@ class EventRouter
 		@machines = {}
 		@element.addEventListener "touchstart", (event) => @touchstart(event)
 		@element.addEventListener "touchend", (event) => @touchend(event)
-		@element.addEventListener "touchmove", (event) => @touchmove(event)	
+		@element.addEventListener "touchmove", (event) => @touchmove(event)
 
 
 	touchstart: (event) ->
@@ -20,7 +20,7 @@ class EventRouter
 		@fingerCount = event.touches.length
 		@grouper.refreshFingerCount @fingerCount, @element
 
-		for i in event.changedTouches	
+		for i in event.changedTouches
 			if !@machines[i.identifier]
 				@addGlobal(event, i)
 				iMachine = new StateMachine i.identifier, this
@@ -32,7 +32,7 @@ class EventRouter
 		event.preventDefault()
 		for iMKey of @machines
 			iMKey = parseInt(iMKey)
-			exists = false	
+			exists = false
 			for iTouch in event.touches
 				if iTouch.identifier == iMKey
 					exists = true
@@ -40,9 +40,9 @@ class EventRouter
 				@machines[iMKey].apply("touchend", @addGlobal(event, {}))
 				delete @machines[iMKey]
 
-					
+
 		@fingerCount = event.touches.length
-		@grouper.refreshFingerCount @fingerCount, @element			
+		@grouper.refreshFingerCount @fingerCount, @element
 
 	touchmove: (event) ->
 		event.preventDefault()
@@ -52,14 +52,14 @@ class EventRouter
 				iMachine.apply "touchstart", i
 				@machines[i.identifier] = iMachine
 			@addGlobal event, i
-			@machines[i.identifier].apply("touchmove", i)		
-			
+			@machines[i.identifier].apply("touchmove", i)
+
 	addGlobal: (event, target) ->
 		target.global = {}
 		target.global =
-			scale: event.scale
+			scale: 		event.scale
 			rotation: event.rotation
-			event: event
+			event: 		event
 
 
 	broadcast: (name, eventObj) ->
@@ -71,21 +71,21 @@ class EventGrouper
 		@savedTap = {}
 		@fixedSave = {}
 		@fingerCount = 0
-		
+
 	refreshFingerCount: (newCount, element) -> # Initialize a new Analyzer, only if the number of fingers increase or is reset
 		@fingerCount = -1 if newCount == 0
 
 		if @fingerCount < newCount
 			@fingerCount = newCount
 			@analyser = new Analyser @fingerCount, element
-			@analyser.notify(@fixedSave[i].identifier, "fixed", @fixedSave[i]) for i of @fixedSave
-			
+			#@analyser.notify(@fixedSave[i].identifier, "fixed", @fixedSave[i]) for i of @fixedSave
+
 
 	receive: (name, eventObj, fingerCount, element) ->
 		@send name, eventObj
 
 		if name == "tap"
-      if typeof this.first != 'undefined' 
+      if typeof this.first != 'undefined'
         t = (new Date().getTime() - this.last)
         this.first = false
       else
@@ -105,4 +105,4 @@ class EventGrouper
 			for i of @fixedSave
 				delete @fixedSave[i] if eventObj.identifier == parseInt(i)
 		@analyser.notify(eventObj.identifier, name, eventObj)
-	
+

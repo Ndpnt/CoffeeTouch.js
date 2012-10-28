@@ -14,7 +14,7 @@ class Analyser
 	# Create an analyser object with total number of fingers and an array of all fingers as attribute
 	constructor: (@totalNbFingers, @targetElement) ->
 		@fingersArray = {} # Hash with fingerId: fingerGestureObject
-		@fingers = [] # Array with all fingers		
+		@fingers = [] # Array with all fingers
 		@firstAnalysis = true # To know if we have to init the informations which will be returned
 		@informations = {} # All informations which will be send with the event gesture
 		@informations = {} # Informations corresponding to all fingers
@@ -23,16 +23,16 @@ class Analyser
 		date = new Date()
 		@fingerArraySize = 0
 		@informations.timeStart = date.getTime()
-		
+
 	# Notify the analyser of a gesture (gesture name, fingerId and parameters of new position etc)
 	notify: (fingerID, gestureName, @eventObj) ->
-		@informations.rotation = @eventObj.global.rotation 
-		@informations.scale = @eventObj.global.scale
+		@informations.rotation 	= @eventObj.global.rotation
+		@informations.scale 		= @eventObj.global.scale
     # Add all HTML targets of fingers
 		@informations.targets = []
 		for targetTouch in @eventObj.global.event.targetTouches
 		  @informations.targets.push targetTouch.target
-		
+
 		date = new Date()
 		@informations.timeElapsed = date.getTime() - @informations.timeStart
 		if @fingersArray[fingerID]?
@@ -43,7 +43,7 @@ class Analyser
 			@fingerArraySize++
 		# Analyse event only when it receives the information from each fingers of the gesture.
 		@analyse @totalNbFingers if @fingerArraySize is @totalNbFingers
-	
+
 	# Analayse precisly the gesture.
 	# Is called only when the analyser has been informed that all fingers have done a basic gesture.
 	analyse: (nbFingers) ->
@@ -55,7 +55,7 @@ class Analyser
 		@triggerFixed()
 		@triggerFlick()
 		@informations.firstTrigger = false if @informations.firstTrigger
-	
+
 	# Sort fingers and initialize some informations that will be triggered to the user
 	# Is called before analysis
 	init: ->
@@ -68,9 +68,9 @@ class Analyser
 		for i in [0..@fingers.length - 1]
 			@informations.fingers[i] = @fingers[i].params
 		@firstAnalysis = false
-	
+
 	# Trigger all names related to the drag event
-	triggerDrag: -> 
+	triggerDrag: ->
 		if @gestureName.contains "drag"
 			@triggerDragDirections()
 			if @gestureName.length > 1
@@ -88,10 +88,10 @@ class Analyser
 		# Spread and Pinch detection
 		sameDirection = false
 		if @informations.scale < 1.1 and !sameDirection
-			@targetElement.makeGesture "#{digit_name(@fingers.length)}:pinch", @informations
+			@targetElement.makeGesture "#{Analyzer.Helper.digit_name(@fingers.length)}:pinch", @informations
 			@targetElement.makeGesture "pinch", @informations
 		else if @informations.scale > 1.1 and !sameDirection
-			@targetElement.makeGesture "#{digit_name(@fingers.length)}:spread", @informations
+			@targetElement.makeGesture "#{Analyzer.Helper.digit_name(@fingers.length)}:spread", @informations
 			@targetElement.makeGesture "spread", @informations
 
 
@@ -107,7 +107,7 @@ class Analyser
 				if finger.gestureName == "drag" then gestureName.push finger.params.dragDirection else gestureName.push "fixed"
 			if !dontTrigger
 				@targetElement.makeGesture gestureName, @informations
-			
+
 	# Trigger all names related to the flick event
 	triggerFlick: ->
 		if @gestureName.contains "dragend"
@@ -125,16 +125,16 @@ class Analyser
 			if !dontTrigger
 				@targetElement.makeGesture gestureName1, @informations
 				@targetElement.makeGesture gestureName2, @informations
-		
+
 
 	# Trigger if it is a rotation, and specify if it is clockwise or counterclockwise
-	triggerRotation: -> 
+	triggerRotation: ->
 		if !@lastRotation?
 			@lastRotation = @informations.rotation
 		rotationDirection = ""
-		if @informations.rotation > @lastRotation then rotationDirection = "rotate:cw" else rotationDirection = "rotate:ccw"	
-		
+		if @informations.rotation > @lastRotation then rotationDirection = "rotate:cw" else rotationDirection = "rotate:ccw"
+
 		@targetElement.makeGesture rotationDirection, @informations
 		@targetElement.makeGesture "rotate", @informations
-		@targetElement.makeGesture "#{digit_name(@fingers.length)}:#{rotationDirection}", @informations
-		@targetElement.makeGesture "#{digit_name(@fingers.length)}:rotate", @informations
+		@targetElement.makeGesture "#{Analyzer.Helper.digit_name(@fingers.length)}:#{rotationDirection}", @informations
+		@targetElement.makeGesture "#{Analyzer.Helper.digit_name(@fingers.length)}:rotate", @informations

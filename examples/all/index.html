@@ -1,27 +1,27 @@
 <DOCTYPE html>
 <html>
 	<head>
-		<meta charset="UTF-8" />		
-		<script src="../../jquery.js"></script>
-		<script src="../../jquery-ui-1.8.16.custom.min.js"></script>
-		<script src="../../CoffeeTouch.js"></script>
+		<meta charset="UTF-8" />
+		<script src="../js/jquery.js"></script>
+		<script src="../js/CoffeeTouch.js"></script>
 		<script src="try.js"></script>
     <link href="try.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="../css/animate.css" rel="stylesheet" type="text/css" />
 
 	</head>
 	<body class="experiment" id="body" style="margin: 0;">
-		<div class="animation_box" id="tap">        <div class="inner_box">Tap</div></div>
-		<div class="animation_box" id="left">       <div class="inner_box">Drag to the left</div></div>
-		<div class="animation_box" id="flick_left"> <div class="inner_box">Flick to the left</div></div>
-		<div class="animation_box" id="left_left">  <div class="inner_box">Drag 2 fingers to the leftt</div></div>
-		<div class="animation_box" id="doubletap">  <div class="inner_box">Double Tap</div></div>
-		<div class="animation_box" id="pinch">      <div class="inner_box">Pinch</div></div>
-		<div class="animation_box" id="three_pinch"><div class="inner_box">Pinch with 3 fingers</div></div>
-		<div class="animation_box" id="spread">     <div class="inner_box">Spread (or pinch out)</div></div>
-		<div class="animation_box" id="rotate">     <div class="inner_box">Rotate</div></div>
-		<div class="animation_box" id="fixed">      <div class="inner_box">Fixed</div></div>
-		<div class="animation_box" id="fixedend">   <div class="inner_box">FixedEnd</div></div>
-		
+		<div class="animated animation_box" data-animation="pulse" 					id="tap">        Tap</div>
+		<div class="animated animation_box" data-animation="fadeOutLeft" 		id="left">       Drag to the left</div>
+		<div class="animated animation_box" data-animation="fadeOutLeftBig" id="flick_left"> Flick to the left</div>
+		<div class="animated animation_box" data-animation="bounceOutLeft" 	id="left_left">  Drag 2 fingers to the leftt</div>
+		<div class="animated animation_box" data-animation="flash" 					id="doubletap">  Double Tap</div>
+		<div class="animated animation_box" data-animation="tada" 					id="pinch">      Pinch</div>
+		<div class="animated animation_box" data-animation="tada" 					id="three_pinch">Pinch with 3 fingers</div>
+		<div class="animated animation_box" data-animation="pulse" 					id="spread">     Spread (or pinch out)</div>
+		<div class="animated animation_box" data-animation="swing" 					id="rotate">     Rotate</div>
+		<div class="animated animation_box" data-animation="flash" 					id="fixed">      Fixed (or Press)</div>
+		<div class="animated animation_box" data-animation="flash" 					id="fixedend">   FixedEnd (when the press is finished)</div>
+
     <link href='http://fonts.googleapis.com/css?family=Sigmar+One' rel='stylesheet' type='text/css'>
 	</body>
 </html>
