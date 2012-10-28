@@ -97,8 +97,8 @@ https://github.com/Crozis/CoffeeTouch/wiki/CoffeeTouch---User's-Manual
 
 ## Contributors
 
-- (Nicolas Dupont)[http://ontherailsagain.com/authors/Nicolas]
-- (Nima Izadi)[http://ontherailsagain.com/authors/Nima]
+- [Nicolas Dupont](http://ontherailsagain.com/authors/Nicolas)
+- [Nima Izadi](http://ontherailsagain.com/authors/Nima)
 
 ### Participated in creation
 
