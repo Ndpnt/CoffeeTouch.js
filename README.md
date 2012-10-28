@@ -94,9 +94,14 @@ Example:
 See wiki for a more complete documentation:
 https://github.com/Crozis/CoffeeTouch/wiki/CoffeeTouch---User's-Manual
 
-If you want to *fork or improve* the library:
-[CoffeeScript](http://jashkenas.github.com/coffee-script/) is required
 
-To compile in javascript file:
+## Contributors
 
-`coffee -c -j CoffeeTouch MethodsHelper.coffee StateMachine.coffee Finger.coffee EventRouter.coffee AnalyzerHelper.coffee Analyzer.coffee`
+- (Nicolas Dupont)[http://ontherailsagain.com/authors/Nicolas]
+- (Nima Izadi)[http://ontherailsagain.com/authors/Nima]
+
+### Participated in creation
+
+- Raphaël Bellec
+- Nicolas Fernandez
+- Pierre Corsini
