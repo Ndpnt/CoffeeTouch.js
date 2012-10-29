@@ -25,18 +25,18 @@ A gesture is composed of one or more actions. Here is an exhaustive list of all 
 * pinch - spread
 * rotate - rotate:cw - rotate:ccw
 
-As you can see, you can listen to gesture with more or less precision. You are free to listen what you want. If you listen a drag gesture, every move of a finger will execute your callback function. But if you listen to a “left” gesture, your callback function will be execute only if the finger is moving to the left.
+As you can see, you can listen to gesture with more or less precision. If you listen a drag gesture, every move of a finger will execute your callback function. But if you listen to a “left” gesture, your callback function will be execute only if the finger is moving to the left.
 **Warning: Gesture names are separated by a single coma, but there is no blank space**
 
 **Notice that order is considered in the gesture name**
 
 You juste have to compose single action. For example:
- * “**up,up,up**” means that you are listening three fingers going up.
- * “**up,down,up**” means that you are listening the first finger going up, the second going down, and the third going up.
+ * **up,up,up** means that you are listening three fingers going up.
+ * **up,down,up** means that you are listening the first finger going up, the second going down, and the third going up.
 
 Notice that for pinch, spread and rotation, you can specify the number of finger used by the user. For doing that, you just have to specify a keyword number before the gesture keyword. Do as follow:
 
-“**three:pinch**” will trigger only when the pinch will be done with three fingers.
+**three:pinch** will trigger only when the pinch will be done with three fingers.
 
 ## Fingers order
 Fingers are ordered in the fingers array in the Western reading direction (left to right, up to down).
