@@ -8,7 +8,7 @@
 
 # Analyse all possible basic gesture of a single finger
 class StateMachine
-	constructor: (@identifier, @router)-> 
+	constructor: (@identifier, @router)->
 		@currentState = new NoTouch(this)
 		@analyser = new Analyser
 	apply: (eventName, eventObj) ->
@@ -16,8 +16,8 @@ class StateMachine
 
 	setState: (newState) -> @currentState = newState
 	getState: -> @currentState
-	
-	
+
+
 
 class GenericState
 	init: -> # Defined par les sous classes
@@ -27,7 +27,7 @@ class GenericState
 		this.init()
 
 	apply: (eventName, arg) ->
-		Object.merge(@eventObj, arg)
+		CoffeeTouch.Helper.mergeObjects(@eventObj, arg)
 		this[eventName]()
 
 	touchstart: -> #throw "undefined"
@@ -35,7 +35,7 @@ class GenericState
 	touchend: -> #throw "undefined"
 
 	notify: (name) ->
-		@machine.router.broadcast(name, @eventObj)	
+		@machine.router.broadcast(name, @eventObj)
 
 
 class NoTouch extends GenericState
@@ -58,7 +58,7 @@ class FirstTouch extends GenericState
 		@notify "drag"
 		@machine.setState new Drag @machine
 
-		
+
 class Fixed extends GenericState
 	init: ->
 		@notify "fixed"
@@ -72,9 +72,9 @@ class Drag extends GenericState
 	init: ->
 		@isTap = true
 		@initialX = @eventObj.clientX
-		@initialY = @eventObj.clientY	
+		@initialY = @eventObj.clientY
 		@delta = 15
-		that = this		
+		that = this
 		setTimeout (-> that.isTap = false), 150
 
 	touchmove: ->

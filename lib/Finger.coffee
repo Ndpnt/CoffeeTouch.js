@@ -72,7 +72,7 @@ class FingerGesture
 			movedX = @params.x - @positions[@positionCount - 1].x
 			movedY = @params.y - @positions[@positionCount - 1].y
 			@params.speed = Math.sqrt(movedX * movedX  + movedY  * movedY) / (@positions[@positionCount].time - @positions[@positionCount - 1].time) #/
-			@params.dragDirection = Analyzer.Helper.getDragDirection(this)
+			@params.dragDirection = CoffeeTouch.Helper.getDragDirection(this)
 		if @gestureName == "dragend"
 			if @params.speed > 0.5 or @params.timeElapsed < 100
 				@isFlick = true

@@ -71,7 +71,7 @@ class Analyser
 
 	# Trigger all names related to the drag event
 	triggerDrag: ->
-		if @gestureName.contains "drag"
+		if CoffeeTouch.Helper.arrayContains @gestureName, "drag"
 			@triggerDragDirections()
 			if @gestureName.length > 1
 				@triggerPinchOrSpread()
@@ -81,23 +81,23 @@ class Analyser
 	triggerDragDirections: ->
 		gestureName = []
 		gestureName.push finger.params.dragDirection for finger in @fingers
-		@targetElement.makeGesture gestureName, @informations if !gestureName.contains "unknown"
+		@targetElement.makeGesture gestureName, @informations if !CoffeeTouch.Helper.stringContains(gestureName, "unknown")
 
 	# Test if the drag is a pinch or a spread
 	triggerPinchOrSpread: ->
 		# Spread and Pinch detection
 		sameDirection = false
 		if @informations.scale < 1.1 and !sameDirection
-			@targetElement.makeGesture "#{Analyzer.Helper.digit_name(@fingers.length)}:pinch", @informations
+			@targetElement.makeGesture "#{CoffeeTouch.Helper.digit_name(@fingers.length)}:pinch", @informations
 			@targetElement.makeGesture "pinch", @informations
 		else if @informations.scale > 1.1 and !sameDirection
-			@targetElement.makeGesture "#{Analyzer.Helper.digit_name(@fingers.length)}:spread", @informations
+			@targetElement.makeGesture "#{CoffeeTouch.Helper.digit_name(@fingers.length)}:spread", @informations
 			@targetElement.makeGesture "spread", @informations
 
 
 	# Trigger all names related to the fixed event
 	triggerFixed: ->
-		if @gestureName.length > 1 and @gestureName.contains "fixed"
+		if @gestureName.length > 1 and CoffeeTouch.Helper.arrayContains(@gestureName, "fixed")
 			dontTrigger = false
 			gestureName = []
 			for finger in @fingers
@@ -110,7 +110,7 @@ class Analyser
 
 	# Trigger all names related to the flick event
 	triggerFlick: ->
-		if @gestureName.contains "dragend"
+		if CoffeeTouch.Helper.arrayContains(@gestureName, "dragend")
 			gestureName1 = []
 			gestureName2 = []
 			dontTrigger = false
@@ -136,5 +136,5 @@ class Analyser
 
 		@targetElement.makeGesture rotationDirection, @informations
 		@targetElement.makeGesture "rotate", @informations
-		@targetElement.makeGesture "#{Analyzer.Helper.digit_name(@fingers.length)}:#{rotationDirection}", @informations
-		@targetElement.makeGesture "#{Analyzer.Helper.digit_name(@fingers.length)}:rotate", @informations
+		@targetElement.makeGesture "#{CoffeeTouch.Helper.digit_name(@fingers.length)}:#{rotationDirection}", @informations
+		@targetElement.makeGesture "#{CoffeeTouch.Helper.digit_name(@fingers.length)}:rotate", @informations

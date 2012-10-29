@@ -6,6 +6,9 @@
 #   Nima Izadi (nim.izadi@gmail.com)
 #   And supervised by Raphaël Bellec (r.bellec@structure-computation.com)
 
+CoffeeTouch = CoffeeTouch || {}
+CoffeeTouch.Helper = CoffeeTouch.Helper || {}
+
 # Analyse all possible basic gesture of a single finger
 # The unbind and trigger function have been taken from Backbone Framework.
 # The onGesture function is inspired by the bind functon of Backbone Framework.
@@ -44,25 +47,52 @@ Element::makeGesture = (ev) ->
       callbacFunction.apply(this, arguments)
   return this
 
-# Basic functions added to String.
-# Returns true if the string contains the substring "it"
-String::contains = (it) ->
-  this.indexOf(it) != -1;
 
-# Basic functions added to Array.
+# Returns true if the string contains the substring "it"
+CoffeeTouch.Helper.stringContains = (str1, str2) ->
+  str1.indexOf(str2) != -1;
+
 # Returns true if the array contains the substring "it"
-unless Array.contains
-  Array::contains = (element) ->
-    for el in this
-      if (el == element) then return true
-    return false
+CoffeeTouch.Helper.arrayContains = (array, element) ->
+  for el in array
+    if (el == element) then return true
+  return false
 
 # Merge two hashes.
-unless Object.merge
-  Object::merge = (destination, source) ->
-    for property of source
-      destination[property] = source[property] if source.hasOwnProperty property
-    return destination
+CoffeeTouch.Helper.mergeObjects = (destination, source) ->
+  for property of source
+    destination[property] = source[property] if source.hasOwnProperty property
+  return destination
+
+
+# Compute the distance between two poits
+CoffeeTouch.Helper.distanceBetweenTwoPoints = (x1, y1, x2, y2) ->
+  Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)))
+
+# Returns a diretion regarding two given delta.
+# @params
+#   deltaX:   basicly: (currentX - lastX)
+#   deltaY:   basicly: (currentY - lastY)
+CoffeeTouch.Helper.getDirection = (deltaX, deltaY) ->
+  if deltaX == deltaY == 0
+    return "unknown"
+  if Math.abs(deltaX) > Math.abs(deltaY)
+    # Horizontal
+    if deltaX < 0 then "left" else "right"
+  else
+    if deltaY < 0 then "up" else "down"
+
+# Returns the direction of the given finger
+CoffeeTouch.Helper.getDragDirection = (finger) ->
+  deltaX = finger.params.x - finger.positions[finger.positionCount - 1].x
+  deltaY = finger.params.y - finger.positions[finger.positionCount - 1].y
+  CoffeeTouch.Helper.getDirection deltaX, deltaY
+
+# Returns the litteral digit of the numeral digit
+CoffeeTouch.Helper.digit_name = (->
+  names = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+  (n) ->
+    names[n])()
 
 if jQuery?
   ( ($) ->
@@ -76,4 +106,3 @@ if jQuery?
       return this.each (i, element) ->
         element.makeGesture(eventName)
   )(jQuery)
-
