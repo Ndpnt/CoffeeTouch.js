@@ -38,6 +38,18 @@ Notice that for pinch, spread and rotation, you can specify the number of finger
 
 **three:pinch** will trigger only when the pinch will be done with three fingers.
 
+## Options
+
+You can pass a hash of options for third parameter.
+
+The options are:
+
+* preventDefault (default to false)
+* flickSpeed (default to 0.5)
+* flickTimeElapsed in ms (default to 100)
+
+
+
 ## Fingers order
 Fingers are ordered in the fingers array in the Western reading direction (left to right, up to down).
 

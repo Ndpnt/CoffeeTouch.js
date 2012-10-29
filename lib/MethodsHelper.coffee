@@ -6,13 +6,18 @@
 #   Nima Izadi (nim.izadi@gmail.com)
 #   And supervised by Raphaël Bellec (r.bellec@structure-computation.com)
 
-CoffeeTouch = CoffeeTouch || {}
-CoffeeTouch.Helper = CoffeeTouch.Helper || {}
+CoffeeTouch         = CoffeeTouch || {}
+CoffeeTouch.Helper  = CoffeeTouch.Helper || {}
+CoffeeTouch.Options = 
+  preventDefault  : false
+  flickSpeed      : 0.5
+  flickTimeElapsed: 100
 
 # Analyse all possible basic gesture of a single finger
 # The unbind and trigger function have been taken from Backbone Framework.
 # The onGesture function is inspired by the bind functon of Backbone Framework.
-Element::onGesture = (eventName, callback) ->
+Element::onGesture = (eventName, callback, options) ->
+  CoffeeTouch.Helper.mergeObjects(CoffeeTouch.Options, options)
   if !this.router?
     this.router = new EventRouter this
   calls = @_callbacks or @_callbacks = {}
@@ -96,9 +101,9 @@ CoffeeTouch.Helper.digit_name = (->
 
 if jQuery?
   ( ($) ->
-    $.fn.onGesture = (eventName, callback) ->
+    $.fn.onGesture = (eventName, callback, options) ->
       return this.each (i, element) ->
-        element.onGesture(eventName, callback)
+        element.onGesture(eventName, callback, options)
     $.fn.unbindGesture = (eventName, callback) ->
       return this.each (i, element) ->
         element.unbindGesture(eventName, callback)

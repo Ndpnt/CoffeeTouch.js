@@ -209,7 +209,9 @@
 
     EventRouter.prototype.touchstart = function(event) {
       var i, iMachine, _i, _len, _ref, _results;
-      event.preventDefault();
+      if (CoffeeTouch.Options.preventDefault) {
+        event.preventDefault();
+      }
       this.fingerCount = event.touches.length;
       this.grouper.refreshFingerCount(this.fingerCount, this.element);
       _ref = event.changedTouches;
@@ -230,7 +232,9 @@
 
     EventRouter.prototype.touchend = function(event) {
       var exists, iMKey, iTouch, _i, _len, _ref;
-      event.preventDefault();
+      if (CoffeeTouch.Options.preventDefault) {
+        event.preventDefault();
+      }
       for (iMKey in this.machines) {
         iMKey = parseInt(iMKey);
         exists = false;
@@ -252,7 +256,9 @@
 
     EventRouter.prototype.touchmove = function(event) {
       var i, iMachine, _i, _len, _ref, _results;
-      event.preventDefault();
+      if (CoffeeTouch.Options.preventDefault) {
+        event.preventDefault();
+      }
       _ref = event.changedTouches;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -389,7 +395,7 @@
         this.params.dragDirection = CoffeeTouch.Helper.getDragDirection(this);
       }
       if (this.gestureName === "dragend") {
-        if (this.params.speed > 0.5 || this.params.timeElapsed < 100) {
+        if (this.params.speed > CoffeeTouch.Options.flickSpeed || this.params.timeElapsed < CoffeeTouch.Options.flickTimeElapsed) {
           return this.isFlick = true;
         }
       }
@@ -410,8 +416,15 @@
 
   CoffeeTouch.Helper = CoffeeTouch.Helper || {};
 
-  Element.prototype.onGesture = function(eventName, callback) {
+  CoffeeTouch.Options =  ({
+    preventDefault: false,
+    flickSpeed: 0.5,
+    flickTimeElapsed: 100
+  });
+
+  Element.prototype.onGesture = function(eventName, callback, options) {
     var calls, list;
+    CoffeeTouch.Helper.mergeObjects(CoffeeTouch.Options, options);
     if (!(this.router != null)) {
       this.router = new EventRouter(this);
     }
@@ -530,9 +543,9 @@
 
   if (typeof jQuery !== "undefined" && jQuery !== null) {
     (function($) {
-      $.fn.onGesture = function(eventName, callback) {
+      $.fn.onGesture = function(eventName, callback, options) {
         return this.each(function(i, element) {
-          return element.onGesture(eventName, callback);
+          return element.onGesture(eventName, callback, options);
         });
       };
       $.fn.unbindGesture = function(eventName, callback) {

@@ -16,7 +16,7 @@ class EventRouter
 
 
 	touchstart: (event) ->
-		event.preventDefault()
+		event.preventDefault() if CoffeeTouch.Options.preventDefault
 		@fingerCount = event.touches.length
 		@grouper.refreshFingerCount @fingerCount, @element
 
@@ -29,7 +29,7 @@ class EventRouter
 
 
 	touchend: (event) ->
-		event.preventDefault()
+		event.preventDefault() if CoffeeTouch.Options.preventDefault
 		for iMKey of @machines
 			iMKey = parseInt(iMKey)
 			exists = false
@@ -45,7 +45,7 @@ class EventRouter
 		@grouper.refreshFingerCount @fingerCount, @element
 
 	touchmove: (event) ->
-		event.preventDefault()
+		event.preventDefault() if CoffeeTouch.Options.preventDefault
 		for i in event.changedTouches
 			if !@machines[i.identifier]?
 				iMachine = new StateMachine i.identifier, this

@@ -74,7 +74,7 @@ class FingerGesture
 			@params.speed = Math.sqrt(movedX * movedX  + movedY  * movedY) / (@positions[@positionCount].time - @positions[@positionCount - 1].time) #/
 			@params.dragDirection = CoffeeTouch.Helper.getDragDirection(this)
 		if @gestureName == "dragend"
-			if @params.speed > 0.5 or @params.timeElapsed < 100
+			if @params.speed > CoffeeTouch.Options.flickSpeed or @params.timeElapsed < CoffeeTouch.Options.flickTimeElapsed
 				@isFlick = true
 
 	# Update finger position
