@@ -1,4 +1,4 @@
-# CoffeeTouch - Multi-touch JavaScript Library
+# CoffeeTouch — Multi-touch JavaScript Library
 
 ## Getting Started
 
@@ -18,25 +18,26 @@ If you just want to *use the library*, skip to the [User's manual](https://githu
 
 A gesture is composed of one or more actions. Here is an exhaustive list of all action possible:
 
-* tap - doubletap
-* fixed - fixedend
-* drag - up - right - down - left - dragend
-* flick - flick:direction
-* pinch - spread
-* rotate - rotate:cw - rotate:ccw
+* `tap` - `doubletap`
+* `fixed` - `fixedend`
+* `drag` - `up` - `right` - `down` - `left` - `dragend`
+* `flick` - `flick:direction`
+* `pinch` - `spread`
+* `rotate` - `rotate:cw` - `rotate:ccw`
 
 As you can see, you can listen to gesture with more or less precision. If you listen a drag gesture, every move of a finger will execute your callback function. But if you listen to a “left” gesture, your callback function will be execute only if the finger is moving to the left.
+
 **Warning: Gesture names are separated by a single coma, but there is no blank space**
 
 **Notice that order is considered in the gesture name**
 
 You juste have to compose single action. For example:
- * **up,up,up** means that you are listening three fingers going up.
- * **up,down,up** means that you are listening the first finger going up, the second going down, and the third going up.
+ * `up,up,up` means that you are listening three fingers going up.
+ * `up,down,up` means that you are listening the first finger going up, the second going down, and the third going up.
 
 Notice that for pinch, spread and rotation, you can specify the number of finger used by the user. For doing that, you just have to specify a keyword number before the gesture keyword. Do as follow:
 
-**three:pinch** will trigger only when the pinch will be done with three fingers.
+`three:pinch` will trigger only when the pinch will be done with three fingers.
 
 ## Options
 
@@ -44,9 +45,9 @@ You can pass a hash of options for third parameter.
 
 The options are:
 
-* preventDefault (default to false)
-* flickSpeed (default to 0.5)
-* flickTimeElapsed in ms (default to 100)
+* `preventDefault` (default to `false`)
+* `flickSpeed` (default to `0.5`)
+* `flickTimeElapsed` in ms (default to `100`)
 
 
 
@@ -60,23 +61,23 @@ If the gesture seems to start vertically, fingers will be ordered from top to bo
 ## Event Information Object
 **event**:
 
-* rotation: Rotation value in degrees
-* scale: Scale factor between fingers (only defined for gestures with two or more fingers)
-* nbFingers: Number of fingers for the gesture
-* timeStart: Time when the gesture started
-* timeElapsed: Time elapsed from the beginning of the gesture (in ms)
-* fingers[nbFingers]: _Each finger has its own informations._
- * startX: Initial X position
- * startY: Initial Y position
- * x: Actual X position
- * y: Actual Y position
- * timeStart: Time when the finger has touched the screen
- * timeElapsed: Time elapsed from the beginning of the touch (in ms)
- * panX: Distance moved in X
- * panY: Distance moved in Y
- * speed: Speed of the finger
- * gestureName: Name of the gesture (_tap, doubletap, fixed or drag_)
- * dragDirection: Direction of the drag (if there is one) - _up, down, righ or left_
+* `rotation`: Rotation value in degrees
+* `scale`: Scale factor between fingers (only defined for gestures with two or more fingers)
+* `nbFingers`: Number of fingers for the gesture
+* `timeStart`: Time when the gesture started
+* `timeElapsed`: Time elapsed from the beginning of the gesture (in ms)
+* `fingers[nbFingers]`: _Each finger has its own informations._
+ * `startX`: Initial X position
+ * `startY`: Initial Y position
+ * `x`: Actual X position
+ * `y`: Actual Y position
+ * `timeStart`: Time when the finger has touched the screen
+ * `timeElapsed`: Time elapsed from the beginning of the touch (in ms)
+ * `panX`: Distance moved in X
+ * `panY`: Distance moved in Y
+ * `speed`: Speed of the finger
+ * `gestureName`: Name of the gesture (_tap, doubletap, fixed or drag_)
+ * `dragDirection`: Direction of the drag (if there is one) - _up, down, righ or left_
 
 ## Other's function
 
