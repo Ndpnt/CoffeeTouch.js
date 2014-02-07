@@ -209,9 +209,6 @@ None. ;)
 
 Try it online with your multitouch device! [Examples](https://github.com/Crozis/CoffeeTouch/wiki/Examples)
 
-If you just want to *use the library*, skip to the [User's manual](https://github.com/Crozis/CoffeeTouch/wiki/CoffeeTouch---User's-Manual)
-
-
 # Issues
 Discovered a bug? Please create an issue here on GitHub!
 
