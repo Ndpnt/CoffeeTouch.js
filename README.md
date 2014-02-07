@@ -217,7 +217,7 @@ Discovered a bug? Please create an issue here on GitHub!
 
 [https://github.com/NicolasDupont/CoffeeTouch.js/issues](https://github.com/NicolasDupont/CoffeeTouch.js/issues)
 
-## Contributors
+# Contributors
 
 - [Nicolas Dupont](http://ontherailsagain.com/authors/Nicolas)
 - [Nima Izadi](http://ontherailsagain.com/authors/Nima)
