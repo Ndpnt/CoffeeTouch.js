@@ -136,7 +136,7 @@ Bind a callback to the gestureName passed in parameter.
 ```JavaScript
 // Listening to a `tap`
 $("#whiteboard").onGesture("tap", function (event){
-    alert(“#whiteboard element has been taped with one finger");
+    alert("#whiteboard element has been taped with one finger");
 });
 ```
 
@@ -187,7 +187,7 @@ Example:
 ```JavaScript
 // Listening to a `tap`
 $("#whiteboard").onGesture("tap", function (event){
-    alert(“#whiteboard element has been taped with one finger");
+    alert("#whiteboard element has been taped with one finger");
 });
 
 // Listening to all events
@@ -198,7 +198,7 @@ $("#whiteboard").onGesture("all", function (name, event){
 
 # Dependencies
 
-None.
+None. ;)
 
 # Compatibilities
 
