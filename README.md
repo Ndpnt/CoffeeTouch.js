@@ -227,3 +227,7 @@ Discovered a bug? Please create an issue here on GitHub!
 - Raphaël Bellec
 - Nicolas Fernandez
 - Pierre Corsini
+
+# License
+
+The code for this software is distributed under the MIT License.
