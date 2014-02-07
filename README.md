@@ -4,6 +4,13 @@ CoffeeTouch.js is a multi-touch JavaScript library that allows you to create and
 
 The library defines a naming convention to describe all possible gestures.
 
+
+# Motivation
+
+### [Hammer.js](http://eightmedia.github.com/hammer.js/), [Scripty2](http://scripty2.com/) ###
+
+All those libraries suffer from the same limitation: the developer can only listen to predefined events, not create his own ones.
+
 # Getting Started
 
 Include CoffeeTouch.js in your web page and you're done. jQuery is not required. The functions are added directly to the Element object.
