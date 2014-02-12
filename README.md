@@ -5,67 +5,99 @@ CoffeeTouch.js is a multi-touch JavaScript library that allows you to create and
 The library defines a naming convention to describe all possible gestures and provides functions to handle them.
 
 
-# Motivation
+## Motivation and benefits
 
-### [Hammer.js](http://eightmedia.github.com/hammer.js/), [Scripty2](http://scripty2.com/) ###
+This project began for the need of the company [Structure Computation](http://www.structure-computation.com/) to create a Web Application that allows to manipulate object in 3D visualization on iPad.
 
-All those libraries suffer from the same limitation: the developer can only listen to predefined events, not create his own ones.
+Some libraries already exist to handle multi-touch gestures and possibly resolve this problem like these ones:
+	[jQuery Mobile](http://jquerymobile.com/),
+	[Hammer.js](http://eightmedia.github.com/hammer.js/),
+	[Scripty2](http://scripty2.com/),
+	[Dojox Gesture](http://dojotoolkit.org/reference-guide/1.7/dojox/gesture.html#dojox-gesture),
+	[Touchy](https://github.com/HotStudio/touchy),
+	[TouchSwipe](http://labs.rampinteractive.co.uk/touchSwipe/demos/),
+But all those libraries suffer from the same limitation: the developer can only listen to predefined events, not create his own ones.
+Moreover, some of them come with many other features, they are heavy and library dependent.
+
+So, benefits of CoffeTouch.js are the following:
+- No dependencies.
+- Lightweight.
+- Easy to use.
+- Allows developper to define his own gestures.
+
+## Compatibilities
+
+* iOs
+* Android 4.1+
 
 # Getting Started
 
-Include CoffeeTouch.js in your web page and you're done. jQuery is not required. The functions are added directly to the Element object.
+Include CoffeeTouch.js in your web page and you're done. 
+
+```HTML
+<script src="CoffeeTouch.js"></script>
+````
+
+jQuery is not required, but CoffeeTouch.js is compatible with jQuery and embed a plugin for it.
 
 ## Listening to a gesture
 
+### Examples
+
 ```JavaScript
-$("#whiteboard").onGesture("tap,tap", function (event){
-  alert("#whiteboard element has been taped with two fingers");
+document.getElementById("#whiteboard").onGesture("tap", function (event){
+  alert("#whiteboard element has been taped with one finger");
+});
+```
+```JavaScript
+document.getElementById("#whiteboard").onGesture("doubleTap", function (event){
+  alert("#whiteboard element has been double taped with one finger");
+});
+```
+```JavaScript
+document.getElementById("#whiteboard").onGesture("doubleTap, doubleTap", function (event){
+  alert("#whiteboard element has been double taped with two fingers");
 });
 ```
 
 ## Naming convention to describe gestures
 
-A gesture is composed of one or more actions.
+A gesture is composed of one or more actions and an action is mapped to a finger.
 
 ### Action names
-Here is an exhaustive list of all possible actions:
-
-#### Simple actions
-
-With the following actions, you can construct gestures.
+Here is an exhaustive list of all possible actions with which you can construct gestures:
 
 * __Tap__: when the user tap on the screen
-    - `tap`: single tap
-    - `doubletap`: double tap, like a double click
-* __Hold__: when the user hold his fingers on the screen:
-    - `fixed`: press and hold fingers on the screen
-    - `fixedend`: release fingers after holding them.
-* __Drag__: when the user move his fingers on the screen:
-    - `drag`: any directional draging action
-    - `up`: draging fingers upwards
-    - `right`: draging fingers to the right
-    - `down`: draging fingers downwards
-    - `left`: draging fingers to the left
-    - `dragend`: draging finished (user remove fingers from the screen)
+	- `tap`: single tap
+	- `doubletap`: double tap, like a double click
+* __Hold__: when the user hold his finger on the screen:
+	- `fixed`: press and hold finger on the screen
+	- `fixedend`: release finger after holding it.
+* __Drag__: when the user move his finger on the screen:
+	- `drag`: any directional draging action
+	- `up`: draging finger upwards
+	- `right`: draging finger to the right
+	- `down`: draging finger downwards
+	- `left`: draging finger to the left
+	- `dragend`: draging finished (user remove finger from the screen)
 
 #### Defined gestures
-
-The following common gestures are already implemented.
+Coffeetouch comes with some common predifined gestures which are:
 
 * __Pinch__: when the user bring his fingers closer or spread them.
-    - `pinch`: bring fingers closer
-    - `spread`: spread fingers
+	- `pinch`: bring fingers closer
+	- `spread`: spread fingers
 * __Flick__: when the user drag quickly on the screen
-    - `flick`: a quick drag
-    - `flick:direction`: flick in a particular direction (direction can be: `left`, `top`, `right`, `bottom`)
+	- `flick`: a quick drag
+	- `flick:direction`: flick in a particular direction (direction can be: `left`, `top`, `right`, `bottom`)
 * __Rotation__: when the user rotate his fingers
-    - `rotate`: any rotation
-    - `rotate:cw`: clockwise rotation
-    - `rotate:ccw`: counterclockwise rotation
+	- `rotate`: any rotation
+	- `rotate:cw`: clockwise rotation
+	- `rotate:ccw`: counterclockwise rotation
 
 ### Defining a gesture
 
-Gesture names are action names separated by a coma. Every action are mapped to specific the fingers touching the screen. First action will be map to the first finger, etc. (see [Fingers order convention](#fingers-order-convention) to understand how each finger is mapped to an action.). That way, you can compose any kind of gestures. Example: 
+Gesture names are action names separated by a coma. Every action are mapped to specific the fingers touching the screen. First action will be map to the first finger, etc. (see [Fingers order convention](#fingers-order-convention) to understand how each finger is mapped to an action.). That way, you can compose any kind of gestures. Example:
 
 * `up,up,up` means that three fingers are going upwards.
 * `up,down,up` means that the first finger is going upwards, the second is going downwards, and the third going upwards.
@@ -83,7 +115,7 @@ If the gesture start horizontally, fingers will be ordered from left to right.
 
 If the gesture start vertically, fingers will be ordered from top to bottom.
 
-You can listen to gesture with more or less precision. If you listen a drag 
+You can listen to gesture with more or less precision. If you listen a drag
 gesture, every move of a finger will execute your callback function. But if you listen to a `left` gesture, your callback function will be execute only if the finger is moving to the left.
 
 **Notice that order is considered in the gesture name**
@@ -113,17 +145,17 @@ When the `onGesture` function is called, an `event` hash is passed as parameter.
 * `timeStart`: time when the gesture started
 * `timeElapsed`: time elapsed from the beginning of the gesture (in ms)
 * `fingers[nbFingers]`: _Each finger has its own informations._
-    - `startX`: initial X position
-    - `startY`: initial Y position
-    - `x`: actual X position
-    - `y`: actual Y position
-    - `timeStart`: time when the finger has touched the screen
-    - `timeElapsed`: time elapsed from the beginning of the touch (in ms)
-    - `panX`: distance moved in X
-    - `panY`: distance moved in Y
-    - `speed`: speed of the finger
-    - `gestureName`: name of the gesture (_tap, doubletap, fixed or drag_)
-    - `dragDirection`: direction of the drag (if there is one) - _up, down, righ or left_
+	- `startX`: initial X position
+	- `startY`: initial Y position
+	- `x`: actual X position
+	- `y`: actual Y position
+	- `timeStart`: time when the finger has touched the screen
+	- `timeElapsed`: time elapsed from the beginning of the touch (in ms)
+	- `panX`: distance moved in X
+	- `panY`: distance moved in Y
+	- `speed`: speed of the finger
+	- `gestureName`: name of the gesture (_tap, doubletap, fixed or drag_)
+	- `dragDirection`: direction of the drag (if there is one) - _up, down, righ or left_
 
 ## Provided function
 
@@ -136,7 +168,7 @@ Bind a callback to the gestureName passed in parameter.
 ```JavaScript
 // Listening to a `tap`
 $("#whiteboard").onGesture("tap", function (event){
-    alert("#whiteboard element has been taped with one finger");
+	alert("#whiteboard element has been taped with one finger");
 });
 ```
 
@@ -145,8 +177,8 @@ $("#whiteboard").onGesture("tap", function (event){
 Remove the callback associated with the gestureName passed in parameter if it exists.
 
 ```JavaScript
-var alertTap = function() { 
-    alert("I've been taped");
+var alertTap = function() {
+	alert("I've been taped");
 }
 // Listen to tap
 $("#whiteboard").onGesture("tap", alertTap);
@@ -163,8 +195,8 @@ Execute the callback associated with the gestureName if a gesture has been assoc
 
 
 ```JavaScript
-var alertTap = function() { 
-    alert("I've been taped");
+var alertTap = function() {
+	alert("I've been taped");
 }
 // Listen to tap
 $("#whiteboard").onGesture("tap", alertTap);
@@ -187,27 +219,35 @@ Example:
 ```JavaScript
 // Listening to a `tap`
 $("#whiteboard").onGesture("tap", function (event){
-    alert("#whiteboard element has been taped with one finger");
+	alert("#whiteboard element has been taped with one finger");
 });
 
 // Listening to all events
 $("#whiteboard").onGesture("all", function (name, event){
-    alert(name + ' has been made on #whiteboard element');
+	alert(name + ' has been made on #whiteboard element');
 });
 ```
 
-# Dependencies
-
-None. ;)
-
-# Compatibilities
-
-* iOs
-* Android 4.1+
 
 # Examples
 
-Try it online with your multitouch device! [Examples](https://github.com/Crozis/CoffeeTouch/wiki/Examples)
+We've made some examples then you'll be able to test yourself the library online with your multitouch device:
+
+- [Try some gestures](http://nicolasdupont.github.io/CoffeeTouch.js/examples/all/).
+Try some basic gestures
+
+- [Compose your gesture](http://nicolasdupont.github.io/CoffeeTouch.js/examples/try/).
+Type / Compose your own gesture and test it!
+
+- [Canvas example](http://nicolasdupont.github.io/CoffeeTouch.js/examples/canvas/).
+    It's a drawing canvas in which you can do:
+
+    - Double tap with one finger         Create a point
+    - Tap with two fingers               Create two points
+    - Flick down with three fingers      Clear the canvas
+    - Tap with three fingers             Validate your drawing
+    - Spread/Pinch with two fingers      Change the radius of selected point
+    - Spread/Pinch with three fingers    Change the radius of unselected points
 
 # Issues
 Discovered a bug? Please create an issue here on GitHub!
