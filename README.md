@@ -204,7 +204,7 @@ var alertTap = function() {
 $("#whiteboard").onGesture("tap", alertTap);
 // When #whiteboard is taped, `alertTap` function is called.
 
-// Unbind `alertTap` function
+// Simulate `tap` gesture
 $("#whiteboard").makeGesture("tap");
 // `alertTap` is called
 ```
