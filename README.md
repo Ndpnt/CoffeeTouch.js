@@ -157,7 +157,7 @@ When the `onGesture` function is called, an `event` hash is passed as parameter.
 	- `gestureName`: name of the gesture (_tap, doubletap, fixed or drag_)
 	- `dragDirection`: direction of the drag (if there is one) - _up, down, righ or left_
 
-## Provided function
+## Provided functions
 
 All functions are added to the Element’s prototype.
 
