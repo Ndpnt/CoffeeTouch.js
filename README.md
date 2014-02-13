@@ -15,7 +15,7 @@ Some libraries already exist to handle multi-touch gestures and possibly resolve
 	[Scripty2](http://scripty2.com/),
 	[Dojox Gesture](http://dojotoolkit.org/reference-guide/1.7/dojox/gesture.html#dojox-gesture),
 	[Touchy](https://github.com/HotStudio/touchy),
-	[TouchSwipe](http://labs.rampinteractive.co.uk/touchSwipe/demos/),
+	[TouchSwipe](http://labs.rampinteractive.co.uk/touchSwipe/demos/). 
 But all those libraries suffer from the same limitation: the developer can only listen to predefined events, not create his own ones.
 Moreover, some of them come with many other features, they are heavy and library dependent.
 
@@ -24,6 +24,8 @@ So, benefits of CoffeTouch.js are the following:
 - Lightweight.
 - Easy to use.
 - Allows developper to define his own gestures.
+
+[Exhaustive list of JavaScript Libraries which deal with touch events.](https://github.com/bebraw/jswiki/wiki/Touch)
 
 ## Compatibilities
 
