@@ -11,10 +11,21 @@ module.exports = function(grunt) {
 					'build/<%= pkg.name %>.js': ['lib/*.coffee'] // concat then compile into single file
 				}
 			}
+		},
+		uglify: {
+			options: {
+				banner: '/*! <%= pkg.name %> v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+			},
+			build: {
+				src: 'build/<%= pkg.name %>.js',
+				dest: 'build/<%= pkg.name %>.min.js'
+			}
 		}
 	});
 
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-coffee');
+
 	// Default task(s).
-	grunt.registerTask('default', ['coffee']);
+	grunt.registerTask('default', ['coffee', 'uglify']);
 };
