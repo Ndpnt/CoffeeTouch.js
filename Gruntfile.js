@@ -8,7 +8,7 @@ module.exports = function(grunt) {
 					join: true
 				},
 				files: {
-					'build/<%= pkg.name %>.js': ['lib/*.coffee'] // concat then compile into single file
+					'build/<%= pkg.name %>.js': ['src/*.coffee'] // concat then compile into single file
 				}
 			}
 		},
