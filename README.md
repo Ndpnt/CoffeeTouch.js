@@ -111,16 +111,13 @@ Example:
 
 ### Fingers order convention
 
-Fingers are ordered in the Western reading direction (`left` to `right`, `up` to `down`).
+Fingers are ordered in the Western reading direction (`left` to `right`, `up` to `down`):
+* If the gesture starts horizontally, fingers will be ordered from left to right.
+* If the gesture starts vertically, fingers will be ordered from top to bottom.
 
-If the gesture starts horizontally, fingers will be ordered from left to right.
+You can listen to gestures with more or less precision. If you listen to a `drag` gesture, every move of a finger will execute your callback function. But if you listen to a `left` gesture, your callback function will be executed only if the finger is moving to the left.
 
-If the gesture starts vertically, fingers will be ordered from top to bottom.
-
-You can listen to gestures with more or less precision. If you listen to a drag
-gesture, every move of a finger will execute your callback function. But if you listen to a `left` gesture, your callback function will be executed only if the finger is moving to the left.
-
-**Notice that order is considered in the gesture name**
+**Notice that order is considered in the gesture name.** So a gesture description `left,right` is different from `right,left`. `left,right` represents a gesture where the first finger is going to the left and the second is going to the right. `right,left` is the opposite, the first finger is going to the right and the second is going to the left.
 
 # Configuration
 
