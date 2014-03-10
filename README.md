@@ -160,9 +160,9 @@ When the `onGesture` function is called, an `event` hash is passed as parameter.
 
 All functions are added to the Element’s prototype.
 
-**onGesture(gestureName, callbackFunction):**
+**myElement.onGesture(gestureDescription, callback):**
 
-Bind a callback to the gestureName passed in parameter.
+Calls `callback` when `gestureDescription` is executed on `myElement`
 
 ```JavaScript
 // Listening to a `tap`
@@ -171,9 +171,9 @@ $("#whiteboard").onGesture("tap", function(event) {
 });
 ```
 
-**unbindGesture(gestureName, callbackFunction):**
+**myElement.unbindGesture(gestureDescription, callback):**
 
-Remove the callback associated with the gestureName passed in parameter if it exists.
+Stop executing `callback` when `gestureDescription` is executed on `myElement`. [TODO] what happen if the callback is not already binded?
 
 ```JavaScript
 var alertTap = function() {
@@ -188,10 +188,9 @@ $("#whiteboard").unbindGesture("tap", alertTap);
 // `alertTap` won't be called if #whiteboard is tapped.
 ```
 
-**makeGesture(gestureName):**
+**myElement.makeGesture(gestureDescription):**
 
-Execute the callback associated with the gestureName if a gesture has been associated before. Like `trigger` in jQuery. Can be used to simulate a gesture.
-
+Triggers `gestureDescription` on `myElement`, can be used to simulate gesture.
 
 ```JavaScript
 var alertTap = function() {
@@ -210,17 +209,12 @@ $("#whiteboard").makeGesture("tap");
 
 If you want to listen to all gesture events, listen to the `all` gesture, and the callback function will be called with two arguments:
 
-- first: name
-- second: eventParam
+1. `name`: [TODO] explain
+2. `event`: [TODO] explain
 
 Example:
 
 ```JavaScript
-// Listening to a `tap`
-$("#whiteboard").onGesture("tap", function (event){
-	alert("#whiteboard element has been taped with one finger");
-});
-
 // Listening to all events
 $("#whiteboard").onGesture("all", function (name, event){
   alert(name + ' has been made on #whiteboard element');
