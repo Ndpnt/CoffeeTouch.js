@@ -243,9 +243,11 @@ Type / Compose your own gesture and test it!
     - Spread/Pinch with three fingers    Change the radius of unselected points
 
 # Issues
-Discovered a bug? Please create an issue here on GitHub!
+Discovered a bug? Please [create an issue](https://github.com/NicolasDupont/CoffeeTouch.js/issues).
 
-[https://github.com/NicolasDupont/CoffeeTouch.js/issues](https://github.com/NicolasDupont/CoffeeTouch.js/issues)
+# Motivation
+
+This project began for the need of the company [Structure Computation](http://www.structure-computation.com/) to create a Web Application that allows to manipulate object in 3D visualization on iPad.
 
 # Contributors
 
