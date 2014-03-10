@@ -127,9 +127,9 @@ You can pass a hash of options as the third parameter.
 
 The options are:
 
-* `preventDefault` (default to `false`): prevent default behavior of browsers. For ex.: a double tap in iOS is a zoom, if preventDefault set to `true`, it won't zoom.
-* `flickSpeed` (default to `0.5`): speed of the fingers movement to trigger the flick.
-* `flickTimeElapsed` in ms (default to `100`): time elapsed between the moment the finger touch the screen and release from it.
+* `preventDefault` (defaults to `false`): prevent default behavior of browsers. For example, a double tap in iOS is a zoom, if `preventDefault` is set to `true`, it won't zoom.
+* `flickSpeed` in `px/ms` (defaults to `0.5`): minimum speed of the fingers movement to trigger the flick.
+* `flickTimeElapsed` in `ms` (defaults to `100`): minimum finger contact time for the gesture to be considered as a `flick`.
 
 
 ## Event information object
