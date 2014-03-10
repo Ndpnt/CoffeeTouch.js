@@ -2,7 +2,7 @@
 
 CoffeeTouch.js is a multi-touch JavaScript library that allows you to create and handle easily your own multi touch gestures.
 
-The library defines a naming convention to describe all possible gestures and provides functions to handle them.
+It defines a naming convention to describe gestures and provides functions to handle them.
 
 
 ## Motivation and benefits
