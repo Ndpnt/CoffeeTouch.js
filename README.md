@@ -29,7 +29,6 @@ So, benefits of CoffeTouch.js are the following:
 ## Compatibility
 
 As this library is for handle multi-touch gestures it does not work on desktop browsers. It was tested on following plateforms:
-
 * iOS 4+
 * Android 4.1+
 
@@ -156,7 +155,7 @@ When the `onGesture` function is called, an `event` hash is passed as parameter.
 	- `gestureName`: name of the gesture (_tap, doubletap, fixed or drag_)
 	- `dragDirection`: direction of the drag (if there is one) - _up, down, righ or left_
 
-## Provided function
+## Provided functions
 
 All functions are added to the Element’s prototype.
 
