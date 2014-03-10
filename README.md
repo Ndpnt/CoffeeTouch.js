@@ -224,23 +224,18 @@ $("#whiteboard").onGesture("all", function (name, event){
 
 # Examples
 
-We've made some examples then you'll be able to test yourself the library online with your multitouch device:
+You can test the library online with your multitouch device:
 
-- [Try some gestures](http://nicolasdupont.github.io/CoffeeTouch.js/examples/all/).
-Try some basic gestures
-
-- [Compose your gesture](http://nicolasdupont.github.io/CoffeeTouch.js/examples/try/).
-Type / Compose your own gesture and test it!
-
+- [Try some basic gestures](http://nicolasdupont.github.io/CoffeeTouch.js/examples/all/).
+- [Compose your own gesture and test it!](http://nicolasdupont.github.io/CoffeeTouch.js/examples/try/).
 - [Canvas example](http://nicolasdupont.github.io/CoffeeTouch.js/examples/canvas/).
-    It's a drawing canvas in which you can do:
-
-    - Double tap with one finger         Create a point
-    - Tap with two fingers               Create two points
-    - Flick down with three fingers      Clear the canvas
-    - Tap with three fingers             Validate your drawing
-    - Spread/Pinch with two fingers      Change the radius of selected point
-    - Spread/Pinch with three fingers    Change the radius of unselected points
+It's a drawing canvas in which you can do:
+    - Double tap with one finger to create a point
+    - Tap with two fingers to create two points
+    - Flick down with three fingers to clear the canvas
+    - Tap with three fingers to validate your drawing
+    - Spread/Pinch with two fingers to change the radius of selected point
+    - Spread/Pinch with three fingers to change the radius of unselected points
 
 # Issues
 Discovered a bug? Please [create an issue](https://github.com/NicolasDupont/CoffeeTouch.js/issues).
