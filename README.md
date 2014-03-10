@@ -1,22 +1,21 @@
 # CoffeeTouch.js
 
-CoffeeTouch.js is a multi-touch JavaScript library that allows you to create and handle easily your own multi touch gestures.
+CoffeeTouch.js is a multi-touch JavaScript library that allows you to create and handle easily your own multi-touch gestures.
 
 It defines a naming convention to describe gestures and provides functions to handle them.
 
 
-## Motivation and benefits
+## Benefits
 
-This project began for the need of the company [Structure Computation](http://www.structure-computation.com/) to create a Web Application that allows to manipulate object in 3D visualization on iPad.
+Some libraries already exist to handle multi-touch gestures like these ones:
+- [jQuery Mobile](http://jquerymobile.com/),
+- [Hammer.js](http://eightmedia.github.com/hammer.js/),
+- [Scripty2](http://scripty2.com/),
+- [Dojox Gesture](http://dojotoolkit.org/reference-guide/1.7/dojox/gesture.html#dojox-gesture),
+- [Touchy](https://github.com/HotStudio/touchy),
+- [TouchSwipe](http://labs.rampinteractive.co.uk/touchSwipe/demos/).
 
-Some libraries already exist to handle multi-touch gestures and possibly resolve this problem like these ones:
-	[jQuery Mobile](http://jquerymobile.com/),
-	[Hammer.js](http://eightmedia.github.com/hammer.js/),
-	[Scripty2](http://scripty2.com/),
-	[Dojox Gesture](http://dojotoolkit.org/reference-guide/1.7/dojox/gesture.html#dojox-gesture),
-	[Touchy](https://github.com/HotStudio/touchy),
-	[TouchSwipe](http://labs.rampinteractive.co.uk/touchSwipe/demos/),
-But all those libraries suffer from the same limitation: the developer can only listen to predefined events, not create his own ones.
+But all those libraries suffer from the same limitation: the developer can only listen to predefined gestures, not create his own ones.
 Moreover, some of them come with many other features, they are heavy and library dependent.
 
 So, benefits of CoffeTouch.js are the following:
@@ -25,9 +24,13 @@ So, benefits of CoffeTouch.js are the following:
 - Easy to use.
 - Allows developper to define his own gestures.
 
-## Compatibilities
+[Exhaustive list of JavaScript Libraries which deal with touch events.](https://github.com/bebraw/jswiki/wiki/Touch)
 
-* iOs
+## Compatibility
+
+As this library is for handle multi-touch gestures it does not work on desktop browsers. It was tested on following plateforms:
+
+* iOS 4+
 * Android 4.1+
 
 # Getting Started
