@@ -41,8 +41,6 @@ Include CoffeeTouch.js in your web page and you're done.
 <script src="CoffeeTouch.js"></script>
 ````
 
-jQuery is not required, but CoffeeTouch.js is compatible with jQuery and embed a plugin for it.
-
 ## Listening to a gesture
 
 ### Examples
