@@ -47,17 +47,17 @@ Include CoffeeTouch.js in your web page and you're done.
 
 ```JavaScript
 document.getElementById("#whiteboard").onGesture("tap", function (event){
-  alert("#whiteboard element has been taped with one finger");
+  alert("#whiteboard element has been tapped with one finger");
 });
 ```
 ```JavaScript
-document.getElementById("#whiteboard").onGesture("doubleTap", function (event){
-  alert("#whiteboard element has been double taped with one finger");
+document.getElementById("#whiteboard").onGesture("doubletap", function (event){
+  alert("#whiteboard element has been double tapped with one finger");
 });
 ```
 ```JavaScript
-document.getElementById("#whiteboard").onGesture("doubleTap, doubleTap", function (event){
-  alert("#whiteboard element has been double taped with two fingers");
+document.getElementById("#whiteboard").onGesture("doubletap, doubletap", function (event){
+  alert("#whiteboard element has been double tapped with two fingers");
 });
 ```
 
@@ -68,43 +68,44 @@ A gesture is composed of one or more actions and an action is mapped to a finger
 ### Action names
 Here is an exhaustive list of all possible actions with which you can construct gestures:
 
-* __Tap__: when the user tap on the screen
-	- `tap`: single tap
-	- `doubletap`: double tap, like a double click
-* __Hold__: when the user hold his finger on the screen:
-	- `fixed`: press and hold finger on the screen
-	- `fixedend`: release finger after holding it.
-* __Drag__: when the user move his finger on the screen:
-	- `drag`: any directional draging action
-	- `up`: draging finger upwards
-	- `right`: draging finger to the right
-	- `down`: draging finger downwards
-	- `left`: draging finger to the left
-	- `dragend`: draging finished (user remove finger from the screen)
+* __Tap__: when the user taps on the screen
+  - `tap`: single tap
+  - `doubletap`: double tap, like a double click
+* __Hold__: when the user holds his finger on the screen:
+  - `fixed`: press and hold finger on the screen
+  - `fixedend`: release finger after holding it.
+* __Drag__: when the user moves his finger on the screen:
+  - `drag`: any directional draging action
+  - `up`: dragging finger upwards
+  - `right`: dragging finger to the right
+  - `down`: dragging finger downwards
+  - `left`: dragging finger to the left
+  - `dragend`: dragging finished (user remove finger from the screen)
 
 #### Defined gestures
-Coffeetouch comes with some common predifined gestures which are:
+CoffeeTouch.js comes with some common predefined gestures which are:
 
-* __Pinch__: when the user bring his fingers closer or spread them.
-	- `pinch`: bring fingers closer
-	- `spread`: spread fingers
-* __Flick__: when the user drag quickly on the screen
-	- `flick`: a quick drag
-	- `flick:direction`: flick in a particular direction (direction can be: `left`, `top`, `right`, `bottom`)
-* __Rotation__: when the user rotate his fingers
-	- `rotate`: any rotation
-	- `rotate:cw`: clockwise rotation
-	- `rotate:ccw`: counterclockwise rotation
+* __Pinch__: when the user brings his fingers closer or spreads them.
+  - `pinch`: bring fingers closer
+  - `spread`: spread fingers
+* __Flick__: when the user drags quickly on the screen
+  - `flick`: a quick drag
+  - `flick:direction`: flick in a particular direction (direction can be: `left`, `top`, `right`, `bottom`)
+* __Rotation__: when the user rotates his fingers
+  - `rotate`: any rotation
+  - `rotate:cw`: clockwise rotation
+  - `rotate:ccw`: counterclockwise rotation
 
 ### Defining a gesture
 
-Gesture names are action names separated by a coma. Every action are mapped to specific the fingers touching the screen. First action will be map to the first finger, etc. (see [Fingers order convention](#fingers-order-convention) to understand how each finger is mapped to an action.). That way, you can compose any kind of gestures. Example:
+Gesture names are action names separated by a comma. Every action is mapped to specific fingers touching the screen. First action will be mapped to the first finger, etc. (see [Fingers order convention](#fingers-order-convention) to understand how each finger is mapped to an action). That way, you can compose any kind of gestures. Example:
 
 * `up,up,up` means that three fingers are going upwards.
 * `up,down,up` means that the first finger is going upwards, the second is going downwards, and the third going upwards.
 
-For `pinch`, `spread` and `rotation`, you can specify the number of finger used by the user you can associate the number of fingers involved in the gesture. Ex.:
+For `pinch`, `spread` and `rotation`, you can specify the number of fingers used by the user.
 
+Example:
 * `three:pinch`: pinch with three fingers
 * `three:rotate`: rotate with three fingers
 
@@ -112,12 +113,12 @@ For `pinch`, `spread` and `rotation`, you can specify the number of finger used 
 
 Fingers are ordered in the Western reading direction (`left` to `right`, `up` to `down`).
 
-If the gesture start horizontally, fingers will be ordered from left to right.
+If the gesture starts horizontally, fingers will be ordered from left to right.
 
-If the gesture start vertically, fingers will be ordered from top to bottom.
+If the gesture starts vertically, fingers will be ordered from top to bottom.
 
-You can listen to gesture with more or less precision. If you listen a drag
-gesture, every move of a finger will execute your callback function. But if you listen to a `left` gesture, your callback function will be execute only if the finger is moving to the left.
+You can listen to gestures with more or less precision. If you listen to a drag
+gesture, every move of a finger will execute your callback function. But if you listen to a `left` gesture, your callback function will be executed only if the finger is moving to the left.
 
 **Notice that order is considered in the gesture name**
 
@@ -125,7 +126,7 @@ gesture, every move of a finger will execute your callback function. But if you 
 
 ## Options
 
-You can pass a hash of options for third parameter.
+You can pass a hash of options as the third parameter.
 
 The options are:
 
@@ -168,8 +169,8 @@ Bind a callback to the gestureName passed in parameter.
 
 ```JavaScript
 // Listening to a `tap`
-$("#whiteboard").onGesture("tap", function (event){
-	alert("#whiteboard element has been taped with one finger");
+$("#whiteboard").onGesture("tap", function(event) {
+  alert("#whiteboard element has been tapped with one finger");
 });
 ```
 
@@ -179,15 +180,15 @@ Remove the callback associated with the gestureName passed in parameter if it ex
 
 ```JavaScript
 var alertTap = function() {
-	alert("I've been taped");
+  alert("I've been tapped");
 }
 // Listen to tap
 $("#whiteboard").onGesture("tap", alertTap);
-// When #whiteboard is taped, `alertTap` function is called.
+// When #whiteboard is tapped, `alertTap` function is called.
 
 // Unbind `alertTap` function
 $("#whiteboard").unbindGesture("tap", alertTap);
-// `alertTap` won't be called if #whiteboard is taped.
+// `alertTap` won't be called if #whiteboard is tapped.
 ```
 
 **makeGesture(gestureName):**
@@ -197,20 +198,20 @@ Execute the callback associated with the gestureName if a gesture has been assoc
 
 ```JavaScript
 var alertTap = function() {
-	alert("I've been taped");
+  alert("I've been tapped");
 }
 // Listen to tap
 $("#whiteboard").onGesture("tap", alertTap);
-// When #whiteboard is taped, `alertTap` function is called.
+// When #whiteboard is tapped, `alertTap` function is called.
 
-// Unbind `alertTap` function
+// Simulate `tap` gesture
 $("#whiteboard").makeGesture("tap");
 // `alertTap` is called
 ```
 
-### Listening to all events
+### Listening to all gestures
 
-If you want to listen to all events, the callback function will be called with two arguments:
+If you want to listen to all gesture events, listen to the `all` gesture, and the callback function will be called with two arguments:
 
 - first: name
 - second: eventParam
@@ -225,7 +226,7 @@ $("#whiteboard").onGesture("tap", function (event){
 
 // Listening to all events
 $("#whiteboard").onGesture("all", function (name, event){
-	alert(name + ' has been made on #whiteboard element');
+  alert(name + ' has been made on #whiteboard element');
 });
 ```
 
