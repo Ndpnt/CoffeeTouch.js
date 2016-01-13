@@ -225,9 +225,9 @@ $("#whiteboard").onGesture("all", function (name, event){
 
 You can test the library online with your multitouch device:
 
-- [Try some basic gestures](http://nicolasdupont.github.io/CoffeeTouch.js/examples/all/).
-- [Compose your own gesture and test it!](http://nicolasdupont.github.io/CoffeeTouch.js/examples/try/).
-- [Canvas example](http://nicolasdupont.github.io/CoffeeTouch.js/examples/canvas/).
+- [Try some basic gestures](http://ndpnt.github.io/CoffeeTouch.js/examples/all/).
+- [Compose your own gesture and test it!](http://ndpnt.github.io/CoffeeTouch.js/examples/try/).
+- [Canvas example](http://ndpnt.github.io/CoffeeTouch.js/examples/canvas/).
 It's a drawing canvas in which you can do:
     - Double tap with one finger to create a point
     - Tap with two fingers to create two points
@@ -245,8 +245,8 @@ This project began for the need of the company [Structure Computation](http://ww
 
 # Contributors
 
-- [Nicolas Dupont](http://ontherailsagain.com/authors/Nicolas)
-- [Nima Izadi](http://ontherailsagain.com/authors/Nima)
+- Nicolas Dupont
+- [Nima Izadi](https://nimz.co)
 
 ### Participated in creation
 
