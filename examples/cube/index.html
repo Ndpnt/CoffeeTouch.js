@@ -7,7 +7,7 @@
 		<meta name="viewport" content="user-scalable=no, width=device-width" />
 		<style type="text/css">
 		#experiment {
-		  -webkit-perspective: 600; 
+		  -webkit-perspective: 600;
 		  -webkit-perspective-origin: 50% 100px;
 		}
 		#body {
@@ -21,7 +21,7 @@
 		  -webkit-transition: -webkit-transform 1s ease-out;
 		  -webkit-transform-style: preserve-3d;
 		}
-		
+
 		.face {
 		  position: absolute;
 		  height: 200px;
@@ -32,44 +32,44 @@
 		  color: #fff;
 		  border: 1px solid #555;
 		  -webkit-border-radius: 3px;
-		}   
-		
+		}
+
 		#cube .one  {
 			background-color: "#FF0000";
 			-webkit-transform: rotateX(90deg) translateZ(100px);
 		}
-		
+
 		#cube .two {
 			-webkit-transform: translateZ(100px);
 		}
-		
+
 		#cube .three {
 		  -webkit-transform: rotateY(90deg) translateZ(100px);
 		}
-		
+
 		#cube .four {
 		  -webkit-transform: rotateY(180deg) translateZ(100px);
 		}
-		
+
 		#cube .five {
 			-webkit-transform: rotateY(-90deg) translateZ(100px);
 		}
-		
+
 		#cube .six {
 		  -webkit-transform: rotateX(-90deg) rotate(180deg) translateZ(100px) ;
 		}
-		  
+
 		#debug {
 			color: black;
 		}
-		</style>			
+		</style>
 		<script src="../../_.js"></script>
 		<script src="../../CoffeeTouch.js"></script>
 		<script src="cube.js"></script>
 	</head>
 	<body class="experiment" id="body">
 		<div id="wrapper">
-			<div id="experiment">	
+			<div id="experiment">
 				<div id="cube">
 			        <div class="face one">
 			        </div>
